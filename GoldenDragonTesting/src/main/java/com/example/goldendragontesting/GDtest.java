@@ -8,6 +8,9 @@ import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
 public class GDtest {
     public static void main(String[] args) {
+
+        //System.setProperty("sun.java2d.opengl", "true");
+
         MeepMeep meepMeep = new MeepMeep(600);
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
