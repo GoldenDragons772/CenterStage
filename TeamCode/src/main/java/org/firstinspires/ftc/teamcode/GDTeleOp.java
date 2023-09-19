@@ -3,14 +3,19 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ServoControllerEx;
+import com.qualcomm.robotcore.hardware.configuration.annotations.ServoType;
 
 import org.firstinspires.ftc.teamcode.RR.drive.SampleMecanumDrive;
 
 @TeleOp(name = "GDTeleOp", group = "TeleOp")
 public class GDTeleOp extends LinearOpMode {
+    ServoType testServo;
     @Override
     public void runOpMode() {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+         testServo = hardwareMap.servo.get("Testservo");
+
 
         waitForStart();
         while(opModeIsActive()) {
@@ -27,6 +32,8 @@ public class GDTeleOp extends LinearOpMode {
                             -spin
                     )
             );
+
+            ;
 
             drive.update();
 
