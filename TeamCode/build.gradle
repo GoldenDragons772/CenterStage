@@ -26,4 +26,14 @@ android {
 dependencies {
     implementation project(':FtcRobotController')
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
+
+    implementation 'org.apache.commons:commons-math3:3.6.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7'
+    implementation 'com.acmerobotics.roadrunner:core:0.5.6'
+
+    implementation 'org.openftc:easyopencv:1.7.0'
+
+    // Vision
+    implementation 'org.bytedeco:depthai:2.21.2-1.5.9'
+    implementation 'org.bytedeco:opencv-platform:4.7.0-1.5.9'
 }
