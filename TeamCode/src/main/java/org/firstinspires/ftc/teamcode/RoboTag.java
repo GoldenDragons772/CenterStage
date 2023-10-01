@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.RR.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.VisionSim.TagPipeline;
@@ -57,20 +59,20 @@ public class RoboTag extends LinearOpMode {
 
             int correction = tag.correction();
 
-            if(correction > 10) {
+            if(correction > 20) {
                 drive.setWeightedDrivePower(
                     new Pose2d(
                             0,
                             0,
-                            0.60
+                            0.45
                     )
                 );
-            } else if (correction < -10) {
+            } else if (correction < -20) {
                 drive.setWeightedDrivePower(
                         new Pose2d(
                                 0,
                                 0,
-                                -0.60
+                                -0.45
                         )
                 );
             } else {
@@ -83,6 +85,8 @@ public class RoboTag extends LinearOpMode {
                 );
             }
 
+            FtcDashboard dashboard = FtcDashboard.getInstance();
+            Telemetry telemetry = dashboard.getTelemetry();
 
             telemetry.addData("Frame Count", webcam.getFrameCount());
             telemetry.addData("FPS", String.format("%.2f", webcam.getFps()));
@@ -91,6 +95,9 @@ public class RoboTag extends LinearOpMode {
             telemetry.addData("Overhead time ms", webcam.getOverheadTimeMs());
             telemetry.addData("Theoretical max FPS", webcam.getCurrentPipelineMaxFps());
             telemetry.addData("Correction", tag.correction());
+
+            TelemetryPacket packet = new TelemetryPacket();
+
             telemetry.update();
         }
     }
