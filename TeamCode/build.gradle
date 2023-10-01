@@ -34,6 +34,6 @@ dependencies {
     implementation 'org.openftc:easyopencv:1.7.0'
 
     // Vision
-    implementation 'org.bytedeco:depthai:2.21.2-1.5.9'
-    implementation 'org.bytedeco:opencv-platform:4.7.0-1.5.9'
+    //implementation 'org.bytedeco:depthai:2.21.2-1.5.9'
+    //implementation 'org.bytedeco:opencv-platform:4.7.0-1.5.9'
 }

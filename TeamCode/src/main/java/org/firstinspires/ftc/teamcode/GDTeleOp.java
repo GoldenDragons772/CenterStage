@@ -14,7 +14,7 @@ public class GDTeleOp extends LinearOpMode {
     @Override
     public void runOpMode() {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-         testServo = hardwareMap.servo.get("Testservo");
+         //testServo = hardwareMap.servo.get("Testservo");
 
 
         waitForStart();
@@ -32,8 +32,6 @@ public class GDTeleOp extends LinearOpMode {
                             -spin
                     )
             );
-
-            ;
 
             drive.update();
 
