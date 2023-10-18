@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -16,88 +17,30 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Autonomous(name = "RobotTag", group = "Auto")
 public class RoboTag extends LinearOpMode {
-    OpenCvCamera webcam;
-
-    TagPipeline tag = new TagPipeline();
+    private HuskyLens huskyLens;
 
     @Override
     public void runOpMode() {
 
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().
-                getIdentifier(
-                        "cameraMonitorViewId",
-                        "id",
-                        hardwareMap.appContext.getPackageName()
-                );
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(
-                hardwareMap.get(WebcamName.class, "GoldenCamera"),
-                cameraMonitorViewId
-        );
-
-        FtcDashboard.getInstance().startCameraStream(webcam, 60);
-
-        webcam.setPipeline(tag);
-
-        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-
-                webcam.startStreaming(320, 240, OpenCvCameraRotation.UPSIDE_DOWN);
-            }
-
-            @Override
-            public void onError(int errorCode) {
-
-            }
-        });
+        if (!huskyLens.knock()) {
+            telemetry.addData(">>", "Problem communicating with " + huskyLens.getDeviceName());
+        } else {
+            telemetry.addData(">>", "Press start to continue");
+        }
+        huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
+        telemetry.update();
+        huskyLens.selectAlgorithm(HuskyLens.Algorithm.TAG_RECOGNITION);
 
         waitForStart();
-
-        while(opModeIsActive()) {
-
-            int correction = tag.correction();
-
-            if(correction > 20) {
-                drive.setWeightedDrivePower(
-                    new Pose2d(
-                            0,
-                            0,
-                            0.45
-                    )
-                );
-            } else if (correction < -20) {
-                drive.setWeightedDrivePower(
-                        new Pose2d(
-                                0,
-                                0,
-                                -0.45
-                        )
-                );
-            } else {
-                drive.setWeightedDrivePower(
-                        new Pose2d(
-                                0,
-                                0,
-                                0
-                        )
-                );
+        while (opModeIsActive()) {
+            HuskyLens.Block[] blocks = huskyLens.blocks();
+            telemetry.addData("Block count", blocks.length);
+            for (HuskyLens.Block i : blocks) {
+                telemetry.addData("Block", i.toString());
             }
 
-            FtcDashboard dashboard = FtcDashboard.getInstance();
-            Telemetry telemetry = dashboard.getTelemetry();
-
-            telemetry.addData("Frame Count", webcam.getFrameCount());
-            telemetry.addData("FPS", String.format("%.2f", webcam.getFps()));
-            telemetry.addData("Total frame time ms", webcam.getTotalFrameTimeMs());
-            telemetry.addData("Pipeline time ms", webcam.getPipelineTimeMs());
-            telemetry.addData("Overhead time ms", webcam.getOverheadTimeMs());
-            telemetry.addData("Theoretical max FPS", webcam.getCurrentPipelineMaxFps());
-            telemetry.addData("Correction", tag.correction());
-
-            TelemetryPacket packet = new TelemetryPacket();
             telemetry.update();
+
         }
     }
 }
