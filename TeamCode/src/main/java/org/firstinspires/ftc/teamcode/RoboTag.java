@@ -9,11 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.RR.drive.SampleMecanumDrive;
-<<<<<<< HEAD
-import org.firstinspires.ftc.teamcode.VisionSim.TagPipeline;
-=======
 import org.firstinspires.ftc.teamcode.Vision.TagPipeline;
->>>>>>> a135552972ded0263d9ebbe5ca6a5eaa4bebc911
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
