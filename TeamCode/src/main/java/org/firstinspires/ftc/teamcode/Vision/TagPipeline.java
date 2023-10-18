@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.VisionSim;
+package org.firstinspires.ftc.teamcode.Vision;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -50,7 +50,7 @@ public class TagPipeline extends OpenCvPipeline {
         List<MatOfPoint> contours = new ArrayList<>();
         Imgproc.findContours(img_format, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
-        double maxArea = 0;
+        double maxArea = 0; // Adjust Based on Needed Area.
         int maxAreaIndex = -1;
 
         // Find the Largest Contour.

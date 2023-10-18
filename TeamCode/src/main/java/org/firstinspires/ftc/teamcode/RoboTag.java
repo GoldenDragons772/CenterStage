@@ -9,7 +9,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.RR.drive.SampleMecanumDrive;
+<<<<<<< HEAD
 import org.firstinspires.ftc.teamcode.VisionSim.TagPipeline;
+=======
+import org.firstinspires.ftc.teamcode.Vision.TagPipeline;
+>>>>>>> a135552972ded0263d9ebbe5ca6a5eaa4bebc911
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -25,8 +29,16 @@ public class RoboTag extends LinearOpMode {
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "GoldenCamera"), cameraMonitorViewId);
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().
+                getIdentifier(
+                        "cameraMonitorViewId",
+                        "id",
+                        hardwareMap.appContext.getPackageName()
+                );
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(
+                hardwareMap.get(WebcamName.class, "GoldenCamera"),
+                cameraMonitorViewId
+        );
 
         FtcDashboard.getInstance().startCameraStream(webcam, 60);
 
@@ -89,7 +101,6 @@ public class RoboTag extends LinearOpMode {
             telemetry.addData("Correction", tag.correction());
 
             TelemetryPacket packet = new TelemetryPacket();
-
             telemetry.update();
         }
     }
