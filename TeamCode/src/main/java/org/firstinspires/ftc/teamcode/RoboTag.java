@@ -22,12 +22,15 @@ public class RoboTag extends LinearOpMode {
     @Override
     public void runOpMode() {
 
+
+        huskyLens = hardwareMap.get(HuskyLens.class, "husky");
+
         if (!huskyLens.knock()) {
             telemetry.addData(">>", "Problem communicating with " + huskyLens.getDeviceName());
         } else {
             telemetry.addData(">>", "Press start to continue");
         }
-        huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
+
         telemetry.update();
         huskyLens.selectAlgorithm(HuskyLens.Algorithm.TAG_RECOGNITION);
 

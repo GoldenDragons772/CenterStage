@@ -4,6 +4,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ServoControllerEx;
 import com.qualcomm.robotcore.hardware.configuration.annotations.ServoType;
 
@@ -14,8 +15,8 @@ public class GDTeleOp extends LinearOpMode {
     @Override
     public void runOpMode() {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-         //testServo = hardwareMap.servo.get("Testservo");
-        HuskyLens
+        CRServo Servo1 = hardwareMap.crservo.get("Plane");
+        //HuskyLens
 
 
         waitForStart();
@@ -33,6 +34,12 @@ public class GDTeleOp extends LinearOpMode {
                             -spin
                     )
             );
+
+            if(gamepad1.triangle) {
+                Servo1.setPower(-1);
+            } else if(gamepad1.square) {
+                Servo1.setPower(-0.3);
+            }
 
             drive.update();
 
