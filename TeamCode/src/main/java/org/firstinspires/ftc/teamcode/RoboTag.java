@@ -1,11 +1,16 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.RR.drive.SampleMecanumDrive;
 
+@Config
 @Autonomous(name = "RobotTag", group = "Auto")
 public class RoboTag extends LinearOpMode {
     int centerX = 160;
@@ -13,6 +18,13 @@ public class RoboTag extends LinearOpMode {
     private double lastError = 0;
     private double lastTime = 0;
 
+    public static double KP = 0.2;
+    public static double KD = .2;
+    public static double KI = 0.1;
+
+    /**
+     * Returns the error in pixels away from the center of the screen
+     */
     private int error(int blockXValue) {
         return blockXValue - centerX;
     }
@@ -21,6 +33,7 @@ public class RoboTag extends LinearOpMode {
     public void runOpMode() {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         huskyLens = hardwareMap.get(HuskyLens.class, "husky");
+        Telemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
         if (!huskyLens.knock()) {
             telemetry.addData(">>", "Problem communicating with " + huskyLens.getDeviceName());
@@ -34,8 +47,9 @@ public class RoboTag extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
             HuskyLens.Block[] blocks = huskyLens.blocks();
+            double time = System.currentTimeMillis();
             if (blocks.length == 0) {
-                drive.setWeightedDrivePower(new Pose2d(0,0,0));
+                drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
                 continue;
             }
             HuskyLens.Block block = blocks[0];
@@ -43,24 +57,25 @@ public class RoboTag extends LinearOpMode {
             double pid = -(PID(error) / 45);
             drive.setWeightedDrivePower(new Pose2d(0, 0, pid));
             telemetry.addData("BlockData", block.toString());
-            telemetry.addData("PID", String.valueOf(pid));
+            telemetry.addData("Error", error);
+            telemetry.addData("PID", String.valueOf(pid*50));
             telemetry.update();
 
         }
     }
 
+    /**
+     * Returns PID based on error and time deltas.
+     */
     private double PID(double error) {
         double i = 0;
         double time = System.currentTimeMillis();
-        final double kP = 0.1;
-        final double kD = 0.1;
-        final double kI = 0;
 
         final double maxI = 1;
 
-        double p = kP * error;
+        double p = KP * error;
 
-        i += kI * (error * (time - lastTime));
+        i += KI * (error * (time - lastTime));
 
         if (i > maxI) {
             i = maxI;
@@ -69,7 +84,7 @@ public class RoboTag extends LinearOpMode {
             i = -maxI;
         }
 
-        double d = kD * (error - lastError) / (time - lastTime);
+        double d = KD * (error - lastError) / (time - lastTime);
         lastError = error;
         lastTime = time;
 
