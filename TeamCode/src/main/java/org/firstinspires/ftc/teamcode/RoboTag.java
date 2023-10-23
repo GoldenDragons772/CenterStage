@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import org.firstinspires.ftc.teamcode.RR.drive.SampleMecanumDrive;
 
 @Autonomous(name = "RobotTag", group = "Auto")
 public class RoboTag extends LinearOpMode {
@@ -17,8 +19,7 @@ public class RoboTag extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
-
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         huskyLens = hardwareMap.get(HuskyLens.class, "husky");
 
         if (!huskyLens.knock()) {
@@ -33,10 +34,14 @@ public class RoboTag extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
             HuskyLens.Block[] blocks = huskyLens.blocks();
-            telemetry.addData("Block count", blocks.length);
+            if (blocks.length == 0) {
+                drive.setWeightedDrivePower(new Pose2d(0,0,0));
+                continue;
+            }
             HuskyLens.Block block = blocks[0];
             int error = error(block.x);
-            double pid = PID(error);
+            double pid = -(PID(error) / 45);
+            drive.setWeightedDrivePower(new Pose2d(0, 0, pid));
             telemetry.addData("BlockData", block.toString());
             telemetry.addData("PID", String.valueOf(pid));
             telemetry.update();
@@ -47,9 +52,10 @@ public class RoboTag extends LinearOpMode {
     private double PID(double error) {
         double i = 0;
         double time = System.currentTimeMillis();
-        final double kP = 0.5;
-        final double kI = 0.5;
-        final double kD = 0.5;
+        final double kP = 0.1;
+        final double kD = 0.1;
+        final double kI = 0;
+
         final double maxI = 1;
 
         double p = kP * error;
