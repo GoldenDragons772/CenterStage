@@ -19,8 +19,8 @@ public class RoboTag extends LinearOpMode {
     private double lastTime = 0;
 
     public static double KP = 0.2;
-    public static double KD = .2;
-    public static double KI = 0.1;
+    public static double KD = .28;
+    public static double KI = 0.0;
 
     /**
      * Returns the error in pixels away from the center of the screen
@@ -74,7 +74,6 @@ public class RoboTag extends LinearOpMode {
         final double maxI = 1;
 
         double p = KP * error;
-
         i += KI * (error * (time - lastTime));
 
         if (i > maxI) {
@@ -87,7 +86,6 @@ public class RoboTag extends LinearOpMode {
         double d = KD * (error - lastError) / (time - lastTime);
         lastError = error;
         lastTime = time;
-
         return d + i + p;
     }
 }
