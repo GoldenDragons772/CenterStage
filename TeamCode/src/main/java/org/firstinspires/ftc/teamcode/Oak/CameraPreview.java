@@ -4,6 +4,6 @@ public class CameraPreview {
     public native void OakPrint();
 
     static {
-        System.loadLibrary("main");
+//        System.loadLibrary("main");
     }
 }
