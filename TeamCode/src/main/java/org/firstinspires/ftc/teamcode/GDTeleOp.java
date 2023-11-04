@@ -36,9 +36,9 @@ public class GDTeleOp extends LinearOpMode {
             );
 
             if(gamepad1.triangle) {
-                Servo1.setPower(-1);
+                Servo1.setPower(0.8); // 7
             } else if(gamepad1.square) {
-                Servo1.setPower(-0.3);
+                Servo1.setPower(0.2);
             }
 
             drive.update();
