@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(BUILD_SHARED_LIBS ON)
+set(CMAKE_DEBUG_POSTFIX "")
+
+
 # Add depthai-core
+set(BUILD_SHARED_LIBS ON)
 add_subdirectory(depthai-core EXCLUDE_FROM_ALL)
 project("GDOats")
 

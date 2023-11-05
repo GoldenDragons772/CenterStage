@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.Oak;
 
 public class CameraPreview {
-    public native void OakPrint();
+
 
     static {
-//        System.loadLibrary("main");
+        System.loadLibrary("GDOats");
     }
+
+    public static native String OakPrint();
 }

@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ServoControllerEx;
 import com.qualcomm.robotcore.hardware.configuration.annotations.ServoType;
 
+import org.firstinspires.ftc.teamcode.Oak.CameraPreview;
 import org.firstinspires.ftc.teamcode.RR.drive.SampleMecanumDrive;
 
 @TeleOp(name = "GDTeleOp", group = "TeleOp")
@@ -17,6 +18,9 @@ public class GDTeleOp extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         CRServo Servo1 = hardwareMap.crservo.get("Plane");
         //HuskyLens
+
+        CameraPreview cam = new CameraPreview();
+        String OakTestString = cam.OakPrint();
 
 
         waitForStart();
@@ -46,7 +50,7 @@ public class GDTeleOp extends LinearOpMode {
             Pose2d currentPos = drive.getPoseEstimate();
             telemetry.addData("x", currentPos.getX());
             telemetry.addData("y", currentPos.getY());
-            //telemetry.addData("heading",);
+            telemetry.addData("OakTest", OakTestString);
 
             telemetry.addData("turn", turn);
             telemetry.addData("speed", speed);
