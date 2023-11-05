@@ -21,10 +21,9 @@ public class GDtest {
 
         RoadRunnerBotEntity Blue = new DefaultBotBuilder(meepMeep)
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
-                .followTrajectorySequence(drive ->
-                                        new Pose2d(-60, 34, Math.toRadians(0))).strafeLeft(22)
-                        drive.trajectorySequenceBuilder(
-                                .build()
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-60, 34, Math.toRadians(0))).
+                        strafeLeft(100)
+                        .build()
                 );
 
         Image img = null;

@@ -1,0 +1,7 @@
+[submodule "TeamCode/src/main/cpp/depthai-core"]
+	path = TeamCode/src/main/cpp/depthai-core
+	url = https://github.com/luxonis/depthai-core.git
+[submodule "TeamCode/src/main/cpp/libusb"]
+	path = TeamCode/src/main/cpp/libusb
+	url = https://github.com/luxonis/libusb.git
+	branch = cmake-android-mainline
