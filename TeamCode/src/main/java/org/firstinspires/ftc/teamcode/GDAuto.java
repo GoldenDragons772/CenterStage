@@ -2,7 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -20,17 +22,25 @@ public class GDAuto extends LinearOpMode {
 
     Trajectory currentTraj;
 
+    public Pose2d LD_BluestartPose = new Pose2d(-19, 33, Math.toRadians(0));
+
+    private Pose2d StartPose = new Pose2d(0, 0, Math.toRadians(0));
+
+    StorePos pos = new StorePos();
+
 
     @Override
     public void runOpMode() {
-        //Telemetry tel = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
+        Telemetry tel = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
         SampleMecanumDrive mecDrive = new SampleMecanumDrive(hardwareMap);
+        //mecDrive.setPoseEstimate(new Pose2d(-60, 34, Math.toRadians(0)));
         // Lists the trajectories
 
         // Long Distance Blue
-        Trajectory ld_blue = mecDrive.trajectoryBuilder(new Pose2d(-60, -34, Math.toRadians(0)))
-                .strafeLeft(100)
+        Trajectory ld_blue = mecDrive.trajectoryBuilder(LD_BluestartPose)
+                .strafeRight(35)
+                .splineToConstantHeading(new Vector2d(28, 23), Math.toRadians(120))
                 .build();
 
         // Short Distance Blue
@@ -47,6 +57,9 @@ public class GDAuto extends LinearOpMode {
         Trajectory sd_red = mecDrive.trajectoryBuilder(new Pose2d(60, 34, Math.toRadians(0)))
                 .strafeLeft(22)
                 .build();
+
+        // Default Auto
+        //Trajectory test_auto = mecDrive.trajectoryBuilder(new Pose2d())
 
 
 
@@ -75,7 +88,9 @@ public class GDAuto extends LinearOpMode {
 
         waitForStart();
 
+        mecDrive.setPoseEstimate(LD_BluestartPose);
         mecDrive.followTrajectory(currentTraj);
+        pos.StorePos(mecDrive.getPoseEstimate());
         telemetry.addData("x", mecDrive.getLocalizer().getPoseEstimate().getX());
         telemetry.addData("y", mecDrive.getLocalizer().getPoseEstimate().getY());
         telemetry.addData("heading", mecDrive.getLocalizer().getPoseEstimate().getHeading());

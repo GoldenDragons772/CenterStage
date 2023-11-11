@@ -17,12 +17,19 @@ public class GDtest {
 
         //System.setProperty("sun.java2d.opengl", "true");
 
+//                        .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-70, -40, Math.toRadians(90)))
+//                        .strafeRight(35)
+//                        .splineToConstantHeading(new Vector2d(-25, 50), Math.toRadians(120))
+
         MeepMeep meepMeep = new MeepMeep(600);
 
         RoadRunnerBotEntity Blue = new DefaultBotBuilder(meepMeep)
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
-                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-60, 34, Math.toRadians(0))).
-                        strafeLeft(100)
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-70, -40, Math.toRadians(90)))
+                        .strafeRight(35)
+                        .splineToConstantHeading(new Vector2d(-25, 50), Math.toRadians(120))
+                        //.lineToSplineHeading(new Pose2d(0, -10, Math.toRadians(0)))
+                        //.splineTo(new Vector2d(0, -10), Math.toRadians(0))
                         .build()
                 );
 
@@ -30,6 +37,7 @@ public class GDtest {
 
         try {
             img = ImageIO.read(new File(ImageConst.FIELD_CENTERSTAGE_DARK));
+
         } catch (IOException e) {
         }
 

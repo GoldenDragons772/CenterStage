@@ -8,4 +8,6 @@ public class CameraPreview {
     }
 
     public static native String OakPrint();
+
+    public static native void startDevice(int width, int height);
 }

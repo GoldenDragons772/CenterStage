@@ -16,6 +16,7 @@ public class GDTeleOp extends LinearOpMode {
     @Override
     public void runOpMode() {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        drive.setPoseEstimate(StorePos.OdoPose);
         CRServo Servo1 = hardwareMap.crservo.get("Plane");
         //HuskyLens
 
