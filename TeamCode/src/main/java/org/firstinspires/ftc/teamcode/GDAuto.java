@@ -23,6 +23,7 @@ public class GDAuto extends LinearOpMode {
     Trajectory currentTraj;
 
     public Pose2d LD_BluestartPose = new Pose2d(-19, 33, Math.toRadians(0));
+    //tlpublic Pose2d LD_RedStartPose = new Pose2d()
 
     private Pose2d StartPose = new Pose2d(0, 0, Math.toRadians(0));
 
@@ -34,6 +35,7 @@ public class GDAuto extends LinearOpMode {
         Telemetry tel = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
         SampleMecanumDrive mecDrive = new SampleMecanumDrive(hardwareMap);
+
         //mecDrive.setPoseEstimate(new Pose2d(-60, 34, Math.toRadians(0)));
         // Lists the trajectories
 
@@ -44,13 +46,16 @@ public class GDAuto extends LinearOpMode {
                 .build();
 
         // Short Distance Blue
-        Trajectory sd_blue = mecDrive.trajectoryBuilder(new Pose2d(-60, 34, Math.toRadians(0)))
-                .strafeLeft(22)
+        Trajectory sd_blue = mecDrive.trajectoryBuilder(new Pose2d(0, 0, Math.toRadians(0)))
+                //.strafeLeft(22)
+                .forward(22)
                 .build();
 
         // Long Distance Red
-        Trajectory ld_red = mecDrive.trajectoryBuilder(new Pose2d(60, -34, Math.toRadians(0)))
-                .strafeLeft(100)
+        Trajectory ld_red = mecDrive.trajectoryBuilder(new Pose2d(-37, 0, Math.toRadians(0)))
+                .strafeLeft(35)
+                .splineToConstantHeading(new Vector2d(7, 18), Math.toRadians(120))
+                //
                 .build();
 
         // Short Distance Red

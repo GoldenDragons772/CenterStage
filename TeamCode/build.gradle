@@ -14,6 +14,29 @@
 // Include common definitions from above.
 apply from: '../build.common.gradle'
 apply from: '../build.dependencies.gradle'
+apply plugin: 'org.team11260.fast-load-plugin'
+
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url = 'https://www.matthewo.tech/maven/'
+        }
+    }
+    dependencies {
+        classpath 'org.team11260:fast-load-plugin:0.1.1'
+    }
+}
+
+repositories {
+    maven {
+        url = 'https://www.matthewo.tech/maven/'
+    }
+}
+
+tasks.withType(Sign) {
+    notCompatibleWithConfigurationCache("https://github.com/gradle/gradle/issues/13470")
+}
 
 android {
     namespace = 'org.firstinspires.ftc.teamcode'
@@ -22,11 +45,11 @@ android {
         jniLibs.useLegacyPackaging true
     }
 
-    externalNativeBuild {
-        cmake {
-            path "src/main/cpp/CMakeLists.txt"
-        }
-    }
+//    externalNativeBuild {
+//        cmake {
+//            path "src/main/cpp/CMakeLists.txt"
+//        }
+//    }
 }
 
 dependencies {
@@ -40,6 +63,8 @@ dependencies {
     implementation 'com.acmerobotics.roadrunner:core:0.5.6'
 
     implementation 'com.acmerobotics.dashboard:dashboard:0.4.13'
+
+    implementation 'org.team11260:fast-load:0.1.1'
 
     // Vision
     //implementation 'org.bytedeco:depthai-platform:2.21.2-1.5.9'

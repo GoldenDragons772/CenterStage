@@ -24,12 +24,10 @@ public class GDtest {
         MeepMeep meepMeep = new MeepMeep(600);
 
         RoadRunnerBotEntity Blue = new DefaultBotBuilder(meepMeep)
-                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
-                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-70, -40, Math.toRadians(90)))
+                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 30)
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-19, 33, Math.toRadians(0)))
                         .strafeRight(35)
-                        .splineToConstantHeading(new Vector2d(-25, 50), Math.toRadians(120))
-                        //.lineToSplineHeading(new Pose2d(0, -10, Math.toRadians(0)))
-                        //.splineTo(new Vector2d(0, -10), Math.toRadians(0))
+                        .splineToConstantHeading(new Vector2d(28, 23), Math.toRadians(60))
                         .build()
                 );
 
