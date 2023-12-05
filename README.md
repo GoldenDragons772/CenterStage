@@ -1,5 +1,5 @@
 # CenterStage
-**Welcome to GoldenDragon FTC #772 from SCGSSM 🐉!**
+**Welcome to GoldenDragons FTC Team #772 from SCGSSM 🐉!**
 This repo contains TeamCode and information regarding the Robot used for the Year 2024 CenterStage Game.
 
 ---
@@ -9,7 +9,7 @@ This repo contains TeamCode and information regarding the Robot used for the Yea
 
 ### Build Project
 1. Clone the repo with the [method of your choosing](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository).
-2. Open the project in Android Studio, and wait for gradle to import the project. This may take anywhere between 2-3 minutes.
+2. Open the project in Android Studio and wait for Gradle to import the project. This may take anywhere between 2-3 minutes.
 3. Press the green play button or green hammer located in the gutter near the top to build.
 
 ### Resources
