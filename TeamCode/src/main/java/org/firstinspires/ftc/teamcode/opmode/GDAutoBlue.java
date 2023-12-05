@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.opmode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -14,26 +14,28 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.RR.drive.SampleMecanumDrive;
 
 @Disabled
-@Autonomous(name = "GDAutoTest")
-public class GDAutoTest extends LinearOpMode {
+@Autonomous(name = "GDAutoBlue")
+public class GDAutoBlue extends LinearOpMode {
 
 
     public void runOpMode() {
         Telemetry tel = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
         SampleMecanumDrive mecDrive = new SampleMecanumDrive(hardwareMap);
-        // Lists the trajectoreis
-        Trajectory t = mecDrive.trajectoryBuilder(
-                        new Pose2d(-20, -20, Math.toRadians(-180)))
-                .splineTo(new Vector2d(-20, 20), Math.toRadians(0))
-                .splineTo(new Vector2d(20, 20), Math.toRadians(0))
-                .splineTo(new Vector2d(20, -20), Math.toRadians(-180))
-                .splineTo(new Vector2d(-20, -20), Math.toRadians(-180))
+        // Lists the trajectories
+
+        // Long Distance Blue
+        Trajectory ld_blue = mecDrive.trajectoryBuilder(new Pose2d(-60, -34, Math.toRadians(0)))
+                .strafeLeft(100)
                 .build();
 
+        // Short Distance Blue
+        Trajectory sd_blue = mecDrive.trajectoryBuilder(new Pose2d(-60, 34, Math.toRadians(0)))
+                .strafeLeft(22)
+                .build();
         waitForStart();
 
-        mecDrive.followTrajectory(t);
+        mecDrive.followTrajectory(ld_blue);
         tel.addData("x", mecDrive.getLocalizer().getPoseEstimate().getX());
         tel.addData("y", mecDrive.getLocalizer().getPoseEstimate().getY());
         tel.addData("heading", mecDrive.getLocalizer().getPoseEstimate().getHeading());

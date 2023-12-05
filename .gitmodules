@@ -5,3 +5,6 @@
 	path = TeamCode/src/main/cpp/libusb
 	url = https://github.com/luxonis/libusb.git
 	branch = cmake-android-mainline
+[submodule "TeamCode/src/main/cpp/opencv"]
+	path = TeamCode/src/main/cpp/opencv
+	url = https://github.com/opencv/opencv.git

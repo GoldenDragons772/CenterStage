@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.opmode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -10,6 +10,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.RR.drive.SampleMecanumDrive;
+
+// Sample code
+// https://github.com/FIRST-Tech-Challenge/FtcRobotController/tree/master/FtcRobotController/src/main/java/org/firstinspires/ftc/robotcontroller/external/samples
 
 @Disabled
 @Config
@@ -56,13 +59,13 @@ public class RoboTag extends LinearOpMode {
             }
             HuskyLens.Block block = blocks[0];
             int error = error(block.x);
+
             double pid = -(PID(error) / 45);
             drive.setWeightedDrivePower(new Pose2d(0, 0, pid));
             telemetry.addData("BlockData", block.toString());
             telemetry.addData("Error", error);
             telemetry.addData("PID", String.valueOf(pid*50));
             telemetry.update();
-
         }
     }
 

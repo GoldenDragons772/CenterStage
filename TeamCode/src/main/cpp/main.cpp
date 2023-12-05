@@ -1,39 +1,45 @@
 #include <jni.h>
 #include <string>
+#include <iostream>
 
-#include <libusb.h>
 #include "depthai/depthai.hpp"
+#include "opencv2/opencv.hpp"
+#include <libusb.h>
+#include <android/log.h>
 
+#define LOG_TAG "depthaiAndroid"
+#define log(...) __android_log_print(ANDROID_LOG_INFO,LOG_TAG, __VA_ARGS__)
 
 std::shared_ptr<dai::Device> device;
-static std::atomic<bool> syncNN{true};
+std::string AprilTagCode;
 
 extern "C" JNIEXPORT jstring JNICALL
 Java_org_firstinspires_ftc_teamcode_Oak_CameraPreview_OakPrint(JNIEnv *env, jobject obj) {
-    std::string hello = "Cant Belive thsi Works";
+    std::string hello = AprilTagCode;
     return env->NewStringUTF(hello.c_str());
 }
 
-extern "C" JNIEXPORT void JNICALL
-Java_org_firstinspires_ftc_teamcode_Oak_CameraPreview_startDevice(JNIEnv *env, jobject obj, int width, int height) {
+extern "C" JNIEXPORT jstring JNICALL
+Java_org_firstinspires_ftc_teamcode_Oak_CameraPreview_startDevice(JNIEnv *env, jobject) {
 
     auto r = libusb_set_option(nullptr, LIBUSB_OPTION_ANDROID_JNIENV, env);
+    log("libusb_set_option ANDROID_JAVAVM: %s", libusb_strerror(r));
 
-    device = std::make_shared<dai::Device>(dai::OpenVINO::VERSION_2022_1, dai::UsbSpeed::HIGH);
-
+    std::string ret;
     dai::Pipeline pipeline;
 
-    auto camRgb = pipeline.create<dai::node::ColorCamera>();
-    auto xoutRgb = pipeline.create<dai::node::XLinkOut>();
+    try {
+        dai::BoardConfig config;
+        config.usb.pid = 0xf63b;
+        pipeline.setBoardConfig(config);
 
-    xoutRgb->setStreamName("rgb");
+        auto deviceInfoVec = dai::Device::getAllAvailableDevices();
+        dai::Device device(pipeline, deviceInfoVec[0], dai::UsbSpeed::SUPER);
 
-    camRgb->setPreviewSize(width, height);
-    camRgb->setResolution(dai::ColorCameraProperties::SensorResolution::THE_1080_P);
-    camRgb->setInterleaved(false);
-    camRgb->setColorOrder(dai::ColorCameraProperties::ColorOrder::BGR);
-
-    camRgb->preview.link(xoutRgb->input);
-
-    device->startPipeline(pipeline);
+        //device.startPipeline(pipeline);
+    } catch (const std::exception& e) {
+        log("Oak-1 Failed: %s", e.what());
+        ret = e.what();
+    }
+    return env->NewStringUTF(ret.c_str());
 }

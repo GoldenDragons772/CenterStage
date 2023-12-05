@@ -1,3 +1,5 @@
 include ':FtcRobotController'
 include ':TeamCode'
 include ':GoldenDragonTesting'
+//include ':opencv'
+//project(':opencv').projectDir = new File(opencvsdk + '/sdk')

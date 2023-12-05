@@ -25,9 +25,9 @@ public class GDtest {
 
         RoadRunnerBotEntity Blue = new DefaultBotBuilder(meepMeep)
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 30)
-                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-19, 33, Math.toRadians(0)))
-                        .strafeRight(35)
-                        .splineToConstantHeading(new Vector2d(28, 23), Math.toRadians(60))
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-37, 0, Math.toRadians(0)))
+                        .strafeLeft(35)
+                        .splineToConstantHeading(new Vector2d(7, 18), Math.toRadians(-30))
                         .build()
                 );
 
