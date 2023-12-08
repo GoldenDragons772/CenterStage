@@ -1,12 +1,11 @@
-//package org.firstinspires.ftc.teamcode.Subsystem;
+//package org.firstinspires.ftc.teamcode.subsystem;
 //
+//import com.arcrobotics.ftclib.command.SubsystemBase;
 //import com.qualcomm.robotcore.hardware.DcMotor;
 //import com.qualcomm.robotcore.hardware.DcMotorEx;
 //import com.qualcomm.robotcore.hardware.HardwareMap;
 //
-//public class ArmDriver {
-//
-//    Thread armPosThread;
+//public class ArmDriver extends SubsystemBase {
 //
 //    private DcMotorEx leftArmMotor, rightArmMotor;
 //
@@ -35,6 +34,7 @@
 //        rightArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //    }
 //
+//
 //    class ArmPosThread implements Runnable {
 //        @Override
 //        public void run() {
@@ -57,12 +57,5 @@
 //
 //    public void setArmPos(ArmPos pos) {
 //        currentPos = pos;
-//
-//        if(armPosThread.isAlive()) {
-//            armPosThread.interrupt();
-//        } else {
-//            armPosThread = new Thread(new ArmPosThread());
-//            armPosThread.start();
-//        }
 //    }
 //}

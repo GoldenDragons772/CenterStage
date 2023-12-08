@@ -11,10 +11,9 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.RR.drive.SampleMecanumDrive;
-//import org.firstinspires.ftc.teamcode.Subsystem.ArmDriver;
 
-@TeleOp(name = "GDTeleOp", group = "TeleOp")
-public class GDTeleOp extends LinearOpMode {
+@TeleOp(name = "GDTeleTuning", group = "TeleOp")
+public class TuningOpMode extends LinearOpMode {
     CRServo bucketServo;
     CRServo Launcher;
 
@@ -37,9 +36,11 @@ public class GDTeleOp extends LinearOpMode {
 
         // Intialize Motor
         leftArmMotor = hardwareMap.get(DcMotorEx.class, "LeftArmMotor");
+        leftArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //leftArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         rightArmMotor = hardwareMap.get(DcMotorEx.class, "RightArmMotor");
+        rightArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //rightArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         rightArmMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -85,24 +86,13 @@ public class GDTeleOp extends LinearOpMode {
                 Launcher.setPower(1);
             }
 
-            if(gamepad1.right_trigger > 0.5) {
-                leftArmMotor.setPower(gamepad1.right_trigger);
-                rightArmMotor.setPower(gamepad1.right_trigger);
-            } else if(gamepad1.left_trigger > 0.5) {
-                leftArmMotor.setPower(-gamepad1.left_trigger);
-                rightArmMotor.setPower(-gamepad1.left_trigger);
-            }
-//            // Make Motor Go UP
-//            leftArmMotor.setPower(gamepad1.right_trigger);
-//            rightArmMotor.setPower(gamepad1.right_trigger);
-//
-//            // Make Motor Go Down
-//            leftArmMotor.setPower(-gamepad1.right_trigger);
-//            rightArmMotor.setPower(-gamepad1.right_trigger);
+            leftArmMotor.setPower(gamepad2.right_stick_y);
+            rightArmMotor.setPower(gamepad2.right_stick_y);
 
-            telemetry.addData("GamePad1 left", gamepad1.left_trigger);
-            telemetry.addData("GamePad1 right", gamepad1.right_trigger);
+            telemetry.addData("GamePad2 Y", gamepad2.right_stick_y);
 
+            telemetry.addData("LeftArmMotor", leftArmMotor.getCurrentPosition());
+            telemetry.addData("RightArmMotor", rightArmMotor.getCurrentPosition());
 
             // Update Telemetry
             drive.update();

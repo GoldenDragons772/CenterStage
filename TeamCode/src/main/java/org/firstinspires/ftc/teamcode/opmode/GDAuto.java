@@ -49,8 +49,8 @@ public class GDAuto extends LinearOpMode {
                 .build();
 
         // Long Distance Red
-        Trajectory ld_red = mecDrive.trajectoryBuilder(new Pose2d(0, 0, Math.toRadians(0)))
-                .strafeRight(-35)
+        Trajectory ld_red = mecDrive.trajectoryBuilder(new Pose2d(-16, -32, Math.toRadians(0)))
+                .strafeRight(35)
                 //.splineToConstantHeading(new Vector2d(7, 18), Math.toRadians(-30))
                 .build();
 
