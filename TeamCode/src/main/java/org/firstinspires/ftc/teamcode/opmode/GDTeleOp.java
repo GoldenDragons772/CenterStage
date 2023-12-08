@@ -85,12 +85,15 @@ public class GDTeleOp extends LinearOpMode {
                 Launcher.setPower(1);
             }
 
-            if(gamepad1.right_trigger > 0.5) {
-                leftArmMotor.setPower(gamepad1.right_trigger);
-                rightArmMotor.setPower(gamepad1.right_trigger);
-            } else if(gamepad1.left_trigger > 0.5) {
-                leftArmMotor.setPower(-gamepad1.left_trigger);
-                rightArmMotor.setPower(-gamepad1.left_trigger);
+            if(gamepad1.right_bumper) {
+                leftArmMotor.setPower(-0.5);
+                rightArmMotor.setPower(-0.5);
+            } else if(gamepad1.left_bumper) {
+                leftArmMotor.setPower(0.5);
+                rightArmMotor.setPower(0.5);
+            } else {
+                leftArmMotor.setPower(0);
+                rightArmMotor.setPower(0);
             }
 //            // Make Motor Go UP
 //            leftArmMotor.setPower(gamepad1.right_trigger);
