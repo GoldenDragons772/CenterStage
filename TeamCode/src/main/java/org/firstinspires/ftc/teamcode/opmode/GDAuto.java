@@ -50,7 +50,7 @@ public class GDAuto extends LinearOpMode {
 
         // Long Distance Red
         Trajectory ld_red = mecDrive.trajectoryBuilder(new Pose2d(-16, -32, Math.toRadians(0)))
-                .strafeRight(35)
+                .lineToConstantHeading(new Vector2d(-12, 0))
                 //.splineToConstantHeading(new Vector2d(7, 18), Math.toRadians(-30))
                 .build();
 

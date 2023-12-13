@@ -21,7 +21,6 @@ public class ArmMotorEx implements Subsystem {
         leftArmMotor = hw.get(DcMotorEx.class, "LeftArmMotor");
         rightArmMotor = hw.get(DcMotorEx.class, "RightArmMotor");
 
-
         // Break the Motors
         leftArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -31,11 +30,12 @@ public class ArmMotorEx implements Subsystem {
     }
 
     public void setArmToPos(int pos) {
-        leftArmMotor.setTargetPosition(pos);
-        rightArmMotor.setTargetPosition(pos);
-
         // Set Mode of the Motor
         leftArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        // Drive to Positon
+        leftArmMotor.setTargetPosition(pos);
+        rightArmMotor.setTargetPosition(pos);
     }
 }

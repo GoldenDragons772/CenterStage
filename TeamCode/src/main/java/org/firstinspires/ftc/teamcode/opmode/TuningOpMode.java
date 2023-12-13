@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmode;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -21,6 +22,9 @@ public class TuningOpMode extends LinearOpMode {
     private GamepadEx gamepadEx1;
     private GamepadEx gamepadEx2;
 
+    // Husky Lens
+    private HuskyLens huskyLens;
+
     //ArmDriver armDriver;
 
     DcMotorEx leftArmMotor, rightArmMotor;
@@ -34,13 +38,14 @@ public class TuningOpMode extends LinearOpMode {
         bucketServo = hardwareMap.crservo.get("Bucket");
         Launcher = hardwareMap.crservo.get("Plane");
 
+        // Huskylens
+        huskyLens = hardwareMap.get(HuskyLens.class, "husky");
+
         // Intialize Motor
         leftArmMotor = hardwareMap.get(DcMotorEx.class, "LeftArmMotor");
-        leftArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //leftArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         rightArmMotor = hardwareMap.get(DcMotorEx.class, "RightArmMotor");
-        rightArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //rightArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         rightArmMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -54,6 +59,14 @@ public class TuningOpMode extends LinearOpMode {
         gamepadEx1 = new GamepadEx(gamepad1);
         gamepadEx2 = new GamepadEx(gamepad2);
 
+        // Initalize the Camera
+        telemetry.addData("CAM_STATE", huskyLens.knock() ? "CONNECTED" : "DISCONNECTED");
+
+        // Set Huskylens Mode
+        huskyLens.selectAlgorithm(HuskyLens.Algorithm.COLOR_RECOGNITION);
+
+        telemetry.update();
+
         waitForStart();
         while(opModeIsActive()) {
 
@@ -64,20 +77,22 @@ public class TuningOpMode extends LinearOpMode {
 
             double Speedper = 1;
 
-            // Set the Power of the Drive Train
-            drive.setWeightedDrivePower(
-                    new Pose2d(
-                            -forward * Speedper,
-                            -strafe * Speedper,
-                            -spin * Speedper
-                    )
-            );
+            HuskyLens.Block[] blocks = huskyLens.blocks();
+            telemetry.addData("Block Count", blocks.length);
+            if(blocks.length != 0) {
+                // Position on the Field
+                String pos;
+                HuskyLens.Block colorBlock = blocks[0];
+                if(colorBlock.x > 105 && colorBlock.x < 250) {
 
-//            // Align to the Backboard
-//            if(gamepad1.a && backBoardPos != AlignBackboard.BB_BL_CENTER) {
-//                alignBackboard.lockToTag(AlignBackboard.BB_BL_CENTER);
-//                backBoardPos = AlignBackboard.BB_BL_CENTER;
-//            }
+                    pos = "CENTER";
+                } else if(colorBlock.x > 250) {
+                    pos = "RIGHT";
+                } else {
+                    pos = "LEFT";
+                }
+                telemetry.addData("POSITION", pos);
+            }
 
             // Shoot the Planes
             if(gamepad1.y) {
@@ -97,8 +112,9 @@ public class TuningOpMode extends LinearOpMode {
             // Update Telemetry
             drive.update();
             //telemetry.addData("Detected Tag", detectedTag);
-            TelemetryPacket packet = new TelemetryPacket();
+            //TelemetryPacket packet = new TelemetryPacket();
             telemetry.update();
         }
     }
 }
+

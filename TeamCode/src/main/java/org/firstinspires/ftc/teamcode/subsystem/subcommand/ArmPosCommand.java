@@ -8,7 +8,7 @@ public class ArmPosCommand extends InstantCommand {
 
     public ArmPosCommand(ArmMotorEx subsystem, ArmMotorEx.ArmPos pos) {
         arm_subsystem = subsystem;
-        addRequirements(subsystem);
+        addRequirements(arm_subsystem);
 
         switch(pos) {
             case BACKBOARD_LOW:

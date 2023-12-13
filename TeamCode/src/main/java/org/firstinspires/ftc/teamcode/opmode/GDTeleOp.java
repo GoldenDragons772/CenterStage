@@ -37,10 +37,10 @@ public class GDTeleOp extends LinearOpMode {
 
         // Intialize Motor
         leftArmMotor = hardwareMap.get(DcMotorEx.class, "LeftArmMotor");
-        //leftArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         rightArmMotor = hardwareMap.get(DcMotorEx.class, "RightArmMotor");
-        //rightArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         rightArmMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -85,6 +85,7 @@ public class GDTeleOp extends LinearOpMode {
                 Launcher.setPower(1);
             }
 
+            // Arm Motor Code
             if(gamepad1.right_bumper) {
                 leftArmMotor.setPower(-0.5);
                 rightArmMotor.setPower(-0.5);
