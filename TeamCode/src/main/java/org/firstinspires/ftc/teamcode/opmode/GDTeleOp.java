@@ -72,12 +72,6 @@ public class GDTeleOp extends LinearOpMode {
                     )
             );
 
-//            // Align to the Backboard
-//            if(gamepad1.a && backBoardPos != AlignBackboard.BB_BL_CENTER) {
-//                alignBackboard.lockToTag(AlignBackboard.BB_BL_CENTER);
-//                backBoardPos = AlignBackboard.BB_BL_CENTER;
-//            }
-
             // Shoot the Planes
             if(gamepad1.y) {
                 Launcher.setPower(0.3); // 7
@@ -86,23 +80,19 @@ public class GDTeleOp extends LinearOpMode {
             }
 
             // Arm Motor Code
-            if(gamepad1.right_bumper) {
-                leftArmMotor.setPower(-0.5);
-                rightArmMotor.setPower(-0.5);
-            } else if(gamepad1.left_bumper) {
-                leftArmMotor.setPower(0.5);
-                rightArmMotor.setPower(0.5);
+            if(gamepad1.right_trigger > 0.1) {
+                // Puts Arm Up
+                leftArmMotor.setPower(-1);
+                rightArmMotor.setPower(-1);
+            } else if(gamepad1.left_trigger > 0.1) {
+                // Puts Arm Down
+                leftArmMotor.setPower(1);
+                rightArmMotor.setPower(1);
             } else {
                 leftArmMotor.setPower(0);
                 rightArmMotor.setPower(0);
             }
-//            // Make Motor Go UP
-//            leftArmMotor.setPower(gamepad1.right_trigger);
-//            rightArmMotor.setPower(gamepad1.right_trigger);
-//
-//            // Make Motor Go Down
-//            leftArmMotor.setPower(-gamepad1.right_trigger);
-//            rightArmMotor.setPower(-gamepad1.right_trigger);
+
 
             telemetry.addData("GamePad1 left", gamepad1.left_trigger);
             telemetry.addData("GamePad1 right", gamepad1.right_trigger);
