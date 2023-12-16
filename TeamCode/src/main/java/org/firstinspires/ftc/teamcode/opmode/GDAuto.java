@@ -17,12 +17,16 @@ public class GDAuto extends LinearOpMode {
     int currentAuto = 0;
     String autoName = "NONE";
 
+    Pose2d currentStartPos = new Pose2d(0, 0, Math.toRadians(0));
+
     Trajectory currentTraj;
+    Pose2d LD_RED_STARTPOS = new Pose2d(-37, -62, Math.toRadians(0));
+    Pose2d LD_BLUE_STARTPOS = new Pose2d(-36, 33, Math.toRadians(0));
 
-    public Pose2d LD_BluestartPose = new Pose2d(-19, 33, Math.toRadians(0));
-    //tlpublic Pose2d LD_RedStartPose = new Pose2d()
+    Pose2d SD_RED_STARTPOS = new Pose2d(60, 34, Math.toRadians(0));
 
-    private Pose2d StartPose = new Pose2d(0, 0, Math.toRadians(0));
+    Pose2d SD_BLUE_STARTPOS = new Pose2d(0, 0, Math.toRadians(0));
+
 
     StorePos pos = new StorePos();
 
@@ -33,11 +37,8 @@ public class GDAuto extends LinearOpMode {
 
         SampleMecanumDrive mecDrive = new SampleMecanumDrive(hardwareMap);
 
-        //mecDrive.setPoseEstimate(new Pose2d(-60, 34, Math.toRadians(0)));
-        // Lists the trajectories
-
         // Long Distance Blue
-        Trajectory ld_blue = mecDrive.trajectoryBuilder(LD_BluestartPose)
+        Trajectory ld_blue = mecDrive.trajectoryBuilder(new Pose2d(-19, 33, Math.toRadians(0)))
                 .strafeRight(40)
                 .splineToConstantHeading(new Vector2d(28, 23), Math.toRadians(120))
                 .build();
@@ -49,9 +50,9 @@ public class GDAuto extends LinearOpMode {
                 .build();
 
         // Long Distance Red
-        Trajectory ld_red = mecDrive.trajectoryBuilder(new Pose2d(-16, -32, Math.toRadians(0)))
-                .lineToConstantHeading(new Vector2d(-12, 0))
-                //.splineToConstantHeading(new Vector2d(7, 18), Math.toRadians(-30))
+        Trajectory ld_red = mecDrive.trajectoryBuilder(new Pose2d(-37, -62, Math.toRadians(0)))
+                .strafeLeft(47)
+                .splineToConstantHeading(new Vector2d(47, -26), Math.toRadians(170))
                 .build();
 
         // Short Distance Red
@@ -59,28 +60,27 @@ public class GDAuto extends LinearOpMode {
                 .forward(22)
                 .build();
 
-        // Default Auto
-        //Trajectory test_auto = mecDrive.trajectoryBuilder(new Pose2d())
-
-
-
         while(opModeInInit()) {
             // Auto Selector
             if(gamepad1.dpad_right) { // Long Distance Red Auto
                 currentAuto = GDAutoPresets.AUTO.LD_RED;
                 currentTraj = ld_red;
+                currentStartPos = LD_RED_STARTPOS;
                 autoName = "LD_RED";
             } else if(gamepad1.dpad_left) { // Short Distance Red Auto
                 currentAuto = GDAutoPresets.AUTO.SD_RED;
                 currentTraj = sd_red;
+                currentStartPos = SD_RED_STARTPOS;
                 autoName = "SD_RED";
             } else if(gamepad1.dpad_up) { // Long Distance Blue Auto
                 currentAuto = GDAutoPresets.AUTO.LD_BLUE;
                 currentTraj = ld_blue;
+                currentStartPos = LD_BLUE_STARTPOS;
                 autoName = "LD_BLUE";
             } else if(gamepad1.dpad_down) { // Short Distance Blue Auto
                 currentAuto = GDAutoPresets.AUTO.SD_BLUE;
                 autoName = "SD_BLUE";
+                currentStartPos = SD_BLUE_STARTPOS;
                 currentTraj = sd_blue;
             }
             telemetry.addData("SELECTED AUTO", autoName);
@@ -88,8 +88,8 @@ public class GDAuto extends LinearOpMode {
         }
 
         waitForStart();
-
-        mecDrive.setPoseEstimate(LD_BluestartPose);
+        // Set the Start Pose of the Robot
+        mecDrive.setPoseEstimate(currentStartPos);
         mecDrive.followTrajectory(currentTraj);
         pos.StorePos(mecDrive.getPoseEstimate());
         telemetry.addData("x", mecDrive.getLocalizer().getPoseEstimate().getX());

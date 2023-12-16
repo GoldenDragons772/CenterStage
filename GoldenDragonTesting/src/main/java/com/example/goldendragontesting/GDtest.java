@@ -22,11 +22,14 @@ public class GDtest {
 //                        .splineToConstantHeading(new Vector2d(-25, 50), Math.toRadians(120))
 
         MeepMeep meepMeep = new MeepMeep(600);
+        meepMeep.setDarkMode(true);
 
         RoadRunnerBotEntity Blue = new DefaultBotBuilder(meepMeep)
-                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 30)
-                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-16, -32, Math.toRadians(0)))
-                        .strafeLeft(20)
+                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 14.83)
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-37, -62, Math.toRadians(270)))
+                        .lineToLinearHeading(new Pose2d(-37, -30, Math.toRadians(90)))
+                        .lineToLinearHeading(new Pose2d(-37, -12, Math.toRadians(180)))
+//                        .splineToSplineHeading(new Pose2d(10, -10), Math.toRadians(180))
                         .build()
                 );
 
@@ -39,7 +42,7 @@ public class GDtest {
         }
 
         meepMeep.setBackground(img)
-                .setDarkMode(false)
+                .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
                 .addEntity(Blue)
                 .start();
