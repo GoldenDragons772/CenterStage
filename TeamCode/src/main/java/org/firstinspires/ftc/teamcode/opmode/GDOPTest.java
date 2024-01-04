@@ -3,10 +3,9 @@ package org.firstinspires.ftc.teamcode.opmode;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.RR.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystem.ArmMotorEx;
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.ArmPosCommand;
 import org.firstinspires.ftc.teamcode.subsystem.MecanumDriveSubsystem;
@@ -23,7 +22,7 @@ public class GDOPTest extends CommandOpMode {
     @Override
     public void initialize() {
         // Initialize the Drive Train
-        drivetrain = new MecanumDriveSubsystem(new SampleMecanumDrive(hardwareMap), false);
+        drivetrain = new MecanumDriveSubsystem(new MainMecanumDrive(hardwareMap), false);
 
         // Initialize ArmDriver
         armDriver = new ArmMotorEx(hardwareMap);

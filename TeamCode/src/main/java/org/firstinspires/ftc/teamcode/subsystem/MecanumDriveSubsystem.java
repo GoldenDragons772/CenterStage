@@ -8,44 +8,23 @@ import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-
-import org.firstinspires.ftc.teamcode.RR.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 
 import java.util.List;
 
 /**
- * A subsystem that uses the {@link SampleMecanumDrive} class.
- * This periodically calls {@link SampleMecanumDrive#update()} which runs the internal
+ * A subsystem that uses the {@link MainMecanumDrive} class.
+ * This periodically calls {@link MainMecanumDrive#update()} which runs the internal
  * state machine for the mecanum drive. All movement/following is async to fit the paradigm.
  */
 public class MecanumDriveSubsystem extends SubsystemBase {
 
-    private final SampleMecanumDrive drive;
+    private final MainMecanumDrive drive;
     private final boolean fieldCentric;
 
-    public MecanumDriveSubsystem(SampleMecanumDrive drive, boolean isFieldCentric) {
+    public MecanumDriveSubsystem(MainMecanumDrive drive, boolean isFieldCentric) {
         this.drive = drive;
         fieldCentric = isFieldCentric;
-    }
-
-    public void setMode(DcMotor.RunMode mode) {
-        drive.setMode(mode);
-    }
-
-    public void setPIDFCoefficients(DcMotor.RunMode mode, PIDFCoefficients coefficients) {
-        drive.setPIDFCoefficients(mode, coefficients);
-    }
-
-    public void setPoseEstimate(Pose2d pose) {
-        drive.setPoseEstimate(pose);
-    }
-
-    public void update() {
-        drive.update();
-    }
-
-    public void updatePoseEstimate() {
-        drive.updatePoseEstimate();
     }
 
     public void drive(double leftY, double leftX, double rightX) {
@@ -64,14 +43,6 @@ public class MecanumDriveSubsystem extends SubsystemBase {
         );
     }
 
-    public void setDrivePower(Pose2d drivePower) {
-        drive.setDrivePower(drivePower);
-    }
-
-    public Pose2d getPoseEstimate() {
-        return drive.getPoseEstimate();
-    }
-
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
         return drive.trajectoryBuilder(startPose);
     }
@@ -88,20 +59,48 @@ public class MecanumDriveSubsystem extends SubsystemBase {
         drive.followTrajectoryAsync(trajectory);
     }
 
-    public boolean isBusy() {
-        return drive.isBusy();
-    }
-
     public void turn(double radians) {
         drive.turnAsync(radians);
+    }
+
+    public void stop() {
+        drive(0, 0, 0);
+    }
+
+    public void update() {
+        drive.update();
+    }
+
+    public void updatePoseEstimate() {
+        drive.updatePoseEstimate();
+    }
+
+    public void setMode(DcMotor.RunMode mode) {
+        drive.setMode(mode);
+    }
+
+    public void setPIDFCoefficients(DcMotor.RunMode mode, PIDFCoefficients coefficients) {
+        drive.setPIDFCoefficients(mode, coefficients);
+    }
+
+    public void setPoseEstimate(Pose2d pose) {
+        drive.setPoseEstimate(pose);
+    }
+
+    public void setDrivePower(Pose2d drivePower) {
+        drive.setDrivePower(drivePower);
+    }
+
+    public boolean isBusy() {
+        return drive.isBusy();
     }
 
     public List<Double> getWheelVelocities() {
         return drive.getWheelVelocities();
     }
 
-    public void stop() {
-        drive(0, 0, 0);
+    public Pose2d getPoseEstimate() {
+        return drive.getPoseEstimate();
     }
 
     public Pose2d getPoseVelocity() {

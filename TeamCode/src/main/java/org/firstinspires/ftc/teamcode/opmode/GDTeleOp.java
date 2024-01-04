@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.teamcode.RR.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 //import org.firstinspires.ftc.teamcode.Subsystem.ArmDriver;
 
 @TeleOp(name = "GDTeleOp", group = "TeleOp")
@@ -28,7 +28,7 @@ public class GDTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        MainMecanumDrive drive = new MainMecanumDrive(hardwareMap);
         //AlignBackboard alignBackboard = new AlignBackboard(hardwareMap, drive);
         //armDriver = new ArmDriver(hardwareMap, ArmDriver.ArmPos.LOW);
 
