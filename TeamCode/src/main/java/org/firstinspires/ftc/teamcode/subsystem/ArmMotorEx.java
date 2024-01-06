@@ -1,14 +1,26 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.Utils.PIDControl;
+
+@Config
 public class ArmMotorEx implements Subsystem {
 
-    private final DcMotorEx leftArmMotor, rightArmMotor;
+    public static double kP, kD, kI;
+
+    public double correction;
+
+    public DcMotorEx leftArmMotor, rightArmMotor;
+    PIDControl rightPID = new PIDControl();
+    PIDControl leftPID = new PIDControl();
 
     public enum ArmPos {
         BACKBOARD_TOP,
@@ -27,15 +39,30 @@ public class ArmMotorEx implements Subsystem {
 
         // Reverse Motors
         rightArmMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        // Set the PID Values
+        leftPID.KP = kP;
+        leftPID.KI = kI;
+        leftPID.KD = kD;
+
     }
+
 
     public void setArmToPos(int pos) {
-        // Set Mode of the Motor
-        leftArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        double minError = 0.5;
+        while (true) {
+            int rightArmError = rightArmMotor.getCurrentPosition() - pos;
+            int leftArmError = leftArmMotor.getCurrentPosition() - pos;
+            double rightArmCorrection = rightPID.PID(rightArmError);
+            correction = rightArmCorrection;
+            double leftArmCorrection = leftPID.PID(leftArmError);
+            if (((double) rightArmError + leftArmError) / 2 < minError) break;
 
-        // Drive to Positon
-        leftArmMotor.setTargetPosition(pos);
-        rightArmMotor.setTargetPosition(pos);
+            // Run Motor
+            leftArmMotor.setPower(-leftArmCorrection / 50);
+            rightArmMotor.setPower(-rightArmCorrection / 50);
+        }
     }
+
+
 }

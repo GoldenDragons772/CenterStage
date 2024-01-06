@@ -37,7 +37,7 @@ public class RoboTag extends LinearOpMode {
     @Override
     public void runOpMode() {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        huskyLens = hardwareMap.get(HuskyLens.class, "husky");
+        huskyLens = hardwareMap.get(HuskyLens.class, "hus   ky");
         Telemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
         if (!huskyLens.knock()) {

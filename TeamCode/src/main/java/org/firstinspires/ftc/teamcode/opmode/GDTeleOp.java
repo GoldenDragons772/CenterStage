@@ -24,7 +24,7 @@ public class GDTeleOp extends LinearOpMode {
 
     //ArmDriver armDriver;
 
-    DcMotorEx leftArmMotor, rightArmMotor;
+    DcMotorEx leftArmMotor, rightArmMotor, intakeMotor;
 
     @Override
     public void runOpMode() {
@@ -36,13 +36,18 @@ public class GDTeleOp extends LinearOpMode {
         Launcher = hardwareMap.crservo.get("Plane");
 
         // Intialize Motor
-        leftArmMotor = hardwareMap.get(DcMotorEx.class, "LeftArmMotor");
-        leftArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        leftArmMotor = hardwareMap.get(DcMotorEx.class, "LeftArmMotor");
+//        leftArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//
+//        rightArmMotor = hardwareMap.get(DcMotorEx.class, "RightArmMotor");
+//        rightArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//
+//        intakeMotor = hardwareMap.get(DcMotorEx.class, "IntakeMotor");
+//        intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        rightArmMotor = hardwareMap.get(DcMotorEx.class, "RightArmMotor");
-        rightArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        rightArmMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        // Reverse Motor
+//        rightArmMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+//        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Set the Pose to the Stored Pose from Autonomous.
         drive.setPoseEstimate(StorePos.OdoPose);
@@ -72,26 +77,33 @@ public class GDTeleOp extends LinearOpMode {
                     )
             );
 
-            // Shoot the Planes
-            if(gamepad1.y) {
-                Launcher.setPower(0.3); // 7
-            } else if (gamepad1.x) {
-                Launcher.setPower(1);
-            }
-
-            // Arm Motor Code
-            if(gamepad1.right_trigger > 0.1) {
-                // Puts Arm Up
-                leftArmMotor.setPower(-1);
-                rightArmMotor.setPower(-1);
-            } else if(gamepad1.left_trigger > 0.1) {
-                // Puts Arm Down
-                leftArmMotor.setPower(1);
-                rightArmMotor.setPower(1);
-            } else {
-                leftArmMotor.setPower(0);
-                rightArmMotor.setPower(0);
-            }
+//            // Shoot the Planes
+//            if(gamepad1.y) {
+//                Launcher.setPower(0.3); // 7
+//            } else if (gamepad1.x) {
+//                Launcher.setPower(1);
+//            }
+//
+//            // Arm Motor Code
+//            if(gamepad1.right_trigger > 0.1) {
+//                // Puts Arm Up
+//                leftArmMotor.setPower(-1);
+//                rightArmMotor.setPower(-1);
+//            } else if(gamepad1.left_trigger > 0.1) {
+//                // Puts Arm Down
+//                leftArmMotor.setPower(1);
+//                rightArmMotor.setPower(1);
+//            } else {
+//                leftArmMotor.setPower(0);
+//                rightArmMotor.setPower(0);
+//            }
+//
+//            // Intake
+//            if(gamepad1.right_bumper) {
+//                intakeMotor.setPower(0.6);
+//            } else {
+//                intakeMotor.setPower(0);
+//            }
 
 
             telemetry.addData("GamePad1 left", gamepad1.left_trigger);

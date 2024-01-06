@@ -4,9 +4,9 @@ public class PIDControl {
     private double lastError = 0;
     private double lastTime = 0;
 
-    private static double KP = 0.2;
-    private static double KD = .28;
-    private static double KI = 0.0;
+    public double KP = 0.2;
+    public double KD = .28;
+    public double KI = 0.0;
 
     public double PID(double error) {
         double i = 0;
