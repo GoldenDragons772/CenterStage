@@ -36,30 +36,43 @@ public class ArmMotorEx implements Subsystem {
         rightArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Reverse Motors
-        rightArmMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftArmMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        rightArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         // Set the PID Values
-        leftPID.KP = kP;
-        leftPID.KI = kI;
-        leftPID.KD = kD;
+//        leftPID.KP = kP;
+//        leftPID.KI = kI;
+//        leftPID.KD = kD;
 
     }
 
 
     public void setArmToPos(int pos) {
-        double minError = 0.5;
-        while (true) {
-            int rightArmError = rightArmMotor.getCurrentPosition() - pos;
-            int leftArmError = leftArmMotor.getCurrentPosition() - pos;
-            double rightArmCorrection = rightPID.PID(rightArmError);
-            correction = rightArmCorrection;
-            double leftArmCorrection = leftPID.PID(leftArmError);
-            if (((double) rightArmError + leftArmError) / 2 < minError) break;
+        leftArmMotor.setTargetPosition(pos);
+        rightArmMotor.setTargetPosition(pos);
 
-            // Run Motor
-            leftArmMotor.setPower(-leftArmCorrection / 50);
-            rightArmMotor.setPower(-rightArmCorrection / 50);
-        }
+
+        leftArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+//        leftArmMotor.setVelocity(1000);
+//        rightArmMotor.setVelocity(1000);
+        leftArmMotor.setPower(1);
+        rightArmMotor.setPower(1);
+//        double minError = 0.5;
+//        while (true) {
+//            int rightArmError = rightArmMotor.getCurrentPosition() - pos;
+//            int leftArmError = leftArmMotor.getCurrentPosition() - pos;
+//            double rightArmCorrection = rightPID.PID(rightArmError);
+//            correction = rightArmCorrection;
+//            double leftArmCorrection = leftPID.PID(leftArmError);
+//            if (((double) rightArmError + leftArmError) / 2 < minError) break;
+//
+//            // Run Motor
+//            leftArmMotor.setPower(-leftArmCorrection / 50);
+//            rightArmMotor.setPower(-rightArmCorrection / 50);
+//        }
     }
 
 
