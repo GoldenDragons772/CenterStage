@@ -23,8 +23,8 @@ public class BucketPivotSubsystem extends SubsystemBase {
             RightBucketPivot.setPosition(0.75);
             LeftBucketPivot.setPosition(0.75);
         } else if(pos == BucketPivotPos.LOADING_POS) {
-            LeftBucketPivot.setPosition(0.05);
-            RightBucketPivot.setPosition(0.05);
+            LeftBucketPivot.setPosition(-0.2);
+            RightBucketPivot.setPosition(-0.2);
         }
     }
 

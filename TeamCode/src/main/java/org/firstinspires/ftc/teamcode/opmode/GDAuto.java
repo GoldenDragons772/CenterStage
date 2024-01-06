@@ -21,9 +21,9 @@ public class GDAuto extends LinearOpMode {
 
     Trajectory currentTraj;
     Pose2d LD_RED_STARTPOS = new Pose2d(-37, -62, Math.toRadians(0));
-    Pose2d LD_BLUE_STARTPOS = new Pose2d(-36, 33, Math.toRadians(0));
+    Pose2d LD_BLUE_STARTPOS = new Pose2d(-37, 62, Math.toRadians(0));
 
-    Pose2d SD_RED_STARTPOS = new Pose2d(60, 34, Math.toRadians(0));
+    Pose2d SD_RED_STARTPOS = new Pose2d(15, -60, Math.toRadians(0));
 
     Pose2d SD_BLUE_STARTPOS = new Pose2d(0, 0, Math.toRadians(0));
 
@@ -38,9 +38,9 @@ public class GDAuto extends LinearOpMode {
         MainMecanumDrive mecDrive = new MainMecanumDrive(hardwareMap);
 
         // Long Distance Blue
-        Trajectory ld_blue = mecDrive.trajectoryBuilder(new Pose2d(-19, 33, Math.toRadians(0)))
-                .strafeRight(40)
-                .splineToConstantHeading(new Vector2d(28, 23), Math.toRadians(120))
+        Trajectory ld_blue = mecDrive.trajectoryBuilder(new Pose2d(-37, 62, Math.toRadians(0)))
+                .strafeRight(30)
+                .splineToConstantHeading(new Vector2d(48, 13), Math.toRadians(-5))
                 .build();
 
         // Short Distance Blue
@@ -56,8 +56,8 @@ public class GDAuto extends LinearOpMode {
                 .build();
 
         // Short Distance Red
-        Trajectory sd_red = mecDrive.trajectoryBuilder(new Pose2d(60, 34, Math.toRadians(0)))
-                .forward(22)
+        Trajectory sd_red = mecDrive.trajectoryBuilder(new Pose2d(15, -60, Math.toRadians(0)))
+                .forward(35)
                 .build();
 
         while(opModeInInit()) {

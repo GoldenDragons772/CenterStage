@@ -29,8 +29,6 @@ public class TuningOpMode extends LinearOpMode {
     @Override
     public void runOpMode() {
         MainMecanumDrive drive = new MainMecanumDrive(hardwareMap);
-        //AlignBackboard alignBackboard = new AlignBackboard(hardwareMap, drive);
-        //armDriver = new ArmDriver(hardwareMap, ArmDriver.ArmPos.LOW);
 
         bucketServo = hardwareMap.crservo.get("Bucket");
         Launcher = hardwareMap.crservo.get("Plane");
