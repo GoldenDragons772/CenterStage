@@ -11,8 +11,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystem.ArmMotorEx;
+import org.firstinspires.ftc.teamcode.subsystem.BucketPivotSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.BucketSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.DipperSubsystem;
+import org.firstinspires.ftc.teamcode.subsystem.DroneSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.MecanumDriveSubsystem;
 
@@ -31,6 +33,10 @@ public class Duo extends CommandOpMode {
 
     private DipperSubsystem dipper;
 
+    private BucketPivotSubsystem bucketPivot;
+
+    private DroneSubsystem drone;
+
     GamepadEx gpad1;
 
     @Override
@@ -44,6 +50,9 @@ public class Duo extends CommandOpMode {
         armMotor = new ArmMotorEx(hardwareMap);
         bucket = new BucketSubsystem(hardwareMap);
         dipper = new DipperSubsystem(hardwareMap);
+        bucketPivot = new BucketPivotSubsystem(hardwareMap);
+        drone = new DroneSubsystem(hardwareMap);
+
 
         // Run Intake and also Intake Pixels.
         gpad1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
@@ -62,21 +71,38 @@ public class Duo extends CommandOpMode {
         gpad1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whenHeld(new InstantCommand(() -> {
                     bucket.dispensePixels();
+                    intake.dispenseIntake();
+
                 }))
                 .whenReleased(new InstantCommand(() -> {
                     bucket.stopBucket();
+                    intake.stopIntake();
                 }));
 
         gpad1.getGamepadButton(GamepadKeys.Button.DPAD_UP)
                 .whenPressed(new InstantCommand(() -> {
                     armMotor.setArmToPos(1500);
                     dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
+                    bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
                 }));
 
         gpad1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
                 .whenPressed(new InstantCommand(() -> {
                     armMotor.setArmToPos(0);
+                    dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
+                    bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
                 }));
+
+        gpad1.getGamepadButton(GamepadKeys.Button.Y)
+                .whenPressed(new InstantCommand(() -> {
+                    drone.shootDrone();
+                }));
+
+        gpad1.getGamepadButton(GamepadKeys.Button.X)
+                .whenPressed(new InstantCommand(() -> {
+                    drone.loadDrone();
+                }));
+
         schedule(new RunCommand(() -> {
 
             double strafe = Math.pow(gamepad1.right_stick_x, 2) * Math.signum(gamepad1.right_stick_x);
@@ -100,6 +126,8 @@ public class Duo extends CommandOpMode {
             telemetry.addData("RightArmPos", armMotor.rightArmMotor.getCurrentPosition());
             telemetry.addData("PIDError", 1500 - (armMotor.leftArmMotor.getCurrentPosition() + armMotor.rightArmMotor.getCurrentPosition()) / 2);
             telemetry.addData("Correction", armMotor.correction);
+            telemetry.addData("DipperRightServo", dipper.rightDipperServo.getPosition());
+            telemetry.addData("DipperLeftServo", dipper.leftDipperServo.getPosition());
             telemetry.update();
         })));
     }
