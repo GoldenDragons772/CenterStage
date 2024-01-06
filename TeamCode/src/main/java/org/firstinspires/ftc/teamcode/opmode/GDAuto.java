@@ -8,7 +8,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.RR.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 
 @Autonomous(name = "GDAuto")
 public class GDAuto extends LinearOpMode {
@@ -35,7 +35,7 @@ public class GDAuto extends LinearOpMode {
     public void runOpMode() {
         Telemetry tel = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        SampleMecanumDrive mecDrive = new SampleMecanumDrive(hardwareMap);
+        MainMecanumDrive mecDrive = new MainMecanumDrive(hardwareMap);
 
         // Long Distance Blue
         Trajectory ld_blue = mecDrive.trajectoryBuilder(new Pose2d(-19, 33, Math.toRadians(0)))

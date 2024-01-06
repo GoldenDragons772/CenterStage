@@ -9,7 +9,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.RR.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
+import org.firstinspires.ftc.teamcode.utils.PIDControl;
 
 // Sample code
 // https://github.com/FIRST-Tech-Challenge/FtcRobotController/tree/master/FtcRobotController/src/main/java/org/firstinspires/ftc/robotcontroller/external/samples
@@ -19,13 +20,8 @@ import org.firstinspires.ftc.teamcode.RR.drive.SampleMecanumDrive;
 @Autonomous(name = "RobotTag", group = "Auto")
 public class RoboTag extends LinearOpMode {
     int centerX = 160;
-    private HuskyLens huskyLens;
-    private double lastError = 0;
-    private double lastTime = 0;
 
-    public static double KP = 0.2;
-    public static double KD = .28;
-    public static double KI = 0.0;
+
 
     /**
      * Returns the error in pixels away from the center of the screen
@@ -36,8 +32,9 @@ public class RoboTag extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        huskyLens = hardwareMap.get(HuskyLens.class, "hus   ky");
+        PIDControl pid = new PIDControl();
+        MainMecanumDrive drive = new MainMecanumDrive(hardwareMap);
+        HuskyLens huskyLens = hardwareMap.get(HuskyLens.class, "husky");
         Telemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
         if (!huskyLens.knock()) {
@@ -60,39 +57,15 @@ public class RoboTag extends LinearOpMode {
             HuskyLens.Block block = blocks[0];
             int error = error(block.x);
 
-            double pid = -(PID(error) / 45);
-            drive.setWeightedDrivePower(new Pose2d(0, 0, pid));
+            double correction = -(pid.PID(error) / 45);
+            drive.setWeightedDrivePower(new Pose2d(0, 0, correction));
             telemetry.addData("BlockData", block.toString());
             telemetry.addData("Error", error);
-            telemetry.addData("PID", String.valueOf(pid*50));
+            telemetry.addData("PID", String.valueOf(correction*50));
             telemetry.update();
         }
     }
 
-    /**
-     * Returns PID based on error and time deltas.
-     */
-    private double PID(double error) {
-        double i = 0;
-        double time = System.currentTimeMillis();
-
-        final double maxI = 1;
-
-        double p = KP * error;
-        i += KI * (error * (time - lastTime));
-
-        if (i > maxI) {
-            i = maxI;
-        }
-        if (i < -maxI) {
-            i = -maxI;
-        }
-
-        double d = KD * (error - lastError) / (time - lastTime);
-        lastError = error;
-        lastTime = time;
-        return d + i + p;
-    }
 }
 
 

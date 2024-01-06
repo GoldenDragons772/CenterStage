@@ -1,17 +1,14 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.teamcode.RR.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 
 @TeleOp(name = "GDTeleTuning", group = "TeleOp")
 public class TuningOpMode extends LinearOpMode {
@@ -31,7 +28,7 @@ public class TuningOpMode extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        MainMecanumDrive drive = new MainMecanumDrive(hardwareMap);
         //AlignBackboard alignBackboard = new AlignBackboard(hardwareMap, drive);
         //armDriver = new ArmDriver(hardwareMap, ArmDriver.ArmPos.LOW);
 
