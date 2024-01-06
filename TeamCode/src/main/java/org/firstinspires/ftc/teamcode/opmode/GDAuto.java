@@ -13,8 +13,8 @@ import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 @Autonomous(name = "GDAuto")
 public class GDAuto extends LinearOpMode {
 
-    GDAutoPresets.AUTO auto;
-    int currentAuto = 0;
+    //    AutoPresets.AUTO auto;
+    AutoPresets currentAuto;
     String autoName = "NONE";
 
     Pose2d currentStartPos = new Pose2d(0, 0, Math.toRadians(0));
@@ -37,52 +37,26 @@ public class GDAuto extends LinearOpMode {
 
         MainMecanumDrive mecDrive = new MainMecanumDrive(hardwareMap);
 
-        // Long Distance Blue
-        Trajectory ld_blue = mecDrive.trajectoryBuilder(new Pose2d(-37, 62, Math.toRadians(0)))
-                .strafeRight(30)
-                .splineToConstantHeading(new Vector2d(48, 13), Math.toRadians(-5))
-                .build();
-
-        // Short Distance Blue
-        Trajectory sd_blue = mecDrive.trajectoryBuilder(new Pose2d(15, 62, Math.toRadians(0)))
-                //.strafeLeft(22)
-                .forward(35)
-                .build();
-
-        // Long Distance Red
-        Trajectory ld_red = mecDrive.trajectoryBuilder(new Pose2d(-37, -62, Math.toRadians(0)))
-                .strafeLeft(47)
-                .splineToConstantHeading(new Vector2d(47, -26), Math.toRadians(170))
-                .build();
-
-        // Short Distance Red
-        Trajectory sd_red = mecDrive.trajectoryBuilder(new Pose2d(15, -60, Math.toRadians(0)))
-                .forward(35)
-                .build();
-
-        while(opModeInInit()) {
+        while (opModeInInit()) {
             // Auto Selector
-            if(gamepad1.dpad_right) { // Long Distance Red Auto
-                currentAuto = GDAutoPresets.AUTO.LD_RED;
-                currentTraj = ld_red;
+            if (gamepad1.dpad_right) { // Long Distance Red Auto
+                currentAuto = AutoPresets.LD_RED;
                 currentStartPos = LD_RED_STARTPOS;
                 autoName = "LD_RED";
-            } else if(gamepad1.dpad_left) { // Short Distance Red Auto
-                currentAuto = GDAutoPresets.AUTO.SD_RED;
-                currentTraj = sd_red;
+            } else if (gamepad1.dpad_left) { // Short Distance Red Auto
+                currentAuto = AutoPresets.SD_RED;
                 currentStartPos = SD_RED_STARTPOS;
                 autoName = "SD_RED";
-            } else if(gamepad1.dpad_up) { // Long Distance Blue Auto
-                currentAuto = GDAutoPresets.AUTO.LD_BLUE;
-                currentTraj = ld_blue;
+            } else if (gamepad1.dpad_up) { // Long Distance Blue Auto
+                currentAuto = AutoPresets.LD_BLUE;
                 currentStartPos = LD_BLUE_STARTPOS;
                 autoName = "LD_BLUE";
-            } else if(gamepad1.dpad_down) { // Short Distance Blue Auto
-                currentAuto = GDAutoPresets.AUTO.SD_BLUE;
+            } else if (gamepad1.dpad_down) { // Short Distance Blue Auto
+                currentAuto = AutoPresets.SD_BLUE;
                 autoName = "SD_BLUE";
                 currentStartPos = SD_BLUE_STARTPOS;
-                currentTraj = sd_blue;
             }
+            currentTraj = getTrajectory(currentAuto, mecDrive);
             telemetry.addData("SELECTED AUTO", autoName);
             telemetry.update();
         }
@@ -95,5 +69,25 @@ public class GDAuto extends LinearOpMode {
         telemetry.addData("x", mecDrive.getLocalizer().getPoseEstimate().getX());
         telemetry.addData("y", mecDrive.getLocalizer().getPoseEstimate().getY());
         telemetry.addData("heading", mecDrive.getLocalizer().getPoseEstimate().getHeading());
+    }
+
+    private Trajectory getTrajectory(AutoPresets preset, MainMecanumDrive mecDrive) {
+        int startingRotation = 0; // in degrees
+        int startingY = 62; // This is flipped across the x-axis for red.
+        int farX = -37;
+        int shortX = 15;
+        boolean isAllianceBlue = preset.getAlliance() == AutoPresets.Alliance.BLUE;
+        int sign = isAllianceBlue ? 1 : -1; // Sign to use for Y values. If the alliance is red, the trajectory is reflected across the x-axis.
+        if (preset.getDistance() == AutoPresets.Distance.LONG) {
+            return mecDrive.trajectoryBuilder(new Pose2d(farX, startingY * sign))
+                           .strafeRight(30 * sign)
+                           .splineToConstantHeading(new Vector2d(-23, 10 * sign), Math.toRadians(startingRotation))
+                           .splineToConstantHeading(new Vector2d(60, 10 * sign), Math.toRadians(startingRotation))
+                           .build();
+        } else { // If distance is short.
+            return mecDrive.trajectoryBuilder(new Pose2d(shortX, startingY * sign, Math.toRadians(startingRotation)))
+                           .forward(35)
+                           .build();
+        }
     }
 }
