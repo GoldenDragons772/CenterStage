@@ -23,6 +23,7 @@ public class GDtest {
 
         MeepMeep meepMeep = new MeepMeep(600);
         meepMeep.setDarkMode(true);
+        meepMeep.getWindowFrame().setVisible(true);
 
         RoadRunnerBotEntity Blue = new DefaultBotBuilder(meepMeep)
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 14.83)
