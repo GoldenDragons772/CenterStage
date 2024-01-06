@@ -12,7 +12,15 @@ public class BucketSubsystem extends SubsystemBase {
         this.bucketServo = hw.get(CRServo.class, "Bucket");
     }
 
-    public void runBucket() {
+    public void dispensePixels() {
+        bucketServo.setPower(-1);
+    }
+
+    public void stopBucket() {
+        bucketServo.setPower(0);
+    }
+
+    public void intakePixels() {
         bucketServo.setPower(1);
     }
 

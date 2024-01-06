@@ -11,6 +11,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystem.ArmMotorEx;
+import org.firstinspires.ftc.teamcode.subsystem.BucketSubsystem;
+import org.firstinspires.ftc.teamcode.subsystem.DipperSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.MecanumDriveSubsystem;
 
@@ -24,6 +26,11 @@ public class Duo extends CommandOpMode {
     private IntakeSubsystem intake;
 
     private ArmMotorEx armMotor;
+
+    private BucketSubsystem bucket;
+
+    private DipperSubsystem dipper;
+
     GamepadEx gpad1;
 
     @Override
@@ -35,19 +42,41 @@ public class Duo extends CommandOpMode {
         gpad1 = new GamepadEx(gamepad1);
         intake = new IntakeSubsystem(hardwareMap);
         armMotor = new ArmMotorEx(hardwareMap);
+        bucket = new BucketSubsystem(hardwareMap);
+        dipper = new DipperSubsystem(hardwareMap);
 
+        // Run Intake and also Intake Pixels.
         gpad1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .whenHeld(new InstantCommand(intake::runIntake))
-                .whenReleased(new InstantCommand(intake::stopIntake));
+                .whenHeld(
+                        new InstantCommand(() -> {
+                            intake.runIntake();
+                            bucket.intakePixels();
+                        })
+                )
+                .whenReleased(new InstantCommand(() -> {
+                    intake.stopIntake();
+                    bucket.stopBucket();
+                }));
+
+        // Dispense Pixels.
+        gpad1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+                .whenHeld(new InstantCommand(() -> {
+                    bucket.dispensePixels();
+                }))
+                .whenReleased(new InstantCommand(() -> {
+                    bucket.stopBucket();
+                }));
 
         gpad1.getGamepadButton(GamepadKeys.Button.DPAD_UP)
                 .whenPressed(new InstantCommand(() -> {
                     armMotor.setArmToPos(1500);
+                    dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
                 }));
 
-        gpad1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(new InstantCommand(() -> {
-            armMotor.setArmToPos(0);
-        }));
+        gpad1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
+                .whenPressed(new InstantCommand(() -> {
+                    armMotor.setArmToPos(0);
+                }));
         schedule(new RunCommand(() -> {
 
             double strafe = Math.pow(gamepad1.right_stick_x, 2) * Math.signum(gamepad1.right_stick_x);
