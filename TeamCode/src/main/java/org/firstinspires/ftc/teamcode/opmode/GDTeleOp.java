@@ -66,6 +66,7 @@ public class GDTeleOp extends LinearOpMode {
             double forward = Math.pow(gamepad1.right_stick_y, 2) * Math.signum(gamepad1.right_stick_y);
             double spin = Math.pow(gamepad1.left_stick_x, 2) * Math.signum(gamepad1.left_stick_x);
 
+
             double Speedper = 1;
 
             // Set the Power of the Drive Train

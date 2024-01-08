@@ -40,13 +40,13 @@ public class GDAuto extends LinearOpMode {
         // Long Distance Blue
         Trajectory ld_blue = mecDrive.trajectoryBuilder(new Pose2d(-37, 62, Math.toRadians(0)))
                 .strafeRight(30)
-                .splineToConstantHeading(new Vector2d(48, 13), Math.toRadians(-5))
+                .splineToConstantHeading(new Vector2d(54, 18), Math.toRadians(10))
                 .build();
 
         // Short Distance Blue
-        Trajectory sd_blue = mecDrive.trajectoryBuilder(new Pose2d(0, 0, Math.toRadians(0)))
+        Trajectory sd_blue = mecDrive.trajectoryBuilder(new Pose2d(15, 62, Math.toRadians(0)))
                 //.strafeLeft(22)
-                .forward(22)
+                .forward(32)
                 .build();
 
         // Long Distance Red

@@ -1,10 +1,19 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+@Config
 public class BucketPivotSubsystem extends SubsystemBase {
+
+    public static double RightBucketPivotDroppingPos = 0.5;
+    public static double LeftBucketPivotDroppingPos = 0.5;
+
+    public static double LeftBucketPivotLoadingPos = 0.05;
+    public static double RightBucketPivotLoadingPos = 0.05;
+
 
     public enum BucketPivotPos {
         LOADING_POS,
@@ -15,16 +24,19 @@ public class BucketPivotSubsystem extends SubsystemBase {
 
     public BucketPivotSubsystem(HardwareMap hw) {
         RightBucketPivot = hw.get(Servo.class, "RBPivot");
+
+        RightBucketPivot.setDirection(Servo.Direction.REVERSE);
+
         LeftBucketPivot = hw.get(Servo.class, "LBPivot");
     }
 
     public void runBucketPos(BucketPivotPos pos) {
         if(pos == BucketPivotPos.DROPPING_POS) {
-            RightBucketPivot.setPosition(0.75);
-            LeftBucketPivot.setPosition(0.75);
+            RightBucketPivot.setPosition(RightBucketPivotDroppingPos);
+            LeftBucketPivot.setPosition(LeftBucketPivotDroppingPos);
         } else if(pos == BucketPivotPos.LOADING_POS) {
-            LeftBucketPivot.setPosition(-0.2);
-            RightBucketPivot.setPosition(-0.2);
+            LeftBucketPivot.setPosition(LeftBucketPivotLoadingPos);
+            RightBucketPivot.setPosition(RightBucketPivotLoadingPos);
         }
     }
 
