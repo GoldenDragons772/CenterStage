@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <string name="bindingIntakeCollect">RIGHT_BUMPER</string>
+    <string name="bindingIntakeDispense">LEFT_BUMPER</string>
+    <string name="bindingArmExtend">DPAD_UP</string>
+    <string name="bindingArmRetract">DPAD_DOWN</string>
 </resources>

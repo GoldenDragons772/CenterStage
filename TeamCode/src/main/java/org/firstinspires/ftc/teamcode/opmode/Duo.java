@@ -7,18 +7,17 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
-import org.firstinspires.ftc.teamcode.subsystem.ArmMotorEx;
-import org.firstinspires.ftc.teamcode.subsystem.BucketPivotSubsystem;
-import org.firstinspires.ftc.teamcode.subsystem.BucketSubsystem;
-import org.firstinspires.ftc.teamcode.subsystem.DipperSubsystem;
-import org.firstinspires.ftc.teamcode.subsystem.DroneSubsystem;
-import org.firstinspires.ftc.teamcode.subsystem.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystem.MecanumDriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystem.*;
 
-import java.util.concurrent.TimeUnit;
+
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 
 @TeleOp(name = "Duo", group = "TeleOp")
 public class Duo extends CommandOpMode {
@@ -39,11 +38,17 @@ public class Duo extends CommandOpMode {
 
     GamepadEx gpad1;
 
+    JsonObject bindings;
     @Override
     public void initialize() {
+        JsonParser parser = new JsonParser();
+        try {
+            bindings = (JsonObject) parser.parse(new FileReader("res/values/bindings.json"));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
 
         Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
-
         drive = new MecanumDriveSubsystem(new MainMecanumDrive(hardwareMap), false);
         gpad1 = new GamepadEx(gamepad1);
         intake = new IntakeSubsystem(hardwareMap);
@@ -55,7 +60,7 @@ public class Duo extends CommandOpMode {
 
 
         // Run Intake and also Intake Pixels.
-        gpad1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
+        gpad1.getGamepadButton(getBinding("intakeCollect"))
                 .whenHeld(
                         new InstantCommand(() -> {
                             intake.runIntake();
@@ -69,7 +74,7 @@ public class Duo extends CommandOpMode {
 
 
         // Dispense Pixels.
-        gpad1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+        gpad1.getGamepadButton(getBinding("intakeDispense"))
                 .whenHeld(new InstantCommand(() -> {
                     bucket.dispensePixels();
                     intake.dispenseIntake();
@@ -80,30 +85,30 @@ public class Duo extends CommandOpMode {
                     intake.stopIntake();
                 }));
 
-
-        gpad1.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+        // Extend arm up
+        gpad1.getGamepadButton(getBinding("armExtend"))
                 .whenPressed(new InstantCommand(() -> {
-                    //armMotor.setArmToPos(1500);
+                    armMotor.setArmToPos(1500);
                     dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
                     bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
                 }));
-
-        gpad1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
+        // Retract arm down
+        gpad1.getGamepadButton(getBinding("armRetract"))
                 .whenPressed(new InstantCommand(() -> {
-                    //armMotor.setArmToPos(0);
+                    armMotor.setArmToPos(0);
                     dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
                     bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
                 }));
-
-        gpad1.getGamepadButton(GamepadKeys.Button.Y)
-                .whenPressed(new InstantCommand(() -> {
-                    drone.shootDrone();
-                }));
-
-        gpad1.getGamepadButton(GamepadKeys.Button.X)
-                .whenPressed(new InstantCommand(() -> {
-                    drone.loadDrone();
-                }));
+//        // Shoot drone
+//        gpad1.getGamepadButton(GamepadKeys.Button.Y)
+//                .whenPressed(new InstantCommand(() -> {
+//                    drone.shootDrone();
+//                }));
+//        // Load drone
+//        gpad1.getGamepadButton(GamepadKeys.Button.X)
+//                .whenPressed(new InstantCommand(() -> {
+//                    drone.loadDrone();
+//                }));
 
         schedule(new RunCommand(() -> {
 
@@ -134,6 +139,11 @@ public class Duo extends CommandOpMode {
 //            telemetry.addData("DipperLeftServo", dipper.leftDipperServo.getPosition());
             telemetry.update();
         })));
+    }
+
+    GamepadKeys.Button getBinding(String action){
+        String stringBinding = bindings.get(action).getAsString().toUpperCase();
+        return GamepadKeys.Button.valueOf(stringBinding);
     }
 
 }

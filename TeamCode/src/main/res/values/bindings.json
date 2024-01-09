@@ -1,0 +1,6 @@
+{
+  "intakeCollect": "RIGHT_BUMPER",
+  "intakeDispense": "LEFT_BUMPER",
+  "armRetract": "DPAD_DOWN",
+  "armExtend": "DPAD_UP"
+}
