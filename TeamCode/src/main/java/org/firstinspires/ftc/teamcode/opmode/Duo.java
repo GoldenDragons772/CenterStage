@@ -37,7 +37,7 @@ public class Duo extends CommandOpMode {
 
     private DroneSubsystem drone;
 
-    GamepadEx gpad1;
+    private GamepadEx gpad1, gpad2;
 
     @Override
     public void initialize() {
@@ -46,6 +46,7 @@ public class Duo extends CommandOpMode {
 
         drive = new MecanumDriveSubsystem(new MainMecanumDrive(hardwareMap), false);
         gpad1 = new GamepadEx(gamepad1);
+        gpad2 = new GamepadEx(gamepad2);
         intake = new IntakeSubsystem(hardwareMap);
         armMotor = new ArmMotorEx(hardwareMap);
         bucket = new BucketSubsystem(hardwareMap);
@@ -55,7 +56,7 @@ public class Duo extends CommandOpMode {
 
 
         // Run Intake and also Intake Pixels.
-        gpad1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
+        gpad2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
                 .whenHeld(
                         new InstantCommand(() -> {
                             intake.runIntake();
@@ -69,7 +70,7 @@ public class Duo extends CommandOpMode {
 
 
         // Dispense Pixels.
-        gpad1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+        gpad2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whenHeld(new InstantCommand(() -> {
                     bucket.dispensePixels();
                     intake.dispenseIntake();
@@ -81,29 +82,29 @@ public class Duo extends CommandOpMode {
                 }));
 
 
-        gpad1.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+        gpad2.getGamepadButton(GamepadKeys.Button.DPAD_UP)
                 .whenPressed(new InstantCommand(() -> {
-                    //armMotor.setArmToPos(1500);
+                    armMotor.setArmToPos(1500);
                     dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
                     bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
                 }));
 
-        gpad1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
+        gpad2.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
                 .whenPressed(new InstantCommand(() -> {
-                    //armMotor.setArmToPos(0);
+                    armMotor.setArmToPos(0);
                     dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
                     bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
                 }));
 
-        gpad1.getGamepadButton(GamepadKeys.Button.Y)
-                .whenPressed(new InstantCommand(() -> {
-                    drone.shootDrone();
-                }));
-
-        gpad1.getGamepadButton(GamepadKeys.Button.X)
-                .whenPressed(new InstantCommand(() -> {
-                    drone.loadDrone();
-                }));
+//        gpad1.getGamepadButton(GamepadKeys.Button.Y)
+//                .whenPressed(new InstantCommand(() -> {
+//                    drone.shootDrone();
+//                }));
+//
+//        gpad1.getGamepadButton(GamepadKeys.Button.X)
+//                .whenPressed(new InstantCommand(() -> {
+//                    drone.loadDrone();
+//                }));
 
         schedule(new RunCommand(() -> {
 
