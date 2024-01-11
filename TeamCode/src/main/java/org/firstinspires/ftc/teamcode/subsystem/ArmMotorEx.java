@@ -58,8 +58,8 @@ public class ArmMotorEx implements Subsystem {
 
 //        leftArmMotor.setVelocity(1000);
 //        rightArmMotor.setVelocity(1000);
-        leftArmMotor.setPower(0.6);
-        rightArmMotor.setPower(0.6);
+        leftArmMotor.setPower(0.8);
+        rightArmMotor.setPower(0.8);
         
 //        double minError = 0.5;
 //        while (true) {
@@ -74,6 +74,9 @@ public class ArmMotorEx implements Subsystem {
 //            leftArmMotor.setPower(-leftArmCorrection / 50);
 //            rightArmMotor.setPower(-rightArmCorrection / 50);
 //        }
+    }
+    public int getAvgArmPosition(){
+        return (leftArmMotor.getCurrentPosition() + rightArmMotor.getCurrentPosition())/2;
     }
 
 

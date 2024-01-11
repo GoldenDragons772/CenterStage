@@ -57,56 +57,60 @@ public class Solo extends CommandOpMode {
 
         // Run Intake and also Intake Pixels.
         gpad1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .whenHeld(
-                        new InstantCommand(() -> {
-                            intake.runIntake();
-                            bucket.intakePixels();
-                        })
-                )
-                .whenReleased(new InstantCommand(() -> {
-                    intake.stopIntake();
-                    bucket.stopBucket();
-                }));
+             .whenHeld(
+                     new InstantCommand(() -> {
+                         intake.runIntake();
+                         bucket.intakePixels();
+                     })
+             )
+             .whenReleased(new InstantCommand(() -> {
+                 intake.stopIntake();
+                 bucket.stopBucket();
+             }));
 
 
         // Dispense Pixels.
         gpad1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whenHeld(new InstantCommand(() -> {
-                    bucket.dispensePixels();
-                    intake.dispenseIntake();
+             .whenHeld(new InstantCommand(() -> {
+                 bucket.dispensePixels();
+                 intake.dispenseIntake();
 
-                }))
-                .whenReleased(new InstantCommand(() -> {
-                    bucket.stopBucket();
-                    intake.stopIntake();
-                }));
+             }))
+             .whenReleased(new InstantCommand(() -> {
+                 bucket.stopBucket();
+                 intake.stopIntake();
+             }));
 
         gpad1.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whenPressed(new InstantCommand(() -> {
-                    armMotor.setArmToPos(2500);
-                    dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
-                    bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
-                }));
+             .whenPressed(new InstantCommand(() -> {
+                 armMotor.setArmToPos(2200);
+                 dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
+                 bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
+             }));
 
 
         gpad1.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
-                .whenPressed(new InstantCommand(() -> {
-                    armMotor.setArmToPos(1500);
-                    dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
-                    bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
-                }));
+             .whenPressed(new InstantCommand(() -> {
+                 armMotor.setArmToPos(1500);
+                 dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
+                 bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
+             }));
 
         gpad1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
-                .whenPressed(new InstantCommand(() -> {
-                    armMotor.setArmToPos(0);
-                    dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
-                    try {
-                        Thread.sleep(800);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
-                }));
+             .whenPressed(new InstantCommand(() -> {
+                 armMotor.setArmToPos(0);
+                 dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
+                 int timeout = 1200;
+                 int epsilon = 500; // Machine epsilon
+                 while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {
+                     try {
+                         Thread.sleep(20);
+                     } catch (InterruptedException e) {
+                         throw new RuntimeException(e);
+                     }
+                 }
+                 bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
+             }));
 
 //        gpad1.getGamepadButton(GamepadKeys.Button.Y)
 //                .whenPressed(new InstantCommand(() -> {
