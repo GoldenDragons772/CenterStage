@@ -28,14 +28,16 @@ public class DipperSubsystem extends SubsystemBase {
     public DipperSubsystem(HardwareMap hw) {
         this.rightDipperServo = hw.get(Servo.class,"RDipper");
         this.leftDipperServo = hw.get(Servo.class, "LDipper");
+
+        rightDipperServo.setDirection(Servo.Direction.REVERSE);
     }
 
     public void setDipperPosition(DipperPositions pos) {
         if(pos == DipperPositions.LOADING_POSITION) {
-            rightDipperServo.setPosition(-0.23);
+            rightDipperServo.setPosition(0.992);
             leftDipperServo.setPosition(0.872);
         } else if(pos == DipperPositions.SCORING_POSITION) {
-            rightDipperServo.setPosition(0.855);
+            rightDipperServo.setPosition(0.16);
             leftDipperServo.setPosition(-1);
         }
     }

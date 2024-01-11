@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
+import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -80,8 +81,15 @@ public class Solo extends CommandOpMode {
                     intake.stopIntake();
                 }));
 
-
         gpad1.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+                .whenPressed(new InstantCommand(() -> {
+                    armMotor.setArmToPos(2500);
+                    dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
+                    bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
+                }));
+
+
+        gpad1.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
                 .whenPressed(new InstantCommand(() -> {
                     armMotor.setArmToPos(1500);
                     dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
@@ -92,6 +100,11 @@ public class Solo extends CommandOpMode {
                 .whenPressed(new InstantCommand(() -> {
                     armMotor.setArmToPos(0);
                     dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
+                    try {
+                        Thread.sleep(800);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                     bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
                 }));
 

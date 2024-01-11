@@ -60,6 +60,7 @@ public class ArmMotorEx implements Subsystem {
 //        rightArmMotor.setVelocity(1000);
         leftArmMotor.setPower(0.6);
         rightArmMotor.setPower(0.6);
+        
 //        double minError = 0.5;
 //        while (true) {
 //            int rightArmError = rightArmMotor.getCurrentPosition() - pos;
