@@ -5,21 +5,18 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
-import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
-import org.firstinspires.ftc.teamcode.subsystem.ArmMotorEx;
+import org.firstinspires.ftc.teamcode.subsystem.ArmMotorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.BucketPivotSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.BucketSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.DipperSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.DroneSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.MecanumDriveSubsystem;
-
-import java.util.concurrent.TimeUnit;
 
 @TeleOp(name = "Solo", group = "TeleOp")
 public class Solo extends CommandOpMode {
@@ -28,7 +25,7 @@ public class Solo extends CommandOpMode {
 
     private IntakeSubsystem intake;
 
-    private ArmMotorEx armMotor;
+    private ArmMotorSubsystem armMotor;
 
     private BucketSubsystem bucket;
 
@@ -48,7 +45,7 @@ public class Solo extends CommandOpMode {
         drive = new MecanumDriveSubsystem(new MainMecanumDrive(hardwareMap), false);
         gpad1 = new GamepadEx(gamepad1);
         intake = new IntakeSubsystem(hardwareMap);
-        armMotor = new ArmMotorEx(hardwareMap);
+        armMotor = new ArmMotorSubsystem(hardwareMap);
         bucket = new BucketSubsystem(hardwareMap);
         dipper = new DipperSubsystem(hardwareMap);
         bucketPivot = new BucketPivotSubsystem(hardwareMap);

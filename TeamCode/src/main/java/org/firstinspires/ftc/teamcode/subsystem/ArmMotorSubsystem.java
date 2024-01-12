@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.utils.PIDControl;
 
 @Config
-public class ArmMotorEx implements Subsystem {
+public class ArmMotorSubsystem implements Subsystem {
 
     public static double kP, kD, kI;
 
@@ -26,7 +26,7 @@ public class ArmMotorEx implements Subsystem {
         BACKBOARD_LOW
     }
 
-    public ArmMotorEx(HardwareMap hw) {
+    public ArmMotorSubsystem(HardwareMap hw) {
         // Get the Motor
         leftArmMotor = hw.get(DcMotorEx.class, "LeftArmMotor");
         rightArmMotor = hw.get(DcMotorEx.class, "RightArmMotor");
