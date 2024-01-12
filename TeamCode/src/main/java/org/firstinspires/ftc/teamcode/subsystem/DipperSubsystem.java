@@ -34,11 +34,11 @@ public class DipperSubsystem extends SubsystemBase {
 
     public void setDipperPosition(DipperPositions pos) {
         if(pos == DipperPositions.LOADING_POSITION) {
-            rightDipperServo.setPosition(0.992);
-            leftDipperServo.setPosition(0.872);
+            rightDipperServo.setPosition(0.135 + 0.08); // 0.08 offset
+            leftDipperServo.setPosition(0.135);
         } else if(pos == DipperPositions.SCORING_POSITION) {
-            rightDipperServo.setPosition(0.16);
-            leftDipperServo.setPosition(-1);
+            rightDipperServo.setPosition(1);
+            leftDipperServo.setPosition(1 - 0.06); // - 0.06 offset
         }
     }
 }

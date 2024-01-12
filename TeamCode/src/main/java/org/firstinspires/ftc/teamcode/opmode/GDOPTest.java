@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.subsystem.ArmMotorEx;
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.ArmPosCommand;
 import org.firstinspires.ftc.teamcode.subsystem.MecanumDriveSubsystem;
 
-@TeleOp(name = "GDTeleOpTest", group = "TeleOp")
+@TeleOp(name = "GDTeleOpTest", group = "Testing")
 public class GDOPTest extends CommandOpMode {
 
     private MecanumDriveSubsystem drivetrain;

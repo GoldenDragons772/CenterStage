@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 
-@TeleOp(name = "GDTeleTuning", group = "TeleOp")
+@TeleOp(name = "GDTeleTuning", group = "Testing")
 public class TuningOpMode extends LinearOpMode {
     CRServo bucketServo;
     CRServo Launcher;
