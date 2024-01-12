@@ -65,7 +65,10 @@ public class GDtest {
         meepMeep.setBackground(img)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
-                .addEntity(ldRed).addEntity(sdRed).addEntity(ldBlue).addEntity(sdBlue)
+                .addEntity(ldRed).
+                addEntity(sdRed)
+//                .addEntity(ldBlue)
+                .addEntity(sdBlue)
                 .start();
     }
 
@@ -77,10 +80,11 @@ public class GDtest {
         boolean isAllianceBlue = preset.contains("BLUE");
         int sign = isAllianceBlue ? 1 : -1; // Sign to use for Y values. If the alliance is red, the trajectory is reflected across the x-axis.
         if (preset.contains("LD")) {
-            return mecDrive.trajectorySequenceBuilder(new Pose2d(farX, startingY * sign))
-                           .strafeRight(30 * sign)
-                           .splineToConstantHeading(new Vector2d(-23, 10 * sign), Math.toRadians(startingRotation))
-                           .splineToConstantHeading(new Vector2d(60, 10 * sign), Math.toRadians(startingRotation))
+            return mecDrive.trajectorySequenceBuilder(new Pose2d())
+                           .splineTo(new Vector2d(15, 15), Math.toRadians(90))
+                           .splineTo(new Vector2d(0, 30), Math.toRadians(180))
+                           .splineTo(new Vector2d(-15, 15), Math.toRadians(270))
+                           .splineTo(new Vector2d(0, 0), 0)
                            .build();
         } else { // If distance is short.
             return mecDrive.trajectorySequenceBuilder(new Pose2d(shortX, startingY * sign, Math.toRadians(startingRotation)))

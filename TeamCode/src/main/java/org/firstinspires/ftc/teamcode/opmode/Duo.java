@@ -5,14 +5,12 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
-import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.arcrobotics.ftclib.gamepad.TriggerReader;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
-import org.firstinspires.ftc.teamcode.subsystem.ArmMotorEx;
+import org.firstinspires.ftc.teamcode.subsystem.ArmMotorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.BucketPivotSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.BucketSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.DipperSubsystem;
@@ -20,25 +18,16 @@ import org.firstinspires.ftc.teamcode.subsystem.DroneSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.MecanumDriveSubsystem;
 
-import java.util.concurrent.TimeUnit;
-
 @TeleOp(name = "Duo", group = "TeleOp")
 public class Duo extends CommandOpMode {
 
     private MecanumDriveSubsystem drive;
-
     private IntakeSubsystem intake;
-
-    private ArmMotorEx armMotor;
-
     private BucketSubsystem bucket;
-
-    private DipperSubsystem dipper;
-
     private BucketPivotSubsystem bucketPivot;
-
+    private DipperSubsystem dipper;
+    private ArmMotorSubsystem armMotor;
     private DroneSubsystem drone;
-
     private GamepadEx gpad1, gpad2;
 
     @Override
@@ -50,7 +39,7 @@ public class Duo extends CommandOpMode {
         gpad1 = new GamepadEx(gamepad1);
         gpad2 = new GamepadEx(gamepad2);
         intake = new IntakeSubsystem(hardwareMap);
-        armMotor = new ArmMotorEx(hardwareMap);
+        armMotor = new ArmMotorSubsystem(hardwareMap);
         bucket = new BucketSubsystem(hardwareMap);
         dipper = new DipperSubsystem(hardwareMap);
         bucketPivot = new BucketPivotSubsystem(hardwareMap);
@@ -59,81 +48,80 @@ public class Duo extends CommandOpMode {
 
         // Run Intake and also Intake Pixels.
         gpad2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .whenHeld(
-                        new InstantCommand(() -> {
-                            intake.runIntake();
-                            bucket.intakePixels();
-                        })
-                )
-                .whenReleased(new InstantCommand(() -> {
-                    intake.stopIntake();
-                    bucket.stopBucket();
-                }));
+             .whenHeld(
+                     new InstantCommand(() -> {
+                         intake.runIntake();
+                         bucket.intakePixels();
+                     })
+             )
+             .whenReleased(new InstantCommand(() -> {
+                 intake.stopIntake();
+                 bucket.stopBucket();
+             }));
 
         gpad1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .whenHeld(
-                        new InstantCommand(() -> {
-                            intake.runIntake();
-                            bucket.intakePixels();
-                        })
-                )
-                .whenReleased(new InstantCommand(() -> {
-                    intake.stopIntake();
-                    bucket.stopBucket();
-                }));
-
+             .whenHeld(
+                     new InstantCommand(() -> {
+                         intake.runIntake();
+                         bucket.intakePixels();
+                     })
+             )
+             .whenReleased(new InstantCommand(() -> {
+                 intake.stopIntake();
+                 bucket.stopBucket();
+             }));
 
 
         // Dispense Pixels.
         gpad2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whenHeld(new InstantCommand(() -> {
-                    bucket.dispensePixels();
-                    intake.dispenseIntake();
+             .whenHeld(new InstantCommand(() -> {
+                 bucket.dispensePixels();
+                 intake.dispenseIntake();
 
-                }))
-                .whenReleased(new InstantCommand(() -> {
-                    bucket.stopBucket();
-                    intake.stopIntake();
-                }));
+             }))
+             .whenReleased(new InstantCommand(() -> {
+                 bucket.stopBucket();
+                 intake.stopIntake();
+             }));
 
         // Dispense Pixels.
         gpad1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whenHeld(new InstantCommand(() -> {
-                    bucket.dispensePixels();
-                    intake.dispenseIntake();
+             .whenHeld(new InstantCommand(() -> {
+                 bucket.dispensePixels();
+                 intake.dispenseIntake();
 
-                }))
-                .whenReleased(new InstantCommand(() -> {
-                    bucket.stopBucket();
-                    intake.stopIntake();
-                }));
+             }))
+             .whenReleased(new InstantCommand(() -> {
+                 bucket.stopBucket();
+                 intake.stopIntake();
+             }));
 
 
         gpad2.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
-                .whenPressed(new InstantCommand(() -> {
-                    armMotor.setArmToPos(1500);
-                    dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
-                    bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
-                }));
+             .whenPressed(new InstantCommand(() -> {
+                 armMotor.setArmToPos(1500);
+                 dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
+                 bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
+             }));
 
         gpad2.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whenPressed(new InstantCommand(() -> {
-                    armMotor.setArmToPos(2500);
-                    dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
-                    bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
-                }));
+             .whenPressed(new InstantCommand(() -> {
+                 armMotor.setArmToPos(2500);
+                 dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
+                 bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
+             }));
 
         gpad2.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
-                .whenPressed(new InstantCommand(() -> {
-                    armMotor.setArmToPos(0);
-                    try {
-                        Thread.sleep(800);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
-                    bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
-                }));
+             .whenPressed(new InstantCommand(() -> {
+                 armMotor.setArmToPos(0);
+                 try {
+                     Thread.sleep(800);
+                 } catch (InterruptedException e) {
+                     throw new RuntimeException(e);
+                 }
+                 dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
+                 bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
+             }));
 
 //        gpad1.getGamepadButton(GamepadKeys.Button.Y)
 //                .whenPressed(new InstantCommand(() -> {

@@ -1,12 +1,12 @@
 package org.firstinspires.ftc.teamcode.subsystem.subcommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 
-import org.firstinspires.ftc.teamcode.subsystem.ArmMotorEx;
+import org.firstinspires.ftc.teamcode.subsystem.ArmMotorSubsystem;
 
 public class ArmPosCommand extends InstantCommand {
-    private final ArmMotorEx arm_subsystem;
+    private final ArmMotorSubsystem arm_subsystem;
 
-    public ArmPosCommand(ArmMotorEx subsystem, ArmMotorEx.ArmPos pos) {
+    public ArmPosCommand(ArmMotorSubsystem subsystem, ArmMotorSubsystem.ArmPos pos) {
         arm_subsystem = subsystem;
         addRequirements(subsystem);
 
