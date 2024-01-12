@@ -80,7 +80,7 @@ public class Solo extends CommandOpMode {
 
         gpad1.getGamepadButton(GamepadKeys.Button.DPAD_UP)
              .whenPressed(new InstantCommand(() -> {
-                 armMotor.setArmToPos(2200);
+                 //armMotor.setArmToPos(2200);
                  dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
                  bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
              }));
@@ -88,14 +88,14 @@ public class Solo extends CommandOpMode {
 
         gpad1.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
              .whenPressed(new InstantCommand(() -> {
-                 armMotor.setArmToPos(1500);
+                 //armMotor.setArmToPos(1500);
                  dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
                  bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
              }));
 
         gpad1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
              .whenPressed(new InstantCommand(() -> {
-                 armMotor.setArmToPos(0);
+                 //armMotor.setArmToPos(0);
                  dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
                  int timeout = 1200;
                  int epsilon = 500; // Machine epsilon

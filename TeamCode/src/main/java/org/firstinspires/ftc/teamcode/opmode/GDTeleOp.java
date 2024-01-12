@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmode;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -13,13 +14,12 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 //import org.firstinspires.ftc.teamcode.Subsystem.ArmDriver;
 
-@TeleOp(name = "GDTeleOp", group = "TeleOp")
+@Disabled
+@TeleOp(name = "GDTeleOp", group = "Archived")
 public class GDTeleOp extends LinearOpMode {
     CRServo bucketServo;
     CRServo Launcher;
 
-    // Intialize Gamepad
-    private GamepadEx gamepadEx1;
     private GamepadEx gamepadEx2;
 
     //ArmDriver armDriver;
@@ -55,7 +55,8 @@ public class GDTeleOp extends LinearOpMode {
         // Backboard Position
         int backBoardPos = 0;
 
-        gamepadEx1 = new GamepadEx(gamepad1);
+        // Intialize Gamepad
+        GamepadEx gamepadEx1 = new GamepadEx(gamepad1);
         gamepadEx2 = new GamepadEx(gamepad2);
 
         waitForStart();

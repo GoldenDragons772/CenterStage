@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.utils.PIDControl;
 
 @Disabled
 @Config
-@Autonomous(name = "RobotTag", group = "Auto")
+@Autonomous(name = "RobotTag", group = "Testing")
 public class RoboTag extends LinearOpMode {
     int centerX = 160;
 
