@@ -29,19 +29,18 @@ class Diagnostic : LinearOpMode() {
         testDipperRotate()
         testSlideRetract()
         testIntake()
-
     }
 
 
     private fun testCircleDrive() {
-        val traj = mecDrive.trajectoryBuilder(Pose2d())
-            .splineTo(Vector2d(strafeLength, strafeLength), Math.toRadians(90.0))
-            .splineTo(Vector2d(0.0, 2 * strafeLength), Math.toRadians(180.0))
-            .splineTo(Vector2d(-strafeLength, strafeLength), Math.toRadians(270.0))
-            .splineTo(Vector2d(0.0, 0.0), 0.0).build()
-
         this.telemetry.addLine("TEST: Circle Drive")
-        mecDrive.followTrajectory(traj)
+        mecDrive.followTrajectory(
+            mecDrive.trajectoryBuilder(Pose2d())
+                .splineTo(Vector2d(strafeLength, strafeLength), Math.toRadians(90.0))
+                .splineTo(Vector2d(0.0, 2 * strafeLength), Math.toRadians(180.0))
+                .splineTo(Vector2d(-strafeLength, strafeLength), Math.toRadians(270.0))
+                .splineTo(Vector2d(0.0, 0.0), 0.0).build()
+        )
         while (mecDrive.isBusy) {
             sleep(20)
         }
@@ -49,16 +48,16 @@ class Diagnostic : LinearOpMode() {
     }
 
     private fun testSquareStrafe() {
-        val traj = mecDrive.trajectorySequenceBuilder(Pose2d(0.0,0.0,0.0))
-            .forward(strafeLength)
-            .strafeLeft(strafeLength)
-            .back(strafeLength)
-            .strafeRight(strafeLength)
-            .build()
-
         this.telemetry.addLine("TEST: Square Strafe")
         this.telemetry.update()
-        mecDrive.followTrajectorySequence(traj)
+        mecDrive.followTrajectorySequence(
+            mecDrive.trajectorySequenceBuilder(Pose2d(0.0, 0.0, 0.0))
+                .forward(strafeLength)
+                .strafeLeft(strafeLength)
+                .back(strafeLength)
+                .strafeRight(strafeLength)
+                .build()
+        )
         while (mecDrive.isBusy) {
             sleep(20)
         }

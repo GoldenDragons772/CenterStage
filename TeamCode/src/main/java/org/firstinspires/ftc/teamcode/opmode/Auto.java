@@ -3,24 +3,19 @@ package org.firstinspires.ftc.teamcode.opmode;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
-import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
-import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystem.*;
-import org.firstinspires.ftc.teamcode.subsystem.ArmMotorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.TrajectoryFollowerCommand;
 
-import java.security.PublicKey;
-
 @Autonomous(name = "GDAutoTest", group = "Auto")
-public class GDAutoTest extends LinearOpMode {
+public class Auto extends LinearOpMode {
 
     private MecanumDriveSubsystem drive;
     private TrajectoryFollowerCommand follower;
