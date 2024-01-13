@@ -15,6 +15,7 @@ class Diagnostic : LinearOpMode() {
     private lateinit var armMotorSubsystem: ArmMotorSubsystem
     private lateinit var dipperSubsystem: DipperSubsystem
     private lateinit var intakeSubsystem: IntakeSubsystem
+    private val strafeLength = 1.0;
     override fun runOpMode() {
         mecDrive = MainMecanumDrive(hardwareMap)
         armMotorSubsystem = ArmMotorSubsystem(hardwareMap)
@@ -34,9 +35,9 @@ class Diagnostic : LinearOpMode() {
 
     private fun testCircleDrive() {
         val traj = mecDrive.trajectoryBuilder(Pose2d())
-            .splineTo(Vector2d(15.0, 15.0), Math.toRadians(90.0))
-            .splineTo(Vector2d(0.0, 30.0), Math.toRadians(180.0))
-            .splineTo(Vector2d(-15.0, 15.0), Math.toRadians(270.0))
+            .splineTo(Vector2d(strafeLength, strafeLength), Math.toRadians(90.0))
+            .splineTo(Vector2d(0.0, 2 * strafeLength), Math.toRadians(180.0))
+            .splineTo(Vector2d(-strafeLength, strafeLength), Math.toRadians(270.0))
             .splineTo(Vector2d(0.0, 0.0), 0.0).build()
 
         this.telemetry.addLine("TEST: Circle Drive")
@@ -49,9 +50,9 @@ class Diagnostic : LinearOpMode() {
 
     private fun testSquareStrafe() {
         val traj = mecDrive.trajectoryBuilder(Pose2d())
-            .lineTo(Vector2d(15.0, 15.0))
-            .lineTo(Vector2d(0.0, 30.0))
-            .lineTo(Vector2d(-15.0, 15.0))
+            .lineTo(Vector2d(strafeLength, 0.0))
+            .lineTo(Vector2d(strafeLength, strafeLength))
+            .lineTo(Vector2d(0.0, strafeLength))
             .lineTo(Vector2d(0.0, 0.0))
             .build()
 
@@ -64,7 +65,6 @@ class Diagnostic : LinearOpMode() {
     }
 
     private fun testRotation() {
-
         this.telemetry.addLine("TEST: Spin (1080deg)")
         mecDrive.turn(Math.toRadians(360.0 * 3.0))
         this.telemetry.addLine("End Pos: (${this.mecDrive.poseEstimate.x}, ${this.mecDrive.poseEstimate.y})/${this.mecDrive.poseEstimate.heading}")

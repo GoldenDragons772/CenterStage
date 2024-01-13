@@ -14,12 +14,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
-import org.firstinspires.ftc.teamcode.subsystem.ArmMotorEx;
-import org.firstinspires.ftc.teamcode.subsystem.BucketPivotSubsystem;
-import org.firstinspires.ftc.teamcode.subsystem.BucketSubsystem;
-import org.firstinspires.ftc.teamcode.subsystem.DipperSubsystem;
-import org.firstinspires.ftc.teamcode.subsystem.HuskySubsystem;
-import org.firstinspires.ftc.teamcode.subsystem.MecanumDriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystem.*;
+import org.firstinspires.ftc.teamcode.subsystem.ArmMotorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.TrajectoryFollowerCommand;
 
 import java.security.PublicKey;
@@ -42,7 +38,7 @@ public class GDAutoTest extends LinearOpMode {
 
     private DipperSubsystem dipper;
 
-    private ArmMotorEx armMotor;
+    private ArmMotorSubsystem armMotor;
 
     private String spikePos = "ERROR_404";
 
@@ -71,7 +67,7 @@ public class GDAutoTest extends LinearOpMode {
 
         dipper = new DipperSubsystem(hardwareMap);
 
-        armMotor = new ArmMotorEx(hardwareMap);
+        armMotor = new ArmMotorSubsystem(hardwareMap);
 
         Trajectory LD_RED_FOLLOW = drive.trajectoryBuilder(LD_RED_STARTPOS)
                 .strafeRight(45)
