@@ -22,7 +22,7 @@ public class Auto extends LinearOpMode {
 
     private TrajectoryFollowerCommand driveToBackdrop;
 
-    private HuskySubsystem husky;
+//    private HuskySubsystem husky;
 
     private HuskySubsystem.SpikeLocation currentSpikeLocation;
 
@@ -53,7 +53,7 @@ public class Auto extends LinearOpMode {
 
         drive = new MecanumDriveSubsystem(new MainMecanumDrive(hardwareMap), false);
 
-        husky = new HuskySubsystem(hardwareMap);
+//        husky = new HuskySubsystem(hardwareMap);
 
         bucket = new BucketSubsystem(hardwareMap);
 
@@ -81,13 +81,11 @@ public class Auto extends LinearOpMode {
 
         Trajectory SD_BLUE_FOLLOW;
 
-
-
 //
 //        follower = new TrajectoryFollowerCommand(drive, traj);
 
         // Set Algorithm to Object Tracking
-        husky.setAlgorithm(HuskyLens.Algorithm.OBJECT_TRACKING);
+//        husky.setAlgorithm(HuskyLens.Algorithm.OBJECT_TRACKING);
 
         follower = new TrajectoryFollowerCommand(drive, LD_RED_FOLLOW);
 
@@ -97,19 +95,19 @@ public class Auto extends LinearOpMode {
 
 
         while(opModeInInit()) {
-            currentSpikeLocation = husky.getSpikeLocation();
-
-            switch(currentSpikeLocation) {
-                case LEFT_POSITION:
-                    spikePos = "LEFT_POSITION";
-                    break;
-                case RIGHT_POSITION:
-                    spikePos = "RIGHT_POSITION";
-                    break;
-                case CENTER_POSITION:
-                    spikePos = "CENTER_POSITION";
-                    break;
-            }
+//            currentSpikeLocation = husky.getSpikeLocation();
+//
+//            switch(currentSpikeLocation) {
+//                case LEFT_POSITION:
+//                    spikePos = "LEFT_POSITION";
+//                    break;
+//                case RIGHT_POSITION:
+//                    spikePos = "RIGHT_POSITION";
+//                    break;
+//                case CENTER_POSITION:
+//                    spikePos = "CENTER_POSITION";
+//                    break;
+//            }
 
             // Auto Selector
             if (gamepad1.dpad_right) { // Long Distance Red Auto
@@ -144,7 +142,26 @@ public class Auto extends LinearOpMode {
                         dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
                         bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
                     }),
-                    driveToBackdrop
+                    driveToBackdrop,
+                    new InstantCommand(() -> {
+                        bucket.dispensePixels();
+                    }),
+                    new WaitCommand(2000),
+                    new InstantCommand(() -> {
+                        bucket.stopBucket();
+                        armMotor.setArmToPos(0);
+                        dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
+                        int timeout = 1200;
+                        int epsilon = 550; // Machine epsilon
+                        while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {
+                            try {
+                                Thread.sleep(20);
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                        bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
+                    })
                 ).alongWith(new RunCommand(() -> {
                     drive.update();
                 }))

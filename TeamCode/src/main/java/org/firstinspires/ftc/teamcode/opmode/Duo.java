@@ -116,7 +116,7 @@ public class Duo extends CommandOpMode {
                     armMotor.setArmToPos(0);
                     dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
                     int timeout = 1200;
-                    int epsilon = 500; // Machine epsilon
+                    int epsilon = 550; // Machine epsilon
                     while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {
                         try {
                             Thread.sleep(20);
