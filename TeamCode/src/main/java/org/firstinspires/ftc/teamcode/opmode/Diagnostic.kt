@@ -49,16 +49,16 @@ class Diagnostic : LinearOpMode() {
     }
 
     private fun testSquareStrafe() {
-        val traj = mecDrive.trajectoryBuilder(Pose2d())
-            .lineTo(Vector2d(strafeLength, 0.0))
-            .lineTo(Vector2d(strafeLength, strafeLength))
-            .lineTo(Vector2d(0.0, strafeLength))
-            .lineTo(Vector2d(0.0, 0.0))
+        val traj = mecDrive.trajectorySequenceBuilder(Pose2d(0.0,0.0,0.0))
+            .forward(strafeLength)
+            .strafeLeft(strafeLength)
+            .back(strafeLength)
+            .strafeRight(strafeLength)
             .build()
 
         this.telemetry.addLine("TEST: Square Strafe")
         this.telemetry.update()
-        mecDrive.followTrajectory(traj)
+        mecDrive.followTrajectorySequence(traj)
         while (mecDrive.isBusy) {
             sleep(20)
         }
