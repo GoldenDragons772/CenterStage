@@ -29,6 +29,9 @@ class Diagnostic : LinearOpMode() {
         testDipperRotate()
         testSlideRetract()
         testIntake()
+        while (true) {
+            sleep(1000)
+        }
     }
 
 

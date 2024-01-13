@@ -96,7 +96,23 @@ public class Duo extends CommandOpMode {
                  intake.stopIntake();
              }));
 
+        // Climb
+        gpad1.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+                .whenPressed(new InstantCommand(() -> {
+                    dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
+                    bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
+                    armMotor.setArmToPos(2200);
+                }));
 
+        // Hang
+        gpad1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
+                .whenPressed(new InstantCommand(() -> {
+                    dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
+                    bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
+                    armMotor.setArmToPos(100);
+                }));
+
+        // Mid Position
         gpad2.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
              .whenPressed(new InstantCommand(() -> {
                  armMotor.setArmToPos(1500);
@@ -104,6 +120,7 @@ public class Duo extends CommandOpMode {
                  bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
              }));
 
+        // Top Position
         gpad2.getGamepadButton(GamepadKeys.Button.DPAD_UP)
                 .whenPressed(new InstantCommand(() -> {
                     armMotor.setArmToPos(2200);
@@ -111,6 +128,7 @@ public class Duo extends CommandOpMode {
                     bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
                 }));
 
+        // Home Positon
         gpad2.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
                 .whenPressed(new InstantCommand(() -> {
                     armMotor.setArmToPos(0);

@@ -13,10 +13,10 @@ public class DroneSubsystem extends SubsystemBase {
     }
 
     public void shootDrone() {
-        drone.setPosition(1);
+        drone.setPosition(-1);
     }
 
     public void loadDrone() {
-        drone.setPosition(-1);
+        drone.setPosition(1);
     }
 }
