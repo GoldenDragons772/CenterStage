@@ -22,6 +22,9 @@ class Diagnostic : LinearOpMode() {
         dipperSubsystem = DipperSubsystem(hardwareMap)
         intakeSubsystem = IntakeSubsystem(hardwareMap)
         waitForStart()
+        this.telemetry.addLine("Creating github issues...")
+        this.telemetry.addLine("Decreasing the number of servos...")
+        this.telemetry.addLine("Fixing \"programming\" issues...")
         testCircleDrive()
         testSquareStrafe()
         testRotation()
@@ -29,6 +32,7 @@ class Diagnostic : LinearOpMode() {
         testDipperRotate()
         testSlideRetract()
         testIntake()
+        // Filibuster
         while (true) {
             sleep(1000)
         }
@@ -52,7 +56,6 @@ class Diagnostic : LinearOpMode() {
 
     private fun testSquareStrafe() {
         this.telemetry.addLine("TEST: Square Strafe")
-        this.telemetry.update()
         mecDrive.followTrajectorySequence(
             mecDrive.trajectorySequenceBuilder(Pose2d(0.0, 0.0, 0.0))
                 .forward(strafeLength)
@@ -69,41 +72,39 @@ class Diagnostic : LinearOpMode() {
 
     private fun testRotation() {
         this.telemetry.addLine("TEST: Spin (1080deg)")
-        this.telemetry.update()
         mecDrive.turn(Math.toRadians(360.0 * 3.0))
         this.telemetry.addLine("End Pos: (${this.mecDrive.poseEstimate.x}, ${this.mecDrive.poseEstimate.y})/${this.mecDrive.poseEstimate.heading}")
     }
 
     private fun testSlideExtend() {
         this.telemetry.addLine("TEST: Slide Extend (2100T)")
-        this.telemetry.update()
         armMotorSubsystem.setArmToPos(2100)
         this.telemetry.addLine("Pos (L): ${armMotorSubsystem.leftArmMotor.currentPosition} Pos (R): ${armMotorSubsystem.rightArmMotor.currentPosition}")
     }
 
     private fun testDipperRotate() {
         this.telemetry.addLine("TEST: Dipper Rotation (Scoring)")
-        this.telemetry.update()
         this.dipperSubsystem.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION)
+        this.telemetry.addLine("Pos (L): ${this.dipperSubsystem.leftDipperServo.position} Pos(R): ${this.dipperSubsystem.rightDipperServo.position} ")
+        this.dipperSubsystem.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION)
         this.telemetry.addLine("Pos (L): ${this.dipperSubsystem.leftDipperServo.position} Pos(R): ${this.dipperSubsystem.rightDipperServo.position} ")
     }
 
     private fun testSlideRetract() {
         this.telemetry.addLine("TEST: Slide Retract (0T)")
-        this.telemetry.update()
         armMotorSubsystem.setArmToPos(0)
         this.telemetry.addLine("Pos (L): ${armMotorSubsystem.leftArmMotor.currentPosition} Pos (R): ${armMotorSubsystem.rightArmMotor.currentPosition}")
     }
 
     private fun testIntake() {
         this.telemetry.addLine("TEST: Intake")
-        this.telemetry.update()
         intakeSubsystem.runIntake()
         sleep(1000)
         intakeSubsystem.stopIntake()
         sleep(1000)
         intakeSubsystem.dispenseIntake()
         sleep(1000)
+        intakeSubsystem.stopIntake()
         this.telemetry.addLine("Intake test complete.")
         this.telemetry.update()
     }
