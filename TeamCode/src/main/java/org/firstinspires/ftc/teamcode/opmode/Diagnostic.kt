@@ -8,6 +8,8 @@ import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive
 import org.firstinspires.ftc.teamcode.subsystem.ArmMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystem.DipperSubsystem
 import org.firstinspires.ftc.teamcode.subsystem.IntakeSubsystem
+import kotlin.math.exp
+import kotlin.math.sqrt
 
 @Autonomous(name = "Diagnostic")
 class Diagnostic : LinearOpMode() {
@@ -40,7 +42,7 @@ class Diagnostic : LinearOpMode() {
 
 
     private fun testCircleDrive() {
-        this.telemetry.addLine("TEST: Circle Drive")
+        this.telemetry.addLine("TEST: Circle Drive (0.0, 0.0)")
         mecDrive.followTrajectory(
             mecDrive.trajectoryBuilder(Pose2d())
                 .splineTo(Vector2d(strafeLength, strafeLength), Math.toRadians(90.0))
@@ -51,11 +53,11 @@ class Diagnostic : LinearOpMode() {
         while (mecDrive.isBusy) {
             sleep(20)
         }
-        this.telemetry.addLine("End Pos: (${this.mecDrive.poseEstimate.x}, ${this.mecDrive.poseEstimate.y})/${this.mecDrive.poseEstimate.heading}")
+        this.telemetry.addLine("Err: ${sqrt(exp(this.mecDrive.poseEstimate.x)-exp(this.mecDrive.poseEstimate.y))} End Pos: (${this.mecDrive.poseEstimate.x}, ${this.mecDrive.poseEstimate.y})/${this.mecDrive.poseEstimate.heading}")
     }
 
     private fun testSquareStrafe() {
-        this.telemetry.addLine("TEST: Square Strafe")
+        this.telemetry.addLine("TEST: Square Strafe (0.0, 0.0)")
         mecDrive.followTrajectorySequence(
             mecDrive.trajectorySequenceBuilder(Pose2d(0.0, 0.0, 0.0))
                 .forward(strafeLength)
@@ -67,13 +69,14 @@ class Diagnostic : LinearOpMode() {
         while (mecDrive.isBusy) {
             sleep(20)
         }
-        this.telemetry.addLine("End Pos: (${this.mecDrive.poseEstimate.x}, ${this.mecDrive.poseEstimate.y})/${this.mecDrive.poseEstimate.heading}")
+        this.telemetry.addLine("Err: ${sqrt(exp(this.mecDrive.poseEstimate.x)-exp(this.mecDrive.poseEstimate.y))} End Pos: (${this.mecDrive.poseEstimate.x}, ${this.mecDrive.poseEstimate.y})/${this.mecDrive.poseEstimate.heading}")
     }
 
     private fun testRotation() {
         this.telemetry.addLine("TEST: Spin (1080deg)")
+        val originalHeading = mecDrive.externalHeading
         mecDrive.turn(Math.toRadians(360.0 * 3.0))
-        this.telemetry.addLine("End Pos: (${this.mecDrive.poseEstimate.x}, ${this.mecDrive.poseEstimate.y})/${this.mecDrive.poseEstimate.heading}")
+        this.telemetry.addLine("Err: ${mecDrive.externalHeading - originalHeading} End Pos: (${this.mecDrive.poseEstimate.x}, ${this.mecDrive.poseEstimate.y})/${this.mecDrive.poseEstimate.heading}")
     }
 
     private fun testSlideExtend() {
@@ -93,7 +96,7 @@ class Diagnostic : LinearOpMode() {
     private fun testSlideRetract() {
         this.telemetry.addLine("TEST: Slide Retract (0T)")
         armMotorSubsystem.setArmToPos(0)
-        this.telemetry.addLine("Pos (L): ${armMotorSubsystem.leftArmMotor.currentPosition} Pos (R): ${armMotorSubsystem.rightArmMotor.currentPosition}")
+        this.telemetry.addLine("Err:${armMotorSubsystem.avgArmPosition} Pos (L): ${armMotorSubsystem.leftArmMotor.currentPosition} Pos (R): ${armMotorSubsystem.rightArmMotor.currentPosition}")
     }
 
     private fun testIntake() {
