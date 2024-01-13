@@ -29,12 +29,13 @@ public class GDtest {
         double strafeLength = 15.0;
         RoadRunnerBotEntity Blue = new DefaultBotBuilder(meepMeep)
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 14.83)
-                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(0,0, Math.toRadians(180)))
-                                                        .lineTo(new Vector2d(strafeLength, 0.0))
-                                                        .lineTo(new Vector2d(strafeLength, strafeLength))
-                                                        .lineTo(new Vector2d(0.0, strafeLength))
-                                                        .lineTo(new Vector2d(0.0, 0.0))
-                                                        .build()
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-37, -62, Math.toRadians(180)))
+                        .strafeRight(45)
+                        .splineToConstantHeading(new Vector2d(10, -10), Math.toRadians(0))
+                        // Go to Backboard
+                        .lineTo(new Vector2d(30, -10))
+                        .splineToConstantHeading(new Vector2d(54, -35), Math.toRadians(0))
+                        .build()
                 );
 
         Image img = null;

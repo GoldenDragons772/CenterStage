@@ -74,9 +74,8 @@ public class GDAutoTest extends LinearOpMode {
                 .build();
 
         Trajectory LD_RED_BACKBOARD = drive.trajectoryBuilder(LD_RED_FOLLOW.end())
-                .lineTo(new Vector2d(48, -10))
-                .strafeRight(30)
-                .forward(10)
+                .lineTo(new Vector2d(30, -10))
+                .splineToConstantHeading(new Vector2d(54, -25), Math.toRadians(0))
                 .build();
 
 
