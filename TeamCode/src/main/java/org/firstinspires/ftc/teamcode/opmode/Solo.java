@@ -109,15 +109,15 @@ public class Solo extends CommandOpMode {
                  bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
              }));
 
-//        gpad1.getGamepadButton(GamepadKeys.Button.Y)
-//                .whenPressed(new InstantCommand(() -> {
-//                    drone.shootDrone();
-//                }));
-//
-//        gpad1.getGamepadButton(GamepadKeys.Button.X)
-//                .whenPressed(new InstantCommand(() -> {
-//                    drone.loadDrone();
-//                }));
+        gpad1.getGamepadButton(GamepadKeys.Button.Y)
+                .whenPressed(new InstantCommand(() -> {
+                    drone.shootDrone();
+                }));
+
+        gpad1.getGamepadButton(GamepadKeys.Button.X)
+                .whenPressed(new InstantCommand(() -> {
+                    drone.loadDrone();
+                }));
 
         schedule(new RunCommand(() -> {
 
