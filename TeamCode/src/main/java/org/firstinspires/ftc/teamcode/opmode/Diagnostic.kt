@@ -57,6 +57,7 @@ class Diagnostic : LinearOpMode() {
             .build()
 
         this.telemetry.addLine("TEST: Square Strafe")
+        this.telemetry.update()
         mecDrive.followTrajectory(traj)
         while (mecDrive.isBusy) {
             sleep(20)
@@ -66,30 +67,35 @@ class Diagnostic : LinearOpMode() {
 
     private fun testRotation() {
         this.telemetry.addLine("TEST: Spin (1080deg)")
+        this.telemetry.update()
         mecDrive.turn(Math.toRadians(360.0 * 3.0))
         this.telemetry.addLine("End Pos: (${this.mecDrive.poseEstimate.x}, ${this.mecDrive.poseEstimate.y})/${this.mecDrive.poseEstimate.heading}")
     }
 
     private fun testSlideExtend() {
         this.telemetry.addLine("TEST: Slide Extend (2100T)")
+        this.telemetry.update()
         armMotorSubsystem.setArmToPos(2100)
         this.telemetry.addLine("Pos (L): ${armMotorSubsystem.leftArmMotor.currentPosition} Pos (R): ${armMotorSubsystem.rightArmMotor.currentPosition}")
     }
 
     private fun testDipperRotate() {
         this.telemetry.addLine("TEST: Dipper Rotation (Scoring)")
+        this.telemetry.update()
         this.dipperSubsystem.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION)
         this.telemetry.addLine("Pos (L): ${this.dipperSubsystem.leftDipperServo.position} Pos(R): ${this.dipperSubsystem.rightDipperServo.position} ")
     }
 
     private fun testSlideRetract() {
         this.telemetry.addLine("TEST: Slide Retract (0T)")
+        this.telemetry.update()
         armMotorSubsystem.setArmToPos(0)
         this.telemetry.addLine("Pos (L): ${armMotorSubsystem.leftArmMotor.currentPosition} Pos (R): ${armMotorSubsystem.rightArmMotor.currentPosition}")
     }
 
     private fun testIntake() {
         this.telemetry.addLine("TEST: Intake")
+        this.telemetry.update()
         intakeSubsystem.runIntake()
         sleep(1000)
         intakeSubsystem.stopIntake()
@@ -97,5 +103,6 @@ class Diagnostic : LinearOpMode() {
         intakeSubsystem.dispenseIntake()
         sleep(1000)
         this.telemetry.addLine("Intake test complete.")
+        this.telemetry.update()
     }
 }
