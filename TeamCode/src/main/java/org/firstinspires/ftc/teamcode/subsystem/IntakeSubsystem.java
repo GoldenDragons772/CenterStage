@@ -20,7 +20,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void dispenseIntake() {
-        intakeMotor.setPower(-1);
+        intakeMotor.setPower(-0.2);
     }
 
     public void stopIntake() {

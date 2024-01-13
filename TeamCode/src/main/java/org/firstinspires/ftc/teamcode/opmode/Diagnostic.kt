@@ -17,7 +17,7 @@ class Diagnostic : LinearOpMode() {
     private lateinit var armMotorSubsystem: ArmMotorSubsystem
     private lateinit var dipperSubsystem: DipperSubsystem
     private lateinit var intakeSubsystem: IntakeSubsystem
-    private val strafeLength = 1.0;
+    private val strafeLength = 3.0;
     override fun runOpMode() {
         mecDrive = MainMecanumDrive(hardwareMap)
         armMotorSubsystem = ArmMotorSubsystem(hardwareMap)
