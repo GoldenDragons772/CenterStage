@@ -12,7 +12,6 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystem.*;
 import org.firstinspires.ftc.teamcode.subsystem.ArmMotorSubsystem;
@@ -76,6 +75,8 @@ public class GDAutoTest extends LinearOpMode {
 
         Trajectory LD_RED_BACKBOARD = drive.trajectoryBuilder(LD_RED_FOLLOW.end())
                 .lineTo(new Vector2d(48, -10))
+                .strafeRight(30)
+                .forward(10)
                 .build();
 
 
