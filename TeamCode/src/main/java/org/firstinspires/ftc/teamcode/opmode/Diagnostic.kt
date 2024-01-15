@@ -80,8 +80,8 @@ class Diagnostic : LinearOpMode() {
     }
 
     private fun testSlideExtend() {
-        this.telemetry.addLine("TEST: Slide Extend (2100T)")
-        armMotorSubsystem.setArmToPos(2100)
+        this.telemetry.addLine("TEST: Slide Extend (2200T)")
+        armMotorSubsystem.setArmToPos(ArmMotorSubsystem.ArmPos.HIGH)
         armMotorSubsystem.waitForIdle()
 
         this.telemetry.addLine("Pos (L): ${armMotorSubsystem.leftArmMotor.currentPosition} Pos (R): ${armMotorSubsystem.rightArmMotor.currentPosition}")
@@ -100,7 +100,7 @@ class Diagnostic : LinearOpMode() {
 
     private fun testSlideRetract() {
         this.telemetry.addLine("TEST: Slide Retract (0T)")
-        armMotorSubsystem.setArmToPos(0)
+        armMotorSubsystem.setArmToPos(ArmMotorSubsystem.ArmPos.HOME)
         this.telemetry.addLine("Err:${armMotorSubsystem.avgArmPosition} Pos (L): ${armMotorSubsystem.leftArmMotor.currentPosition} Pos (R): ${armMotorSubsystem.rightArmMotor.currentPosition}")
     }
 

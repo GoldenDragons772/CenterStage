@@ -50,18 +50,7 @@ public class Duo extends CommandOpMode {
         gpad2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
              .whenHeld(
                      new InstantCommand(() -> {
-                         intake.runIntake();
-                         bucket.intakePixels();
-                     })
-             )
-             .whenReleased(new InstantCommand(() -> {
-                 intake.stopIntake();
-                 bucket.stopBucket();
-             }));
-
-        gpad1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-             .whenHeld(
-                     new InstantCommand(() -> {
+                         if (armMotor.getArmPos() != ArmMotorSubsystem.ArmPos.HOME) return;
                          intake.runIntake();
                          bucket.intakePixels();
                      })
@@ -84,24 +73,12 @@ public class Duo extends CommandOpMode {
                  intake.stopIntake();
              }));
 
-        // Dispense Pixels.
-        gpad1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-             .whenHeld(new InstantCommand(() -> {
-                 bucket.dispensePixels();
-                 intake.dispenseIntake();
-
-             }))
-             .whenReleased(new InstantCommand(() -> {
-                 bucket.stopBucket();
-                 intake.stopIntake();
-             }));
-
         // Climb
         gpad1.getGamepadButton(GamepadKeys.Button.DPAD_UP)
                 .whenPressed(new InstantCommand(() -> {
                     dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
                     bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
-                    armMotor.setArmToPos(2200);
+                    armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HIGH);
                 }));
 
         // Hang
@@ -112,10 +89,10 @@ public class Duo extends CommandOpMode {
                     armMotor.setArmToPos(100);
                 }));
 
-        // Mid Position
+        // Middle Position
         gpad2.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
              .whenPressed(new InstantCommand(() -> {
-                 armMotor.setArmToPos(1500);
+                 armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.MIDDLE);
                  dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
                  bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
              }));
@@ -123,15 +100,15 @@ public class Duo extends CommandOpMode {
         // Top Position
         gpad2.getGamepadButton(GamepadKeys.Button.DPAD_UP)
                 .whenPressed(new InstantCommand(() -> {
-                    armMotor.setArmToPos(2200);
+                    armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HIGH);
                     dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
                     bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
                 }));
 
-        // Home Positon
+        // Home Position
         gpad2.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
                 .whenPressed(new InstantCommand(() -> {
-                    armMotor.setArmToPos(0);
+                    armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
                     dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
                     int timeout = 1200;
                     int epsilon = 550; // Machine epsilon
@@ -161,12 +138,12 @@ public class Duo extends CommandOpMode {
             double forward = Math.pow(gamepad1.right_stick_y, 2) * Math.signum(gamepad1.right_stick_y);
             double spin = Math.pow(gamepad1.left_stick_x, 2) * Math.signum(gamepad1.left_stick_x);
 
-            double Speedper = 1;
+            double speedMultiplier = 1;
 
             drive.drive(
-                    forward * Speedper,
-                    strafe * Speedper,
-                    spin * Speedper
+                    forward * speedMultiplier,
+                    strafe * speedMultiplier,
+                    spin * speedMultiplier
             );
 
 

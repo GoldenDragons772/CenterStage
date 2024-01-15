@@ -152,7 +152,7 @@ public class Auto extends LinearOpMode {
                 new SequentialCommandGroup(
                     follower,
                     new InstantCommand(() -> {
-                        armMotor.setArmToPos(1500);
+                        armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.MIDDLE);
                         dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
                         bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
                     }),
@@ -163,7 +163,7 @@ public class Auto extends LinearOpMode {
                     new WaitCommand(2000),
                     new InstantCommand(() -> {
                         bucket.stopBucket();
-                        armMotor.setArmToPos(0);
+                        armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
                         dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
                         int timeout = 1200;
                         int epsilon = 550; // Machine epsilon
