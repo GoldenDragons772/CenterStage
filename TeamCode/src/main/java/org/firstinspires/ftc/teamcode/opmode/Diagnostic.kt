@@ -82,15 +82,20 @@ class Diagnostic : LinearOpMode() {
     private fun testSlideExtend() {
         this.telemetry.addLine("TEST: Slide Extend (2100T)")
         armMotorSubsystem.setArmToPos(2100)
+        armMotorSubsystem.waitForIdle()
+
         this.telemetry.addLine("Pos (L): ${armMotorSubsystem.leftArmMotor.currentPosition} Pos (R): ${armMotorSubsystem.rightArmMotor.currentPosition}")
     }
 
     private fun testDipperRotate() {
         this.telemetry.addLine("TEST: Dipper Rotation (Scoring)")
+        // This assumes that the dipper is already in the loading position.
         this.dipperSubsystem.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION)
-        this.telemetry.addLine("Pos (L): ${this.dipperSubsystem.leftDipperServo.position} Pos(R): ${this.dipperSubsystem.rightDipperServo.position} ")
+        this.dipperSubsystem.waitForIdle()
+        this.telemetry.addLine("Pos (L): ${this.dipperSubsystem.leftPosition} Pos(R): ${this.dipperSubsystem.rightPosition} ")
         this.dipperSubsystem.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION)
-        this.telemetry.addLine("Pos (L): ${this.dipperSubsystem.leftDipperServo.position} Pos(R): ${this.dipperSubsystem.rightDipperServo.position} ")
+        this.dipperSubsystem.waitForIdle()
+        this.telemetry.addLine("Pos (L): ${this.dipperSubsystem.leftPosition} Pos(R): ${this.dipperSubsystem.rightPosition} ")
     }
 
     private fun testSlideRetract() {

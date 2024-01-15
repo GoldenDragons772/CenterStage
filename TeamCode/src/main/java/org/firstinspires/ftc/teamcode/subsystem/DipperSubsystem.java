@@ -8,37 +8,49 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Config
 public class DipperSubsystem extends SubsystemBase {
 
-    public static double rightDipperServoLoadingPos = -0.2;
-
-    public static double leftDipperServoLoadingPos = 0.875;
-
-    public static double rightDipperServoScoringPos = 0.855;
-
-    public static double leftDipperServoScoringPos = -1;
-
-
-    public Servo rightDipperServo, leftDipperServo;
+    private final static double rightLoadingPos = 0.215 + 0.025;
+    private final static double leftLoadingPos = 0.875;
+    private final static double rightScoringPos = 0.855;
+    private final static double leftScoringPos = -1;
+    private static double leftDestinationPos = 0.0;
+    private static double rightDestinationPos = 0.0;
+    private final Servo right, left;
 
     public enum DipperPositions {
         LOADING_POSITION,
         SCORING_POSITION
     }
 
+    public void waitForIdle() {
+        while (this.right.getPosition() != leftDestinationPos || this.left.getPosition() != leftDestinationPos){
+            continue;
+        }
+    }
 
     public DipperSubsystem(HardwareMap hw) {
-        this.rightDipperServo = hw.get(Servo.class,"RDipper");
-        this.leftDipperServo = hw.get(Servo.class, "LDipper");
+        this.right = hw.get(Servo.class, "RDipper");
+        this.left = hw.get(Servo.class, "LDipper");
 
-        rightDipperServo.setDirection(Servo.Direction.REVERSE);
+        right.setDirection(Servo.Direction.REVERSE);
     }
 
     public void setDipperPosition(DipperPositions pos) {
-        if(pos == DipperPositions.LOADING_POSITION) {
-            rightDipperServo.setPosition(0.215 + 0.025 ); // 0.08 offset
-            leftDipperServo.setPosition(0.215);
-        } else if(pos == DipperPositions.SCORING_POSITION) {
-            rightDipperServo.setPosition(0.98);
-            leftDipperServo.setPosition(0.98 - 0.06); // - 0.06 offset
+        if (pos == DipperPositions.LOADING_POSITION) {
+            right.setPosition(rightLoadingPos); // 0.08 offset
+            left.setPosition(leftLoadingPos);
+            rightDestinationPos = rightLoadingPos;
+            leftDestinationPos = leftLoadingPos;
+        } else if (pos == DipperPositions.SCORING_POSITION) {
+            right.setPosition(rightScoringPos);
+            left.setPosition(leftScoringPos); // - 0.06 offset
+            rightDestinationPos = rightScoringPos;
+            leftDestinationPos = leftScoringPos;
         }
+    }
+    public double getLeftPosition() {
+        return this.left.getPosition();
+    }
+    public double getRightPosition(){
+        return this.right.getPosition();
     }
 }

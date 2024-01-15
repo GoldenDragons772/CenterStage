@@ -46,6 +46,9 @@ public class ArmMotorSubsystem implements Subsystem {
 //        leftPID.KD = kD;
 
     }
+    public void waitForIdle(){
+        while (!Thread.currentThread().isInterrupted() && leftArmMotor.isBusy() && rightArmMotor.isBusy());
+    }
 
 
     public void setArmToPos(int pos) {
