@@ -16,3 +16,4 @@ This repo contains TeamCode and information regarding the Robot used for the Yea
 - [gm0](https://gm0.org/en/latest/)
 - [First](https://www.firstinspires.org/)
 - [Google](https://www.google.com)
+- [Pit Checklist](https://docs.google.com/document/d/1njgC9PQ0OBxSRBnAYGHunU7Sf8JPv_Jf05HdO0xzoY4)
