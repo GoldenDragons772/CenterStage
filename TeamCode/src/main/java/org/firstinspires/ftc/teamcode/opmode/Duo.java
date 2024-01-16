@@ -128,11 +128,12 @@ public class Duo extends CommandOpMode {
                     bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
                 }));
 
-        // Home Positon
+        // Home Position
         gpad2.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
                 .whenPressed(new InstantCommand(() -> {
-                    armMotor.setArmToPos(0);
                     dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
+                    armMotor.setArmToPos(0);
+                    // Wait for Arm Before going to Loading Position.
                     int timeout = 1200;
                     int epsilon = 550; // Machine epsilon
                     while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {

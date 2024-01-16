@@ -8,13 +8,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Config
 public class DipperSubsystem extends SubsystemBase {
 
-    public static double rightDipperServoLoadingPos = -0.2;
+    public static double leftDipperServoLoadingPos = 0.195;
 
-    public static double leftDipperServoLoadingPos = 0.875;
+    public static double leftDipperServoScoringPos = 0.95;
 
-    public static double rightDipperServoScoringPos = 0.855;
+    public static double rightDipperServoLoadingPos = 0.235;
 
-    public static double leftDipperServoScoringPos = -1;
+    public static double rightDipperServoScoringPos = 0.973;
 
 
     public Servo rightDipperServo, leftDipperServo;
@@ -34,11 +34,11 @@ public class DipperSubsystem extends SubsystemBase {
 
     public void setDipperPosition(DipperPositions pos) {
         if(pos == DipperPositions.LOADING_POSITION) {
-            rightDipperServo.setPosition(0.215 + 0.025 ); // 0.08 offset
-            leftDipperServo.setPosition(0.215);
+            rightDipperServo.setPosition(rightDipperServoLoadingPos + 0.025); // 0.08 offset
+            leftDipperServo.setPosition(leftDipperServoLoadingPos);
         } else if(pos == DipperPositions.SCORING_POSITION) {
-            rightDipperServo.setPosition(0.98);
-            leftDipperServo.setPosition(0.98 - 0.06); // - 0.06 offset
+            rightDipperServo.setPosition(rightDipperServoScoringPos);
+            leftDipperServo.setPosition(leftDipperServoScoringPos - 0.06); // - 0.06 offset
         }
     }
 }

@@ -95,8 +95,8 @@ public class Solo extends CommandOpMode {
 
         gpad1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
              .whenPressed(new InstantCommand(() -> {
-                 armMotor.setArmToPos(0);
                  dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
+                 armMotor.setArmToPos(0);
                  int timeout = 1200;
                  int epsilon = 550; // Machine epsilon
                  while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {

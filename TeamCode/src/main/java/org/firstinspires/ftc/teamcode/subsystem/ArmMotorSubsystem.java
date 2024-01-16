@@ -58,9 +58,29 @@ public class ArmMotorSubsystem implements Subsystem {
 
 //        leftArmMotor.setVelocity(1000);
 //        rightArmMotor.setVelocity(1000);
-        leftArmMotor.setPower(0.8);
-        rightArmMotor.setPower(0.8);
-        
+
+
+        if(pos == 0) {
+            // A Timeout just in case something breaks.
+            long startTime = System.currentTimeMillis();
+            long timeout = 5000; // 5 seconds in milliseconds
+
+            while(getAvgArmPosition() > 100 && (System.currentTimeMillis() - startTime) < timeout) {
+                leftArmMotor.setPower(0.8);
+                rightArmMotor.setPower(0.8);
+            }
+            // Stop the Motor
+            leftArmMotor.setPower(0);
+            rightArmMotor.setPower(0);
+            // Reset Positions
+            rightArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            leftArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        } else {
+            leftArmMotor.setPower(0.8);
+            rightArmMotor.setPower(0.8);
+        }
+
+
 //        double minError = 0.5;
 //        while (true) {
 //            int rightArmError = rightArmMotor.getCurrentPosition() - pos;
