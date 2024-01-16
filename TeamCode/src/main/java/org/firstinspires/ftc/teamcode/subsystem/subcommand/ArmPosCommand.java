@@ -11,13 +11,13 @@ public class ArmPosCommand extends InstantCommand {
         addRequirements(subsystem);
 
         switch(pos) {
-            case BACKBOARD_LOW:
+            case HOME:
                 arm_subsystem.setArmToPos(30);
                 break;
-            case BACKBOARD_CENTER:
+            case MIDDLE:
                 arm_subsystem.setArmToPos(50);
                 break;
-            case BACKBOARD_TOP:
+            case HIGH:
                 arm_subsystem.setArmToPos(80);
         }
     }

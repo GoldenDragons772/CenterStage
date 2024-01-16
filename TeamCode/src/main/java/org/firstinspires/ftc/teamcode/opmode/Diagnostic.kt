@@ -80,22 +80,27 @@ class Diagnostic : LinearOpMode() {
     }
 
     private fun testSlideExtend() {
-        this.telemetry.addLine("TEST: Slide Extend (2100T)")
-        armMotorSubsystem.setArmToPos(2100)
+        this.telemetry.addLine("TEST: Slide Extend (2200T)")
+        armMotorSubsystem.setArmToPos(ArmMotorSubsystem.ArmPos.HIGH)
+        armMotorSubsystem.waitForIdle()
+
         this.telemetry.addLine("Pos (L): ${armMotorSubsystem.leftArmMotor.currentPosition} Pos (R): ${armMotorSubsystem.rightArmMotor.currentPosition}")
     }
 
     private fun testDipperRotate() {
         this.telemetry.addLine("TEST: Dipper Rotation (Scoring)")
+        // This assumes that the dipper is already in the loading position.
         this.dipperSubsystem.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION)
-        this.telemetry.addLine("Pos (L): ${this.dipperSubsystem.leftDipperServo.position} Pos(R): ${this.dipperSubsystem.rightDipperServo.position} ")
+        this.dipperSubsystem.waitForIdle()
+        this.telemetry.addLine("Pos (L): ${this.dipperSubsystem.leftPosition} Pos(R): ${this.dipperSubsystem.rightPosition} ")
         this.dipperSubsystem.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION)
-        this.telemetry.addLine("Pos (L): ${this.dipperSubsystem.leftDipperServo.position} Pos(R): ${this.dipperSubsystem.rightDipperServo.position} ")
+        this.dipperSubsystem.waitForIdle()
+        this.telemetry.addLine("Pos (L): ${this.dipperSubsystem.leftPosition} Pos(R): ${this.dipperSubsystem.rightPosition} ")
     }
 
     private fun testSlideRetract() {
         this.telemetry.addLine("TEST: Slide Retract (0T)")
-        armMotorSubsystem.setArmToPos(0)
+        armMotorSubsystem.setArmToPos(ArmMotorSubsystem.ArmPos.HOME)
         this.telemetry.addLine("Err:${armMotorSubsystem.avgArmPosition} Pos (L): ${armMotorSubsystem.leftArmMotor.currentPosition} Pos (R): ${armMotorSubsystem.rightArmMotor.currentPosition}")
     }
 
