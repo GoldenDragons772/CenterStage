@@ -156,11 +156,7 @@ public class Auto extends LinearOpMode {
                 new SequentialCommandGroup(
                     follower,
                     new InstantCommand(() -> {
-<<<<<<< Updated upstream
                         armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.MIDDLE);
-=======
-                        armMotor.setArmToPos(1000);
->>>>>>> Stashed changes
                         dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
                         bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
                     }),

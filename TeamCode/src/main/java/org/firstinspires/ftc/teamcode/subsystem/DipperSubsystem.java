@@ -7,8 +7,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @Config
 public class DipperSubsystem extends SubsystemBase {
-
-<<<<<<< Updated upstream
     private final static double rightLoadingPos = 0.195;
     private final static double leftLoadingPos = 0.95;
     private final static double rightScoringPos = 0.235;
@@ -17,18 +15,6 @@ public class DipperSubsystem extends SubsystemBase {
     private static double rightDestinationPos = 0.0;
     private final Servo right, left;
 
-=======
-    public static double leftDipperServoLoadingPos = 0.195;
-
-    public static double leftDipperServoScoringPos = 0.95;
-
-    public static double rightDipperServoLoadingPos = 0.235;
-
-    public static double rightDipperServoScoringPos = 0.973;
-
-
-    public Servo rightDipperServo, leftDipperServo;
->>>>>>> Stashed changes
 
     public enum DipperPositions {
         LOADING_POSITION,
@@ -49,7 +35,6 @@ public class DipperSubsystem extends SubsystemBase {
     }
 
     public void setDipperPosition(DipperPositions pos) {
-<<<<<<< Updated upstream
 
         if (pos == DipperPositions.LOADING_POSITION) {
             right.setPosition(rightLoadingPos + 0.025); // 0.025 offset
@@ -61,14 +46,6 @@ public class DipperSubsystem extends SubsystemBase {
             left.setPosition(leftScoringPos - 0.06); // - 0.06 offset
             rightDestinationPos = rightScoringPos;
             leftDestinationPos = leftScoringPos;
-=======
-        if(pos == DipperPositions.LOADING_POSITION) {
-            rightDipperServo.setPosition(rightDipperServoLoadingPos + 0.025); // 0.08 offset
-            leftDipperServo.setPosition(leftDipperServoLoadingPos);
-        } else if(pos == DipperPositions.SCORING_POSITION) {
-            rightDipperServo.setPosition(rightDipperServoScoringPos);
-            leftDipperServo.setPosition(leftDipperServoScoringPos - 0.06); // - 0.06 offset
->>>>>>> Stashed changes
         }
     }
     public double getLeftPosition() {
