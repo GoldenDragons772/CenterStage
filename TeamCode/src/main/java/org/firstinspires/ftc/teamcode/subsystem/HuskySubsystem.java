@@ -24,20 +24,27 @@ public class HuskySubsystem extends SubsystemBase {
         husky.selectAlgorithm(alg);
     }
 
-    public SpikeLocation getSpikeLocation() {
+    public int getSpikeX() {
         blocks = husky.blocks();
 
         if(blocks.length != 0) {
             HuskyLens.Block spikeBlock = blocks[0];
 
-            if(spikeBlock.x > 105 && spikeBlock.x < 250) {
-                return SpikeLocation.CENTER_POSITION;
-            } else if(spikeBlock.x > 250) {
-                return SpikeLocation.RIGHT_POSITION;
-            } else {
-                return SpikeLocation.LEFT_POSITION;
-            }
+            return spikeBlock.x;
         }
-        return SpikeLocation.CENTER_POSITION;
+        return 0;
+    }
+
+
+    public SpikeLocation getSpikeLocation() {
+        int spikeBlock = getSpikeX();
+
+        if (spikeBlock > 100 && spikeBlock < 170) {
+            return SpikeLocation.LEFT_POSITION;
+        } else if (spikeBlock > 170 && spikeBlock < 275) {
+            return SpikeLocation.CENTER_POSITION;
+        } else {
+            return SpikeLocation.RIGHT_POSITION;
+        }
     }
 }

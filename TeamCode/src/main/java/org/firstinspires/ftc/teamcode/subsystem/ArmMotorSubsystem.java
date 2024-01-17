@@ -78,7 +78,6 @@ public class ArmMotorSubsystem implements Subsystem {
             leftArmMotor.setPower(0.8);
             rightArmMotor.setPower(0.8);
         }
-
     }
 
     

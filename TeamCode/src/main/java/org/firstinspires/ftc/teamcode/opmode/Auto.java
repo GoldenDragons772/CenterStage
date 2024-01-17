@@ -23,7 +23,7 @@ public class Auto extends LinearOpMode {
 
     private TrajectoryFollowerCommand driveToBackdrop;
 
-//    private HuskySubsystem husky;
+    private HuskySubsystem husky;
 
     private HuskySubsystem.SpikeLocation currentSpikeLocation;
 
@@ -45,7 +45,10 @@ public class Auto extends LinearOpMode {
 
     Pose2d LD_BLUE_STARTPOS = new Pose2d(-37, 62, Math.toRadians(180));
 
-    Pose2d SD_BLUE_STARTPOS = new Pose2d(15, 62, Math.toRadians(90));
+    Pose2d SD_BLUE_STARTPOS = new Pose2d(15, 62, Math.toRadians(270));
+
+    // Backdrop
+    Pose2d BackDropPos = new Pose2d(0, 0, Math.toRadians(0));
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -54,7 +57,7 @@ public class Auto extends LinearOpMode {
 
         drive = new MecanumDriveSubsystem(new MainMecanumDrive(hardwareMap), false);
 
-//        husky = new HuskySubsystem(hardwareMap);
+        husky = new HuskySubsystem(hardwareMap);
 
         bucket = new BucketSubsystem(hardwareMap);
 
@@ -64,61 +67,43 @@ public class Auto extends LinearOpMode {
 
         armMotor = new ArmMotorSubsystem(hardwareMap);
 
-        Trajectory LD_RED_FOLLOW = drive.trajectoryBuilder(LD_RED_STARTPOS)
-                .strafeRight(45)
-                .splineToConstantHeading(new Vector2d(10, -10), Math.toRadians(0))
-                .build();
 
-        Trajectory LD_RED_BACKBOARD = drive.trajectoryBuilder(LD_RED_FOLLOW.end())
-                .lineTo(new Vector2d(30, -10))
-                .splineToConstantHeading(new Vector2d(54, -25), Math.toRadians(0))
-                .build();
-
-        Trajectory LD_BLUE_FOLLOW = drive.trajectoryBuilder(LD_BLUE_STARTPOS)
-                .strafeLeft(45)
-                .splineToConstantHeading(new Vector2d(10, 10), Math.toRadians(0))
-                .build();
-
-        Trajectory LD_BLUE_BACKBOARD = drive.trajectoryBuilder(LD_BLUE_FOLLOW.end())
-                .lineTo(new Vector2d(53, 10))
-                .build();
-
-
-
-        //Trajectory SD_RED_FOLLOW = drive.trajectoryBuilder(SD_RED_STARTPOS)
-
-
-//        Trajectory LD_BLUE_FOLLOW;
-//
-//        Trajectory SD_BLUE_FOLLOW;
-
-//
-//        follower = new TrajectoryFollowerCommand(drive, traj);
-
-        // Set Algorithm to Object Tracking
-//        husky.setAlgorithm(HuskyLens.Algorithm.OBJECT_TRACKING);
-
-//        follower = new TrajectoryFollowerCommand(drive, LD_RED_FOLLOW);
-//
-//        driveToBackdrop = new TrajectoryFollowerCommand(drive, LD_RED_BACKBOARD);
-//
-//        drive.setPoseEstimate(LD_RED_STARTPOS);
-
+        // Set Algorithm
+        husky.setAlgorithm(HuskyLens.Algorithm.COLOR_RECOGNITION);
 
         while(opModeInInit()) {
-//            currentSpikeLocation = husky.getSpikeLocation();
-//
-//            switch(currentSpikeLocation) {
-//                case LEFT_POSITION:
-//                    spikePos = "LEFT_POSITION";
-//                    break;
-//                case RIGHT_POSITION:
-//                    spikePos = "RIGHT_POSITION";
-//                    break;
-//                case CENTER_POSITION:
-//                    spikePos = "CENTER_POSITION";
-//                    break;
-//            }
+
+            // Red Long Distance Path
+            Trajectory LD_RED_FOLLOW = drive.trajectoryBuilder(LD_RED_STARTPOS)
+                    .strafeRight(45)
+                    .splineToConstantHeading(new Vector2d(10, -10), Math.toRadians(0))
+                    .build();
+
+            Trajectory LD_RED_BACKBOARD = drive.trajectoryBuilder(LD_RED_FOLLOW.end())
+                    .lineTo(new Vector2d(30, -10))
+                    .splineToConstantHeading(new Vector2d(54, -25), Math.toRadians(0))
+                    .build();
+
+            // Blue Long Distance Auto Path
+            Trajectory LD_BLUE_FOLLOW = drive.trajectoryBuilder(LD_BLUE_STARTPOS)
+                    .strafeLeft(45)
+                    .splineToConstantHeading(new Vector2d(10, 10), Math.toRadians(0))
+                    .build();
+
+            Trajectory LD_BLUE_BACKBOARD = drive.trajectoryBuilder(LD_BLUE_FOLLOW.end())
+                    .lineTo(new Vector2d(30, 10))
+                    .splineToConstantHeading(new Vector2d(54, 25), Math.toRadians(90))
+                    .build();
+
+            // Blue Short Distance Auto Path
+            Trajectory SD_BLUE_FOLLOW = drive.trajectoryBuilder(SD_BLUE_STARTPOS)
+                    .forward(5)
+                    .build();
+
+            Trajectory SD_BLUE_BACKBOARD = drive.trajectoryBuilder(SD_BLUE_FOLLOW.end())
+                    .splineToLinearHeading(BackDropPos, Math.toRadians(0))
+                    .build();
+
 
             // Auto Selector
             if (gamepad1.dpad_right) { // Long Distance Red Auto
@@ -137,12 +122,31 @@ public class Auto extends LinearOpMode {
                 autoName = "LD_BLUE";
             } else if (gamepad1.dpad_down) { // Short Distance Blue Auto
                 drive.setPoseEstimate(SD_BLUE_STARTPOS);
-                //follower = new TrajectoryFollowerCommand(drive, SD_BLUE_FOLLOW);
+                follower = new TrajectoryFollowerCommand(drive, SD_BLUE_FOLLOW);
                 autoName = "SD_BLUE";
+            }
+
+            currentSpikeLocation = husky.getSpikeLocation();
+
+            // Determine the Prop location
+
+            if(currentSpikeLocation == HuskySubsystem.SpikeLocation.LEFT_POSITION) {
+                spikePos = "LEFT_POSITION";
+                BackDropPos = new Pose2d(54, 44, Math.toRadians(180));
+                driveToBackdrop = new TrajectoryFollowerCommand(drive, SD_BLUE_BACKBOARD);
+            } else if(currentSpikeLocation == HuskySubsystem.SpikeLocation.RIGHT_POSITION) {
+                spikePos = "RIGHT_POSITION";
+                BackDropPos = new Pose2d(54, 26, Math.toRadians(180));
+                driveToBackdrop = new TrajectoryFollowerCommand(drive, SD_BLUE_BACKBOARD);
+            } else {
+                spikePos = "CENTER_POSITION";
+                BackDropPos = new Pose2d(54, 34, Math.toRadians(180));
+                driveToBackdrop = new TrajectoryFollowerCommand(drive, SD_BLUE_BACKBOARD);
             }
 
             telemetry.addData("CurrentSpike Location", spikePos);
             telemetry.addData("Current Auto", autoName);
+            telemetry.addData("Prop Location", husky.getSpikeX());
             telemetry.update();
         }
 
@@ -176,13 +180,12 @@ public class Auto extends LinearOpMode {
                         }
                         bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
                     })
-                ).alongWith(new RunCommand(() -> {
-                    drive.update();
-                }))
+                )
         );
 
         while(opModeIsActive()) {
             CommandScheduler.getInstance().run();
+            drive.update();
         }
     }
 }
