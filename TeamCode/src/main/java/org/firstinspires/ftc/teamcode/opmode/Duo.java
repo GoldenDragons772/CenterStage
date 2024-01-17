@@ -108,8 +108,9 @@ public class Duo extends CommandOpMode {
         // Home Position
         gpad2.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
                 .whenPressed(new InstantCommand(() -> {
-                    armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
                     dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
+                    armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
+                    // Wait for Arm Before going to Loading Position.
                     int timeout = 1200;
                     int epsilon = 550; // Machine epsilon
                     while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {
