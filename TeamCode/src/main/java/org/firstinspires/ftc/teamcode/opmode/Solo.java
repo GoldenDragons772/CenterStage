@@ -1,7 +1,10 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
+import androidx.core.os.TraceKt;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
@@ -17,6 +20,7 @@ import org.firstinspires.ftc.teamcode.subsystem.DipperSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.DroneSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.MecanumDriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystem.subcommand.TrajectoryFollowerCommand;
 
 @TeleOp(name = "Solo", group = "TeleOp")
 public class Solo extends CommandOpMode {
@@ -37,6 +41,9 @@ public class Solo extends CommandOpMode {
 
     GamepadEx gpad1;
 
+    TrajectoryFollowerCommand driveToBackDropBlue;
+
+
     @Override
     public void initialize() {
 
@@ -51,6 +58,15 @@ public class Solo extends CommandOpMode {
         bucketPivot = new BucketPivotSubsystem(hardwareMap);
         drone = new DroneSubsystem(hardwareMap);
 
+        // Auto Drive Cmds
+        Trajectory BACKDROP_BLUE_LEFT = drive.trajectoryBuilder(drive.getPoseEstimate())
+                .lineToLinearHeading(new Pose2d(54, 41, Math.toRadians(180)))
+                .build();
+
+        driveToBackDropBlue = new TrajectoryFollowerCommand(drive, BACKDROP_BLUE_LEFT);
+
+        // Set Initial Pose
+        drive.setPoseEstimate(StorePos.OdoPose);
 
         // Run Intake and also Intake Pixels.
         gpad1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
@@ -120,6 +136,12 @@ public class Solo extends CommandOpMode {
                     drone.loadDrone();
                 }));
 
+        // Auto Align Feature
+        gpad1.getGamepadButton(GamepadKeys.Button.X)
+                .whenPressed(
+                    driveToBackDropBlue
+                );
+
         schedule(new RunCommand(() -> {
 
             double strafe = Math.pow(gamepad1.right_stick_x, 2) * Math.signum(gamepad1.right_stick_x);
@@ -151,4 +173,8 @@ public class Solo extends CommandOpMode {
         })));
     }
 
+    @Override
+    public void run() {
+        super.run();
+    }
 }

@@ -10,13 +10,14 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 @Config
 public class ArmMotorSubsystem implements Subsystem {
     public double correction;
-    private ArmPos armPos;
+    private ArmPos armPos = ArmPos.HOME;
     public DcMotorEx leftArmMotor, rightArmMotor;
 
 
     public enum ArmPos {
         HIGH(2200),
-        MIDDLE(1500),
+        MIDDLE(1000),
+        LOW(500),
         HOME(0);
         final private int position;
 
@@ -64,7 +65,7 @@ public class ArmMotorSubsystem implements Subsystem {
             long startTime = System.currentTimeMillis();
             long timeout = 5000; // 5 seconds in milliseconds
 
-            while(getAvgArmPosition() > 100 && (System.currentTimeMillis() - startTime) < timeout) {
+            while(getAvgArmPosition() > 75 && (System.currentTimeMillis() - startTime) < timeout) {
                 leftArmMotor.setPower(0.8);
                 rightArmMotor.setPower(0.8);
             }

@@ -19,8 +19,12 @@ public class IntakeSubsystem extends SubsystemBase {
         intakeMotor.setPower(1);
     }
 
+    public void spikePixel() {
+        intakeMotor.setPower(0.2);
+    }
+
     public void dispenseIntake() {
-        intakeMotor.setPower(-0.5);
+        intakeMotor.setPower(-0.2);
     }
 
     public void stopIntake() {

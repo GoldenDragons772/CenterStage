@@ -41,7 +41,7 @@ public class HuskySubsystem extends SubsystemBase {
 
         if (spikeBlock > 100 && spikeBlock < 170) {
             return SpikeLocation.LEFT_POSITION;
-        } else if (spikeBlock > 170 && spikeBlock < 275) {
+        } else if (spikeBlock > 170 && spikeBlock < 285) {
             return SpikeLocation.CENTER_POSITION;
         } else {
             return SpikeLocation.RIGHT_POSITION;

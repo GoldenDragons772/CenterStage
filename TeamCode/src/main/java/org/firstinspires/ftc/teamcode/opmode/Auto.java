@@ -23,6 +23,8 @@ public class Auto extends LinearOpMode {
 
     private TrajectoryFollowerCommand driveToBackdrop;
 
+    private TrajectoryFollowerCommand driveToSpike;
+
     private HuskySubsystem husky;
 
     private HuskySubsystem.SpikeLocation currentSpikeLocation;
@@ -34,6 +36,8 @@ public class Auto extends LinearOpMode {
     private DipperSubsystem dipper;
 
     private ArmMotorSubsystem armMotor;
+
+    private IntakeSubsystem intake;
 
     private String spikePos = "ERROR_404";
 
@@ -49,6 +53,9 @@ public class Auto extends LinearOpMode {
 
     // Backdrop
     Pose2d BackDropPos = new Pose2d(0, 0, Math.toRadians(0));
+
+    // StorePose
+    StorePos storePos = new StorePos();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -66,6 +73,8 @@ public class Auto extends LinearOpMode {
         dipper = new DipperSubsystem(hardwareMap);
 
         armMotor = new ArmMotorSubsystem(hardwareMap);
+
+        intake = new IntakeSubsystem(hardwareMap);
 
 
         // Set Algorithm
@@ -95,14 +104,20 @@ public class Auto extends LinearOpMode {
                     .splineToConstantHeading(new Vector2d(54, 25), Math.toRadians(90))
                     .build();
 
+            // Short Distance Blue Spike.
+            Trajectory SD_BLUE_SPIKE = drive.trajectoryBuilder(SD_BLUE_STARTPOS)
+                    .lineToLinearHeading(new Pose2d(32, 29, Math.toRadians(180)))
+                    .build();
+
             // Blue Short Distance Auto Path
-            Trajectory SD_BLUE_FOLLOW = drive.trajectoryBuilder(SD_BLUE_STARTPOS)
-                    .forward(5)
+            Trajectory SD_BLUE_FOLLOW = drive.trajectoryBuilder(SD_BLUE_SPIKE.end())
+                    .forward(1)
                     .build();
 
             Trajectory SD_BLUE_BACKBOARD = drive.trajectoryBuilder(SD_BLUE_FOLLOW.end())
                     .splineToLinearHeading(BackDropPos, Math.toRadians(0))
                     .build();
+
 
 
             // Auto Selector
@@ -132,8 +147,12 @@ public class Auto extends LinearOpMode {
 
             if(currentSpikeLocation == HuskySubsystem.SpikeLocation.LEFT_POSITION) {
                 spikePos = "LEFT_POSITION";
-                BackDropPos = new Pose2d(54, 44, Math.toRadians(180));
+                BackDropPos = new Pose2d(54, 41, Math.toRadians(180));
                 driveToBackdrop = new TrajectoryFollowerCommand(drive, SD_BLUE_BACKBOARD);
+                // Check if Auto is Short Distance Blue
+                if(autoName == "SD_BLUE") {
+                    driveToSpike = new TrajectoryFollowerCommand(drive, SD_BLUE_SPIKE);
+                }
             } else if(currentSpikeLocation == HuskySubsystem.SpikeLocation.RIGHT_POSITION) {
                 spikePos = "RIGHT_POSITION";
                 BackDropPos = new Pose2d(54, 26, Math.toRadians(180));
@@ -154,12 +173,19 @@ public class Auto extends LinearOpMode {
 
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
+                    driveToSpike,
                     follower,
                     new InstantCommand(() -> {
-                        armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.MIDDLE);
+                        intake.spikePixel();
+                        sleep(500);
+                        intake.stopIntake();
+                    }),
+                    new InstantCommand(() -> {
+                        armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.LOW);
                         dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
                         bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
                     }),
+                    new WaitCommand(750),
                     driveToBackdrop,
                     new InstantCommand(() -> {
                         bucket.dispensePixels();
@@ -185,7 +211,9 @@ public class Auto extends LinearOpMode {
 
         while(opModeIsActive()) {
             CommandScheduler.getInstance().run();
-            drive.update();
+            //drive.update();
         }
+        // Store End Pose
+        storePos.StorePos(drive.getPoseEstimate());
     }
 }
