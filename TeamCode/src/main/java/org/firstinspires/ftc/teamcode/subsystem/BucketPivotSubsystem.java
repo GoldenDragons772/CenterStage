@@ -27,6 +27,10 @@ public class BucketPivotSubsystem extends SubsystemBase {
         RightBucketPivot.setDirection(Servo.Direction.REVERSE);
 
         LeftBucketPivot = hw.get(Servo.class, "LBPivot");
+
+        // Set Initial Pos
+        RightBucketPivot.setPosition(RightBucketPivotLoadingPos);
+        LeftBucketPivot.setPosition(LeftBucketPivotLoadingPos);
     }
 
     public void runBucketPos(BucketPivotPos pos) {

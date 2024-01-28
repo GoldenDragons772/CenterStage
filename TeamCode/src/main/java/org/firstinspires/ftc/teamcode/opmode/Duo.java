@@ -66,7 +66,6 @@ public class Duo extends CommandOpMode {
              .whenHeld(new InstantCommand(() -> {
                  bucket.dispensePixels();
                  intake.dispenseIntake();
-
              }))
              .whenReleased(new InstantCommand(() -> {
                  bucket.stopBucket();
@@ -96,6 +95,15 @@ public class Duo extends CommandOpMode {
                  dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
                  bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
              }));
+
+        // Low Positions
+        gpad2.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
+            .whenPressed(new InstantCommand(() -> {
+                armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.LOW);
+                dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
+                bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
+            }));
+
 
         // Top Position
         gpad2.getGamepadButton(GamepadKeys.Button.DPAD_UP)

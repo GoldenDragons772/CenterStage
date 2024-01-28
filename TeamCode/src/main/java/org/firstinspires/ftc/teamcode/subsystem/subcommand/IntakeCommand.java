@@ -4,5 +4,4 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 
 public class IntakeCommand extends InstantCommand {
 
-
 }

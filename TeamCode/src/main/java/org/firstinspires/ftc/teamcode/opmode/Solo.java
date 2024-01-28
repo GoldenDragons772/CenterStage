@@ -46,7 +46,6 @@ public class Solo extends CommandOpMode {
 
     @Override
     public void initialize() {
-
         Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
 
         drive = new MecanumDriveSubsystem(new MainMecanumDrive(hardwareMap), false);
@@ -109,6 +108,14 @@ public class Solo extends CommandOpMode {
                  dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
                  bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
              }));
+
+        // Low Positions
+        gpad1.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
+            .whenPressed(new InstantCommand(() -> {
+                armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.LOW);
+                dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
+                bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
+            }));
 
         gpad1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
              .whenPressed(new InstantCommand(() -> {

@@ -32,6 +32,10 @@ public class DipperSubsystem extends SubsystemBase {
         this.left = hw.get(Servo.class, "LDipper");
 
         right.setDirection(Servo.Direction.REVERSE);
+
+        // Set Initial Loading Pos
+        right.setPosition(rightLoadingPos);
+        left.setPosition(leftLoadingPos);
     }
 
     public void setDipperPosition(DipperPositions pos) {

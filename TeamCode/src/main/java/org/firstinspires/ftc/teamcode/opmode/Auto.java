@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.path.Path;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -57,6 +58,10 @@ public class Auto extends LinearOpMode {
     // StorePose
     StorePos storePos = new StorePos();
 
+    PoseManager poseManager = new PoseManager();
+
+    PoseManager.spikeLocations spikeLocation = PoseManager.spikeLocations.SD_BLUE_LEFT;
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -104,18 +109,21 @@ public class Auto extends LinearOpMode {
                     .splineToConstantHeading(new Vector2d(54, 25), Math.toRadians(90))
                     .build();
 
-            // Short Distance Blue Spike.
-            Trajectory SD_BLUE_SPIKE = drive.trajectoryBuilder(SD_BLUE_STARTPOS)
-                    .lineToLinearHeading(new Pose2d(32, 29, Math.toRadians(180)))
-                    .build();
 
             // Blue Short Distance Auto Path
-            Trajectory SD_BLUE_FOLLOW = drive.trajectoryBuilder(SD_BLUE_SPIKE.end())
-                    .forward(1)
+            Trajectory SD_BLUE_FOLLOW = drive.trajectoryBuilder(SD_BLUE_STARTPOS)
+                    .forward(30)
                     .build();
 
-            Trajectory SD_BLUE_BACKBOARD = drive.trajectoryBuilder(SD_BLUE_FOLLOW.end())
-                    .splineToLinearHeading(BackDropPos, Math.toRadians(0))
+            // Short Distance Blue Spike.
+            Trajectory SD_BLUE_SPIKE = drive.trajectoryBuilder(SD_BLUE_FOLLOW.end())
+//                    .lineToLinearHeading(new Pose2d(32, 29, Math.toRadians(180)))
+                    .lineToLinearHeading(poseManager.getSpikeLocation(spikeLocation))
+                    .build();
+
+
+            Trajectory SD_BLUE_BACKBOARD = drive.trajectoryBuilder(SD_BLUE_SPIKE.end())
+                    .lineToLinearHeading(BackDropPos)
                     .build();
 
 
@@ -151,16 +159,26 @@ public class Auto extends LinearOpMode {
                 driveToBackdrop = new TrajectoryFollowerCommand(drive, SD_BLUE_BACKBOARD);
                 // Check if Auto is Short Distance Blue
                 if(autoName == "SD_BLUE") {
+                    spikeLocation = PoseManager.spikeLocations.SD_BLUE_LEFT;
                     driveToSpike = new TrajectoryFollowerCommand(drive, SD_BLUE_SPIKE);
                 }
             } else if(currentSpikeLocation == HuskySubsystem.SpikeLocation.RIGHT_POSITION) {
                 spikePos = "RIGHT_POSITION";
-                BackDropPos = new Pose2d(54, 26, Math.toRadians(180));
+                BackDropPos = new Pose2d(53, 28, Math.toRadians(180));
                 driveToBackdrop = new TrajectoryFollowerCommand(drive, SD_BLUE_BACKBOARD);
+                if(autoName == "SD_BLUE") {
+                    spikeLocation = PoseManager.spikeLocations.SD_BLUE_RIGHT;
+                    driveToSpike = new TrajectoryFollowerCommand(drive, SD_BLUE_SPIKE);
+                }
             } else {
                 spikePos = "CENTER_POSITION";
                 BackDropPos = new Pose2d(54, 34, Math.toRadians(180));
                 driveToBackdrop = new TrajectoryFollowerCommand(drive, SD_BLUE_BACKBOARD);
+                // Check if Auto is in short Distance Blue.
+                if(autoName == "SD_BLUE") {
+                    spikeLocation = PoseManager.spikeLocations.SD_BLUE_CENTER;
+                    driveToSpike = new TrajectoryFollowerCommand(drive, SD_BLUE_SPIKE);
+                }
             }
 
             telemetry.addData("CurrentSpike Location", spikePos);
@@ -173,8 +191,8 @@ public class Auto extends LinearOpMode {
 
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
-                    driveToSpike,
                     follower,
+                    driveToSpike,
                     new InstantCommand(() -> {
                         intake.spikePixel();
                         sleep(500);
@@ -193,8 +211,8 @@ public class Auto extends LinearOpMode {
                     new WaitCommand(2000),
                     new InstantCommand(() -> {
                         bucket.stopBucket();
-                        armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
                         dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
+                        armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
                         int timeout = 1200;
                         int epsilon = 550; // Machine epsilon
                         while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {

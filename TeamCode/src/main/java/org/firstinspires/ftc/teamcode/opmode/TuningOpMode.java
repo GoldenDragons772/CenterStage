@@ -1,115 +1,180 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
+import androidx.core.os.TraceKt;
+
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.qualcomm.hardware.dfrobot.HuskyLens;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
+import org.firstinspires.ftc.teamcode.subsystem.ArmMotorSubsystem;
+import org.firstinspires.ftc.teamcode.subsystem.BucketPivotSubsystem;
+import org.firstinspires.ftc.teamcode.subsystem.BucketSubsystem;
+import org.firstinspires.ftc.teamcode.subsystem.DipperSubsystem;
+import org.firstinspires.ftc.teamcode.subsystem.DroneSubsystem;
+import org.firstinspires.ftc.teamcode.subsystem.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystem.MecanumDriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystem.subcommand.TrajectoryFollowerCommand;
 
-@TeleOp(name = "GDTeleTuning", group = "Testing")
-public class TuningOpMode extends LinearOpMode {
-    CRServo bucketServo;
-    CRServo Launcher;
+@TeleOp(name = "TuningOpMode", group = "Debug")
+public class TuningOpMode extends CommandOpMode {
 
-    // Intialize Gamepad
-    private GamepadEx gamepadEx1;
-    private GamepadEx gamepadEx2;
+    private MecanumDriveSubsystem drive;
 
-    // Husky Lens
-    private HuskyLens huskyLens;
+    private IntakeSubsystem intake;
 
-    //ArmDriver armDriver;
+    private ArmMotorSubsystem armMotor;
 
-    DcMotorEx leftArmMotor, rightArmMotor;
+    private BucketSubsystem bucket;
+
+    private DipperSubsystem dipper;
+
+    private BucketPivotSubsystem bucketPivot;
+
+    private DroneSubsystem drone;
+
+    GamepadEx gpad1;
+
+    TrajectoryFollowerCommand driveToBackDropBlue;
+
 
     @Override
-    public void runOpMode() {
-        MainMecanumDrive drive = new MainMecanumDrive(hardwareMap);
+    public void initialize() {
 
-        bucketServo = hardwareMap.crservo.get("Bucket");
-        Launcher = hardwareMap.crservo.get("Plane");
+        Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
 
-        // Huskylens
-        huskyLens = hardwareMap.get(HuskyLens.class, "husky");
+        drive = new MecanumDriveSubsystem(new MainMecanumDrive(hardwareMap), false);
+        gpad1 = new GamepadEx(gamepad1);
+        intake = new IntakeSubsystem(hardwareMap);
+        armMotor = new ArmMotorSubsystem(hardwareMap);
+        bucket = new BucketSubsystem(hardwareMap);
+        dipper = new DipperSubsystem(hardwareMap);
+        bucketPivot = new BucketPivotSubsystem(hardwareMap);
+        drone = new DroneSubsystem(hardwareMap);
 
-        // Intialize Motor
-        leftArmMotor = hardwareMap.get(DcMotorEx.class, "LeftArmMotor");
-        //leftArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        // Auto Drive Cmds
+        Trajectory BACKDROP_BLUE_LEFT = drive.trajectoryBuilder(drive.getPoseEstimate())
+                .lineToLinearHeading(new Pose2d(54, 41, Math.toRadians(180)))
+                .build();
 
-        rightArmMotor = hardwareMap.get(DcMotorEx.class, "RightArmMotor");
-        //rightArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        driveToBackDropBlue = new TrajectoryFollowerCommand(drive, BACKDROP_BLUE_LEFT);
 
-        rightArmMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        // Set the Pose to the Stored Pose from Autonomous.
+        // Set Initial Pose
         drive.setPoseEstimate(StorePos.OdoPose);
 
-        // Backboard Position
-        int backBoardPos = 0;
+        // Run Intake and also Intake Pixels.
+        gpad1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
+                .whenHeld(
+                        new InstantCommand(() -> {
+                            if (armMotor.getArmPos() != ArmMotorSubsystem.ArmPos.HOME) return;
+                            intake.runIntake();
+                            bucket.intakePixels();
+                        })
+                )
+                .whenReleased(new InstantCommand(() -> {
+                    intake.stopIntake();
+                    bucket.stopBucket();
+                }));
 
-        gamepadEx1 = new GamepadEx(gamepad1);
-        gamepadEx2 = new GamepadEx(gamepad2);
 
-        // Initalize the Camera
-        telemetry.addData("CAM_STATE", huskyLens.knock() ? "CONNECTED" : "DISCONNECTED");
+        // Dispense Pixels.
+        gpad1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+                .whenHeld(new InstantCommand(() -> {
+                    bucket.dispensePixels();
+                    intake.dispenseIntake();
 
-        // Set Huskylens Mode
-        huskyLens.selectAlgorithm(HuskyLens.Algorithm.COLOR_RECOGNITION);
+                }))
+                .whenReleased(new InstantCommand(() -> {
+                    bucket.stopBucket();
+                    intake.stopIntake();
+                }));
 
-        telemetry.update();
+        gpad1.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+                .whenPressed(new InstantCommand(() -> {
+                    armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HIGH);
+                    dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
+                    bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
+                }));
 
-        waitForStart();
-        while(opModeIsActive()) {
 
-            // Square the Values to get better Control.
+        gpad1.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
+                .whenPressed(new InstantCommand(() -> {
+                    armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.MIDDLE);
+                    dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
+                    bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
+                }));
+
+        gpad1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
+                .whenPressed(new InstantCommand(() -> {
+                    dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
+                    armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
+                    int timeout = 1200;
+                    int epsilon = 550; // Machine epsilon
+                    while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {
+                        try {
+                            Thread.sleep(20);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
+                }));
+
+        gpad1.getGamepadButton(GamepadKeys.Button.Y)
+                .whenPressed(new InstantCommand(() -> {
+                    drone.shootDrone();
+                }));
+
+        gpad1.getGamepadButton(GamepadKeys.Button.X)
+                .whenPressed(new InstantCommand(() -> {
+                    drone.loadDrone();
+                }));
+
+        // Auto Align Feature
+        gpad1.getGamepadButton(GamepadKeys.Button.X)
+                .whenPressed(
+                        driveToBackDropBlue
+                );
+
+        schedule(new RunCommand(() -> {
+
             double strafe = Math.pow(gamepad1.right_stick_x, 2) * Math.signum(gamepad1.right_stick_x);
             double forward = Math.pow(gamepad1.right_stick_y, 2) * Math.signum(gamepad1.right_stick_y);
             double spin = Math.pow(gamepad1.left_stick_x, 2) * Math.signum(gamepad1.left_stick_x);
 
             double Speedper = 1;
 
-            HuskyLens.Block[] blocks = huskyLens.blocks();
-            telemetry.addData("Block Count", blocks.length);
-            if(blocks.length != 0) {
-                // Position on the Field
-                String pos;
-                HuskyLens.Block colorBlock = blocks[0];
-                if(colorBlock.x > 105 && colorBlock.x < 250) {
+            drive.drive(
+                    forward * Speedper,
+                    strafe * Speedper,
+                    spin * Speedper
+            );
 
-                    pos = "CENTER";
-                } else if(colorBlock.x > 250) {
-                    pos = "RIGHT";
-                } else {
-                    pos = "LEFT";
-                }
-                telemetry.addData("POSITION", pos);
-            }
 
-            // Shoot the Planes
-            if(gamepad1.y) {
-                Launcher.setPower(0.3); // 7
-            } else if (gamepad1.x) {
-                Launcher.setPower(1);
-            }
-
-            leftArmMotor.setPower(gamepad2.right_stick_y);
-            rightArmMotor.setPower(gamepad2.right_stick_y);
-
-            telemetry.addData("GamePad2 Y", gamepad2.right_stick_y);
-
-            telemetry.addData("LeftArmMotor", leftArmMotor.getCurrentPosition());
-            telemetry.addData("RightArmMotor", rightArmMotor.getCurrentPosition());
-
-            // Update Telemetry
+        }).alongWith(new RunCommand(() -> {
             drive.update();
-            //telemetry.addData("Detected Tag", detectedTag);
-            //TelemetryPacket packet = new TelemetryPacket();
+            Pose2d poseEstimate = drive.getPoseEstimate();
+            telemetry.addData("x", poseEstimate.getX());
+            telemetry.addData("y", poseEstimate.getY());
+            telemetry.addData("heading", poseEstimate.getHeading());
+            telemetry.addData("LeftArmPos", armMotor.leftArmMotor.getCurrentPosition());
+            telemetry.addData("RightArmPos", armMotor.rightArmMotor.getCurrentPosition());
+            telemetry.addData("PIDError", 1500 - (armMotor.leftArmMotor.getCurrentPosition() + armMotor.rightArmMotor.getCurrentPosition()) / 2);
+            telemetry.addData("Correction", armMotor.correction);
+//            telemetry.addData("DipperRightServo", dipper.rightDipperServo.getPosition());
+//            telemetry.addData("DipperLeftServo", dipper.leftDipperServo.getPosition());
             telemetry.update();
-        }
+        })));
+    }
+
+    @Override
+    public void run() {
+        super.run();
     }
 }
-

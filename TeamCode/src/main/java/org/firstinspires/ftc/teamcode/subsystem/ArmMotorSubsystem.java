@@ -16,8 +16,8 @@ public class ArmMotorSubsystem implements Subsystem {
 
     public enum ArmPos {
         HIGH(2200),
-        MIDDLE(1000),
-        LOW(500),
+        MIDDLE(1500),
+        LOW(750),
         HOME(0);
         final private int position;
 
@@ -39,11 +39,11 @@ public class ArmMotorSubsystem implements Subsystem {
         leftArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        // Reverse Motors
-        leftArmMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-
         rightArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        // Reverse Motors
+        leftArmMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void waitForIdle() {
@@ -65,7 +65,7 @@ public class ArmMotorSubsystem implements Subsystem {
             long startTime = System.currentTimeMillis();
             long timeout = 5000; // 5 seconds in milliseconds
 
-            while(getAvgArmPosition() > 75 && (System.currentTimeMillis() - startTime) < timeout) {
+            while(getAvgArmPosition() > 0 && (System.currentTimeMillis() - startTime) < timeout) {
                 leftArmMotor.setPower(0.8);
                 rightArmMotor.setPower(0.8);
             }
@@ -89,6 +89,4 @@ public class ArmMotorSubsystem implements Subsystem {
     public ArmPos getArmPos(){
         return armPos;
     }
-
-
 }
