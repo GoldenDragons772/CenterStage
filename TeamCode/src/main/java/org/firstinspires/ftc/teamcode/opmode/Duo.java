@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmode;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -29,11 +30,12 @@ public class Duo extends CommandOpMode {
     private ArmMotorSubsystem armMotor;
     private DroneSubsystem drone;
     private GamepadEx gpad1, gpad2;
+    private Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
 
     @Override
     public void initialize() {
 
-        Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
+        CommandScheduler.getInstance().reset();
 
         drive = new MecanumDriveSubsystem(new MainMecanumDrive(hardwareMap), false);
         gpad1 = new GamepadEx(gamepad1);
@@ -140,36 +142,38 @@ public class Duo extends CommandOpMode {
                 .whenPressed(new InstantCommand(() -> {
                     drone.loadDrone();
                 }));
-
-        schedule(new RunCommand(() -> {
-
-            double strafe = Math.pow(gamepad1.right_stick_x, 2) * Math.signum(gamepad1.right_stick_x);
-            double forward = Math.pow(gamepad1.right_stick_y, 2) * Math.signum(gamepad1.right_stick_y);
-            double spin = Math.pow(gamepad1.left_stick_x, 2) * Math.signum(gamepad1.left_stick_x);
-
-            double speedMultiplier = 1;
-
-            drive.drive(
-                    forward * speedMultiplier,
-                    strafe * speedMultiplier,
-                    spin * speedMultiplier
-            );
-
-
-        }).alongWith(new RunCommand(() -> {
-            drive.update();
-            Pose2d poseEstimate = drive.getPoseEstimate();
-            telemetry.addData("x", poseEstimate.getX());
-            telemetry.addData("y", poseEstimate.getY());
-            telemetry.addData("heading", poseEstimate.getHeading());
-            telemetry.addData("LeftArmPos", armMotor.leftArmMotor.getCurrentPosition());
-            telemetry.addData("RightArmPos", armMotor.rightArmMotor.getCurrentPosition());
-            telemetry.addData("PIDError", 1500 - (armMotor.leftArmMotor.getCurrentPosition() + armMotor.rightArmMotor.getCurrentPosition()) / 2);
-            telemetry.addData("Correction", armMotor.correction);
-//            telemetry.addData("DipperRightServo", dipper.rightDipperServo.getPosition());
-//            telemetry.addData("DipperLeftServo", dipper.leftDipperServo.getPosition());
-            telemetry.update();
-        })));
     }
 
+    @Override
+    public void run() {
+        // Run Scheduler.
+        CommandScheduler.getInstance().run();
+
+        // Drive System
+        double strafe = Math.pow(gamepad1.right_stick_x, 2) * Math.signum(gamepad1.right_stick_x);
+        double forward = Math.pow(gamepad1.right_stick_y, 2) * Math.signum(gamepad1.right_stick_y);
+        double spin = Math.pow(gamepad1.left_stick_x, 2) * Math.signum(gamepad1.left_stick_x);
+
+        double speedMultiplier = 1;
+
+        drive.drive(
+                forward * speedMultiplier,
+                strafe * speedMultiplier,
+                spin * speedMultiplier
+        );
+
+        drive.update();
+        Pose2d poseEstimate = drive.getPoseEstimate();
+        telemetry.addData("x", poseEstimate.getX());
+        telemetry.addData("y", poseEstimate.getY());
+        telemetry.addData("heading", poseEstimate.getHeading());
+        telemetry.addData("LeftArmPos", armMotor.leftArmMotor.getCurrentPosition());
+        telemetry.addData("RightArmPos", armMotor.rightArmMotor.getCurrentPosition());
+        telemetry.addData("PIDError", 1500 - (armMotor.leftArmMotor.getCurrentPosition() + armMotor.rightArmMotor.getCurrentPosition()) / 2);
+        telemetry.addData("Correction", armMotor.correction);
+//            telemetry.addData("DipperRightServo", dipper.rightDipperServo.getPosition());
+//            telemetry.addData("DipperLeftServo", dipper.leftDipperServo.getPosition());
+        telemetry.update();
+
+    }
 }

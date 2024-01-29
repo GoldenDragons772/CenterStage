@@ -21,11 +21,11 @@ public class PoseManager {
     public Pose2d getSpikeLocation(spikeLocations spikeLoc) {
         switch (spikeLoc) {
             case SD_BLUE_LEFT:
-                return new Pose2d(21, 42, Math.toRadians(270));
+                return new Pose2d(22, 39, Math.toRadians(270));
             case SD_BLUE_CENTER:
                 return new Pose2d(21, 24, Math.toRadians(180));
             case SD_BLUE_RIGHT:
-                return new Pose2d(-2, 38, Math.toRadians(270));
+                return new Pose2d(0, 37, Math.toRadians(270));
         }
         return new Pose2d(0, 0, Math.toRadians(0));
     }

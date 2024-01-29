@@ -148,40 +148,33 @@ public class Solo extends CommandOpMode {
                 .whenPressed(
                     driveToBackDropBlue
                 );
-
-        schedule(new RunCommand(() -> {
-
-            double strafe = Math.pow(gamepad1.right_stick_x, 2) * Math.signum(gamepad1.right_stick_x);
-            double forward = Math.pow(gamepad1.right_stick_y, 2) * Math.signum(gamepad1.right_stick_y);
-            double spin = Math.pow(gamepad1.left_stick_x, 2) * Math.signum(gamepad1.left_stick_x);
-
-            double Speedper = 1;
-
-            drive.drive(
-                    forward * Speedper,
-                    strafe * Speedper,
-                    spin * Speedper
-            );
-
-
-        }).alongWith(new RunCommand(() -> {
-            drive.update();
-            Pose2d poseEstimate = drive.getPoseEstimate();
-            telemetry.addData("x", poseEstimate.getX());
-            telemetry.addData("y", poseEstimate.getY());
-            telemetry.addData("heading", poseEstimate.getHeading());
-            telemetry.addData("LeftArmPos", armMotor.leftArmMotor.getCurrentPosition());
-            telemetry.addData("RightArmPos", armMotor.rightArmMotor.getCurrentPosition());
-            telemetry.addData("PIDError", 1500 - (armMotor.leftArmMotor.getCurrentPosition() + armMotor.rightArmMotor.getCurrentPosition()) / 2);
-            telemetry.addData("Correction", armMotor.correction);
-//            telemetry.addData("DipperRightServo", dipper.rightDipperServo.getPosition());
-//            telemetry.addData("DipperLeftServo", dipper.leftDipperServo.getPosition());
-            telemetry.update();
-        })));
     }
 
     @Override
     public void run() {
-        super.run();
+        double strafe = Math.pow(gamepad1.right_stick_x, 2) * Math.signum(gamepad1.right_stick_x);
+        double forward = Math.pow(gamepad1.right_stick_y, 2) * Math.signum(gamepad1.right_stick_y);
+        double spin = Math.pow(gamepad1.left_stick_x, 2) * Math.signum(gamepad1.left_stick_x);
+
+        double Speedper = 1;
+
+        drive.drive(
+                forward * Speedper,
+                strafe * Speedper,
+                spin * Speedper
+        );
+
+        drive.update();
+        Pose2d poseEstimate = drive.getPoseEstimate();
+        telemetry.addData("x", poseEstimate.getX());
+        telemetry.addData("y", poseEstimate.getY());
+        telemetry.addData("heading", poseEstimate.getHeading());
+        telemetry.addData("LeftArmPos", armMotor.leftArmMotor.getCurrentPosition());
+        telemetry.addData("RightArmPos", armMotor.rightArmMotor.getCurrentPosition());
+        telemetry.addData("PIDError", 1500 - (armMotor.leftArmMotor.getCurrentPosition() + armMotor.rightArmMotor.getCurrentPosition()) / 2);
+        telemetry.addData("Correction", armMotor.correction);
+//            telemetry.addData("DipperRightServo", dipper.rightDipperServo.getPosition());
+//            telemetry.addData("DipperLeftServo", dipper.leftDipperServo.getPosition());
+        telemetry.update();
     }
 }

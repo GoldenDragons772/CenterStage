@@ -63,7 +63,7 @@ public class ArmMotorSubsystem implements Subsystem {
         if(pos == 0) {
             // A Timeout just in case something breaks.
             long startTime = System.currentTimeMillis();
-            long timeout = 5000; // 5 seconds in milliseconds
+            long timeout = 3500; // 3.5 seconds in milliseconds
 
             while(getAvgArmPosition() > 0 && (System.currentTimeMillis() - startTime) < timeout) {
                 leftArmMotor.setPower(0.8);

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
+import androidx.core.os.TraceKt;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.path.Path;
@@ -121,27 +123,36 @@ public class Auto extends LinearOpMode {
                     .lineToLinearHeading(poseManager.getSpikeLocation(spikeLocation))
                     .build();
 
-
             Trajectory SD_BLUE_BACKBOARD = drive.trajectoryBuilder(SD_BLUE_SPIKE.end())
                     .lineToLinearHeading(BackDropPos)
                     .build();
 
 
+            // Red Short Distance Auto Path
+            Trajectory SD_RED_FOLLOW = drive.trajectoryBuilder(SD_RED_STARTPOS)
+                    .forward(30)
+                    .build();
+
+            Trajectory SD_RED_SPIKE = drive.trajectoryBuilder(SD_RED_FOLLOW.end())
+                    .lineToLinearHeading(poseManager.getSpikeLocation(spikeLocation))
+                    .build();
+
+            Trajectory SD_RED_BACKBOARD = drive.trajectoryBuilder(SD_RED_FOLLOW.end())
+                    .lineToLinearHeading(BackDropPos)
+                    .build();
 
             // Auto Selector
             if (gamepad1.dpad_right) { // Long Distance Red Auto
                 drive.setPoseEstimate(LD_RED_STARTPOS);
                 follower = new TrajectoryFollowerCommand(drive, LD_RED_FOLLOW);
-                driveToBackdrop = new TrajectoryFollowerCommand(drive, LD_RED_BACKBOARD);
                 autoName = "LD_RED";
             } else if (gamepad1.dpad_left) { // Short Distance Red Auto
                 drive.setPoseEstimate(SD_RED_STARTPOS);
-                //follower = new TrajectoryFollowerCommand(drive, SD_RED_FOLLOW);
+                follower = new TrajectoryFollowerCommand(drive, SD_RED_FOLLOW);
                 autoName = "SD_RED";
             } else if (gamepad1.dpad_up) { // Long Distance Blue Auto
                 drive.setPoseEstimate(LD_BLUE_STARTPOS);
                 follower = new TrajectoryFollowerCommand(drive, LD_BLUE_FOLLOW);
-                driveToBackdrop = new TrajectoryFollowerCommand(drive, LD_BLUE_BACKBOARD);
                 autoName = "LD_BLUE";
             } else if (gamepad1.dpad_down) { // Short Distance Blue Auto
                 drive.setPoseEstimate(SD_BLUE_STARTPOS);
@@ -163,12 +174,16 @@ public class Auto extends LinearOpMode {
                     driveToSpike = new TrajectoryFollowerCommand(drive, SD_BLUE_SPIKE);
                 }
             } else if(currentSpikeLocation == HuskySubsystem.SpikeLocation.RIGHT_POSITION) {
+                // Right Position
                 spikePos = "RIGHT_POSITION";
-                BackDropPos = new Pose2d(53, 28, Math.toRadians(180));
+                BackDropPos = new Pose2d(54, 27, Math.toRadians(180));
                 driveToBackdrop = new TrajectoryFollowerCommand(drive, SD_BLUE_BACKBOARD);
                 if(autoName == "SD_BLUE") {
                     spikeLocation = PoseManager.spikeLocations.SD_BLUE_RIGHT;
                     driveToSpike = new TrajectoryFollowerCommand(drive, SD_BLUE_SPIKE);
+                } else if(autoName == "SD_RED") {
+                    spikeLocation = PoseManager.spikeLocations.SD_RED_RIGHT;
+                    driveToSpike = new TrajectoryFollowerCommand(drive, SD_RED_SPIKE);
                 }
             } else {
                 spikePos = "CENTER_POSITION";
