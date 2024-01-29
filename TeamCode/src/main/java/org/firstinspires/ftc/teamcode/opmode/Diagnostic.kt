@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode
 
+import com.acmerobotics.dashboard.FtcDashboard
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
@@ -17,23 +19,33 @@ class Diagnostic : LinearOpMode() {
     private lateinit var armMotorSubsystem: ArmMotorSubsystem
     private lateinit var dipperSubsystem: DipperSubsystem
     private lateinit var intakeSubsystem: IntakeSubsystem
+    private lateinit var ftcDashboard: FtcDashboard
     private val strafeLength = 3.0;
     override fun runOpMode() {
+        ftcDashboard = FtcDashboard.getInstance()
         mecDrive = MainMecanumDrive(hardwareMap)
         armMotorSubsystem = ArmMotorSubsystem(hardwareMap)
         dipperSubsystem = DipperSubsystem(hardwareMap)
         intakeSubsystem = IntakeSubsystem(hardwareMap)
         waitForStart()
-        this.telemetry.addLine("Creating github issues...")
-        this.telemetry.addLine("Decreasing the number of servos...")
-        this.telemetry.addLine("Fixing \"programming\" issues...")
-        testCircleDrive()
-        testSquareStrafe()
-        testRotation()
-        testSlideExtend()
-        testDipperRotate()
-        testSlideRetract()
-        testIntake()
+
+        sendTelemetryPacket(
+            mutableListOf(
+                "Creating github issues...", "Decreasing the number of servos...", "Fixing \"programming\" issues..."
+            )
+        )
+        val tests = mutableListOf({ testCircleDrive() },
+            { testSquareStrafe() },
+            { testRotation() },
+            { testSlideExtend() },
+            { testDipperLeave() },
+            { testDipperReturn() },
+            { testSlideRetract() },
+            { testIntake() })
+        for (i in tests) {
+            i()
+            waitForConfirmation()
+        }
         // Filibuster
         while (true) {
             sleep(1000)
@@ -41,11 +53,18 @@ class Diagnostic : LinearOpMode() {
     }
 
 
+    private fun waitForConfirmation() {
+        while (!gamepad1.a) {
+            sleep(10)
+        }
+    }
+
+
     private fun testCircleDrive() {
-        this.telemetry.addLine("TEST: Circle Drive (0.0, 0.0)")
+        val telemetryStrings = mutableListOf<String>()
+        telemetryStrings += "TEST: Circle Drive (0.0, 0.0)"
         mecDrive.followTrajectory(
-            mecDrive.trajectoryBuilder(Pose2d())
-                .splineTo(Vector2d(strafeLength, strafeLength), Math.toRadians(90.0))
+            mecDrive.trajectoryBuilder(Pose2d()).splineTo(Vector2d(strafeLength, strafeLength), Math.toRadians(90.0))
                 .splineTo(Vector2d(0.0, 2 * strafeLength), Math.toRadians(180.0))
                 .splineTo(Vector2d(-strafeLength, strafeLength), Math.toRadians(270.0))
                 .splineTo(Vector2d(0.0, 0.0), 0.0).build()
@@ -53,59 +72,77 @@ class Diagnostic : LinearOpMode() {
         while (mecDrive.isBusy) {
             sleep(20)
         }
-        this.telemetry.addLine("Err: ${sqrt(exp(this.mecDrive.poseEstimate.x)-exp(this.mecDrive.poseEstimate.y))} End Pos: (${this.mecDrive.poseEstimate.x}, ${this.mecDrive.poseEstimate.y})/${this.mecDrive.poseEstimate.heading}")
+        telemetryStrings += ("Err: ${sqrt(exp(this.mecDrive.poseEstimate.x) - exp(this.mecDrive.poseEstimate.y))}")
+        telemetryStrings += ("End Pos: (${this.mecDrive.poseEstimate.x}, ${this.mecDrive.poseEstimate.y})/${this.mecDrive.poseEstimate.heading}")
+        sendTelemetryPacket(telemetryStrings)
     }
 
     private fun testSquareStrafe() {
-        this.telemetry.addLine("TEST: Square Strafe (0.0, 0.0)")
+        val telemetryStrings = mutableListOf<String>()
+        telemetryStrings += ("TEST: Square Strafe (0.0, 0.0)")
         mecDrive.followTrajectorySequence(
-            mecDrive.trajectorySequenceBuilder(Pose2d(0.0, 0.0, 0.0))
-                .forward(strafeLength)
-                .strafeLeft(strafeLength)
-                .back(strafeLength)
-                .strafeRight(strafeLength)
-                .build()
+            mecDrive.trajectorySequenceBuilder(Pose2d(0.0, 0.0, 0.0)).forward(strafeLength).strafeLeft(strafeLength)
+                .back(strafeLength).strafeRight(strafeLength).build()
         )
         while (mecDrive.isBusy) {
             sleep(20)
         }
-        this.telemetry.addLine("Err: ${sqrt(exp(this.mecDrive.poseEstimate.x)-exp(this.mecDrive.poseEstimate.y))} End Pos: (${this.mecDrive.poseEstimate.x}, ${this.mecDrive.poseEstimate.y})/${this.mecDrive.poseEstimate.heading}")
+        telemetryStrings += ("Err: ${sqrt(exp(this.mecDrive.poseEstimate.x) - exp(this.mecDrive.poseEstimate.y))}")
+        telemetryStrings += ("End Pos: (${this.mecDrive.poseEstimate.x}, ${this.mecDrive.poseEstimate.y})/${this.mecDrive.poseEstimate.heading}")
+
+        sendTelemetryPacket(telemetryStrings)
     }
 
     private fun testRotation() {
-        this.telemetry.addLine("TEST: Spin (1080deg)")
+        val telemetryStrings = mutableListOf<String>()
+        telemetryStrings += ("TEST: Spin (1080deg)")
         val originalHeading = mecDrive.externalHeading
         mecDrive.turn(Math.toRadians(360.0 * 3.0))
-        this.telemetry.addLine("Err: ${mecDrive.externalHeading - originalHeading} End Pos: (${this.mecDrive.poseEstimate.x}, ${this.mecDrive.poseEstimate.y})/${this.mecDrive.poseEstimate.heading}")
+        telemetryStrings += ("Err: ${mecDrive.externalHeading - originalHeading}")
+        telemetryStrings += ("End Pos: (${this.mecDrive.poseEstimate.x}, ${this.mecDrive.poseEstimate.y})/${this.mecDrive.poseEstimate.heading}")
+        sendTelemetryPacket(telemetryStrings)
     }
 
     private fun testSlideExtend() {
-        this.telemetry.addLine("TEST: Slide Extend (2200T)")
+        val telemetryStrings = mutableListOf<String>()
+        telemetryStrings += ("TEST: Slide Extend (2200T)")
         armMotorSubsystem.setArmToPos(ArmMotorSubsystem.ArmPos.HIGH)
         armMotorSubsystem.waitForIdle()
 
-        this.telemetry.addLine("Pos (L): ${armMotorSubsystem.leftArmMotor.currentPosition} Pos (R): ${armMotorSubsystem.rightArmMotor.currentPosition}")
+        telemetryStrings += ("Pos (L): ${armMotorSubsystem.leftArmMotor.currentPosition} Pos (R): ${armMotorSubsystem.rightArmMotor.currentPosition}")
+        sendTelemetryPacket(telemetryStrings)
     }
 
-    private fun testDipperRotate() {
-        this.telemetry.addLine("TEST: Dipper Rotation (Scoring)")
+    private fun testDipperLeave() {
+        val telemetryStrings = mutableListOf<String>()
+        telemetryStrings += ("TEST: Dipper Rotation (Scoring)")
         // This assumes that the dipper is already in the loading position.
         this.dipperSubsystem.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION)
-        this.dipperSubsystem.waitForIdle()
-        this.telemetry.addLine("Pos (L): ${this.dipperSubsystem.leftPosition} Pos(R): ${this.dipperSubsystem.rightPosition} ")
+        telemetryStrings += ("Pos (L): ${this.dipperSubsystem.leftPosition} Pos(R): ${this.dipperSubsystem.rightPosition} ")
+        sendTelemetryPacket(telemetryStrings)
+    }
+
+    private fun testDipperReturn() {
+        val telemetryStrings = mutableListOf<String>()
+        telemetryStrings += ("TEST: Dipper Rotation (Loading)")
+        // This assumes that the dipper is already in the scoring position.
         this.dipperSubsystem.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION)
-        this.dipperSubsystem.waitForIdle()
-        this.telemetry.addLine("Pos (L): ${this.dipperSubsystem.leftPosition} Pos(R): ${this.dipperSubsystem.rightPosition} ")
+        telemetryStrings += ("Pos (L): ${this.dipperSubsystem.leftPosition} Pos(R): ${this.dipperSubsystem.rightPosition} ")
+        sendTelemetryPacket(telemetryStrings)
     }
 
     private fun testSlideRetract() {
-        this.telemetry.addLine("TEST: Slide Retract (0T)")
+        val telemetryStrings = mutableListOf<String>()
+        telemetryStrings += ("TEST: Slide Retract (0T)")
         armMotorSubsystem.setArmToPos(ArmMotorSubsystem.ArmPos.HOME)
-        this.telemetry.addLine("Err:${armMotorSubsystem.avgArmPosition} Pos (L): ${armMotorSubsystem.leftArmMotor.currentPosition} Pos (R): ${armMotorSubsystem.rightArmMotor.currentPosition}")
+        telemetryStrings += ("Err:${armMotorSubsystem.avgArmPosition}")
+        telemetryStrings += ("Pos (L): ${armMotorSubsystem.leftArmMotor.currentPosition} Pos (R): ${armMotorSubsystem.rightArmMotor.currentPosition}")
+        sendTelemetryPacket(telemetryStrings)
     }
 
     private fun testIntake() {
-        this.telemetry.addLine("TEST: Intake")
+        val telemetryStrings = mutableListOf<String>()
+        telemetryStrings += ("TEST: Intake")
         intakeSubsystem.runIntake()
         sleep(1000)
         intakeSubsystem.stopIntake()
@@ -113,7 +150,15 @@ class Diagnostic : LinearOpMode() {
         intakeSubsystem.dispenseIntake()
         sleep(1000)
         intakeSubsystem.stopIntake()
-        this.telemetry.addLine("Intake test complete.")
+        telemetryStrings += ("Intake test complete.")
+        sendTelemetryPacket(telemetryStrings)
+    }
+
+    private fun sendTelemetryPacket(strings: MutableList<String>) {
+        val packet = TelemetryPacket()
+        strings.forEach { packet.addLine(it + "\n"); this.telemetry.addLine(it) }
+        ftcDashboard.sendTelemetryPacket(packet)
         this.telemetry.update()
+
     }
 }
