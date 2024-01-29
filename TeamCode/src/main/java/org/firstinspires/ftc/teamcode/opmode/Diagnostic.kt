@@ -4,22 +4,28 @@ import com.acmerobotics.dashboard.FtcDashboard
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
+import com.arcrobotics.ftclib.command.CommandScheduler
+import com.arcrobotics.ftclib.gamepad.GamepadEx
+import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive
 import org.firstinspires.ftc.teamcode.subsystem.ArmMotorSubsystem
+import org.firstinspires.ftc.teamcode.subsystem.BucketPivotSubsystem
 import org.firstinspires.ftc.teamcode.subsystem.DipperSubsystem
 import org.firstinspires.ftc.teamcode.subsystem.IntakeSubsystem
 import kotlin.math.exp
 import kotlin.math.sqrt
 
-@Autonomous(name = "Diagnostic")
+@TeleOp(name = "Diagnostic")
 class Diagnostic : LinearOpMode() {
     private lateinit var mecDrive: MainMecanumDrive;
     private lateinit var armMotorSubsystem: ArmMotorSubsystem
     private lateinit var dipperSubsystem: DipperSubsystem
     private lateinit var intakeSubsystem: IntakeSubsystem
     private lateinit var ftcDashboard: FtcDashboard
+    private lateinit var bucketPivotSubsystem: BucketPivotSubsystem
     private val strafeLength = 3.0;
     override fun runOpMode() {
         ftcDashboard = FtcDashboard.getInstance()
@@ -27,6 +33,9 @@ class Diagnostic : LinearOpMode() {
         armMotorSubsystem = ArmMotorSubsystem(hardwareMap)
         dipperSubsystem = DipperSubsystem(hardwareMap)
         intakeSubsystem = IntakeSubsystem(hardwareMap)
+        bucketPivotSubsystem = BucketPivotSubsystem(hardwareMap)
+        CommandScheduler.getInstance().reset()
+        val gpad = GamepadEx(gamepad1)
         waitForStart()
 
         sendTelemetryPacket(
@@ -42,18 +51,21 @@ class Diagnostic : LinearOpMode() {
             { testDipperReturn() },
             { testSlideRetract() },
             { testIntake() })
-        for (i in tests) {
-            i()
-            waitForConfirmation()
-        }
+        var lastTest = 0
+        gpad.getGamepadButton(GamepadKeys.Button.A).whenPressed(Runnable {
+            tests[lastTest]()
+            lastTest++;
+        })
         // Filibuster
-        while (true) {
-            sleep(1000)
+        while (opModeIsActive()) {
+            CommandScheduler.getInstance().run()
         }
     }
 
 
+
     private fun waitForConfirmation() {
+        sleep(500)
         while (!gamepad1.a) {
             sleep(10)
         }
@@ -107,6 +119,7 @@ class Diagnostic : LinearOpMode() {
         val telemetryStrings = mutableListOf<String>()
         telemetryStrings += ("TEST: Slide Extend (2200T)")
         armMotorSubsystem.setArmToPos(ArmMotorSubsystem.ArmPos.HIGH)
+
         armMotorSubsystem.waitForIdle()
 
         telemetryStrings += ("Pos (L): ${armMotorSubsystem.leftArmMotor.currentPosition} Pos (R): ${armMotorSubsystem.rightArmMotor.currentPosition}")
@@ -118,6 +131,7 @@ class Diagnostic : LinearOpMode() {
         telemetryStrings += ("TEST: Dipper Rotation (Scoring)")
         // This assumes that the dipper is already in the loading position.
         this.dipperSubsystem.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION)
+        this.bucketPivotSubsystem.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS)
         telemetryStrings += ("Pos (L): ${this.dipperSubsystem.leftPosition} Pos(R): ${this.dipperSubsystem.rightPosition} ")
         sendTelemetryPacket(telemetryStrings)
     }
@@ -127,6 +141,7 @@ class Diagnostic : LinearOpMode() {
         telemetryStrings += ("TEST: Dipper Rotation (Loading)")
         // This assumes that the dipper is already in the scoring position.
         this.dipperSubsystem.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION)
+        this.bucketPivotSubsystem.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS)
         telemetryStrings += ("Pos (L): ${this.dipperSubsystem.leftPosition} Pos(R): ${this.dipperSubsystem.rightPosition} ")
         sendTelemetryPacket(telemetryStrings)
     }
