@@ -7,12 +7,16 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 @Config
 public class ArmMotorSubsystem implements Subsystem {
     public double correction;
     private ArmPos armPos = ArmPos.HOME;
     public DcMotorEx leftArmMotor, rightArmMotor;
-
+    Timer t;
+    TimerTask tt;
 
     public enum ArmPos {
         HIGH(2200),
@@ -54,36 +58,6 @@ public class ArmMotorSubsystem implements Subsystem {
         this.setArmToPos(pos.getPosition());
     }
 
-    public void setArmToPos(int pos) {
-        leftArmMotor.setTargetPosition(pos + 50);
-        rightArmMotor.setTargetPosition(pos);
-
-        leftArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        leftArmMotor.setPower(0.8);
-        rightArmMotor.setPower(0.8);
-//        if(pos == 0) {
-//            // A Timeout just in case something breaks.
-//            long startTime = System.currentTimeMillis();
-//            long timeout = 3500; // 3.5 seconds in milliseconds
-//
-//            while(getAvgArmPosition() > 0 && (System.currentTimeMillis() - startTime) < timeout) {
-//                leftArmMotor.setPower(0.8);
-//                rightArmMotor.setPower(0.8);
-//            }
-//            // Stop the Motor
-//            leftArmMotor.setPower(0);
-//            rightArmMotor.setPower(0);
-//            // Reset Positions
-//            rightArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//            leftArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        } else {
-//            leftArmMotor.setPower(0.8);
-//            rightArmMotor.setPower(0.8);
-//        }
-    }
-
     public void stopResetArm() {
         leftArmMotor.setPower(0);
         rightArmMotor.setPower(0);
@@ -91,6 +65,38 @@ public class ArmMotorSubsystem implements Subsystem {
         leftArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
+
+    public void setArmToPos(int pos) {
+        leftArmMotor.setTargetPosition(pos);
+        rightArmMotor.setTargetPosition(pos);
+
+        leftArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        leftArmMotor.setPower(0.8);
+        rightArmMotor.setPower(0.8);
+
+        if(pos == 0) {
+
+            t = new Timer();
+            tt = new TimerTask() {
+                @Override
+                public void run() {
+                    stopResetArm();
+                };
+            };
+
+            t.schedule(tt,3500);
+        } else {
+            try {
+                tt.cancel();
+            } catch (Exception e) {
+                // Do Nothing
+            }
+        }
+    }
+
+
 
   public int getAvgArmPosition() {
         return (leftArmMotor.getCurrentPosition() + rightArmMotor.getCurrentPosition()) / 2;

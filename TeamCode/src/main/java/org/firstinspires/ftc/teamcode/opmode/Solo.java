@@ -122,9 +122,9 @@ public class Solo extends CommandOpMode {
              .whenPressed(new InstantCommand(() -> {
                  dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
                  armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
-                 long startTime = System.currentTimeMillis();
-                 int timeout = 1200;
-                 int epsilon = 10; // Machine epsilon
+//                 long startTime = System.currentTimeMillis();
+//                 int timeout = 1200;
+//                 int epsilon = 10; // Machine epsilon
 //                 while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {
 //                     if((System.currentTimeMillis() - startTime) > timeout) {
 //                         break;
@@ -137,8 +137,8 @@ public class Solo extends CommandOpMode {
 //                     }
 //                 }
                  bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
-                 armMotor.waitForIdle();
-             }).andThen(new InstantCommand(() -> {armMotor.stopResetArm();})));
+                 //armMotor.stopResetArm();
+             }));
 
         gpad1.getGamepadButton(GamepadKeys.Button.Y)
                 .whenPressed(new InstantCommand(() -> {
@@ -160,7 +160,7 @@ public class Solo extends CommandOpMode {
     @Override
     public void run() {
 
-
+        CommandScheduler.getInstance().run();
 
         double strafe = Math.pow(gamepad1.right_stick_x, 2) * Math.signum(gamepad1.right_stick_x);
         double forward = Math.pow(gamepad1.right_stick_y, 2) * Math.signum(gamepad1.right_stick_y);
@@ -186,7 +186,5 @@ public class Solo extends CommandOpMode {
 //            telemetry.addData("DipperRightServo", dipper.rightDipperServo.getPosition());
 //            telemetry.addData("DipperLeftServo", dipper.leftDipperServo.getPosition());
         telemetry.update();
-
-        CommandScheduler.getInstance().run();
     }
 }
