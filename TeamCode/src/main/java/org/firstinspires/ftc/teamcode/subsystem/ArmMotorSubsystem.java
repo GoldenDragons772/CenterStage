@@ -47,7 +47,7 @@ public class ArmMotorSubsystem implements Subsystem {
     }
 
     public void waitForIdle() {
-        while (!Thread.currentThread().isInterrupted() && leftArmMotor.isBusy() && rightArmMotor.isBusy()) ;
+        while (!Thread.currentThread().isInterrupted() && leftArmMotor.isBusy() && rightArmMotor.isBusy());
     }
 
     public void setArmToPos(ArmPos pos) {
@@ -55,33 +55,42 @@ public class ArmMotorSubsystem implements Subsystem {
     }
 
     public void setArmToPos(int pos) {
-        leftArmMotor.setTargetPosition(pos);
+        leftArmMotor.setTargetPosition(pos + 50);
         rightArmMotor.setTargetPosition(pos);
 
         leftArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        if(pos == 0) {
-            // A Timeout just in case something breaks.
-            long startTime = System.currentTimeMillis();
-            long timeout = 3500; // 3.5 seconds in milliseconds
 
-            while(getAvgArmPosition() > 0 && (System.currentTimeMillis() - startTime) < timeout) {
-                leftArmMotor.setPower(0.8);
-                rightArmMotor.setPower(0.8);
-            }
-            // Stop the Motor
-            leftArmMotor.setPower(0);
-            rightArmMotor.setPower(0);
-            // Reset Positions
-            rightArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            leftArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        } else {
-            leftArmMotor.setPower(0.8);
-            rightArmMotor.setPower(0.8);
-        }
+        leftArmMotor.setPower(0.8);
+        rightArmMotor.setPower(0.8);
+//        if(pos == 0) {
+//            // A Timeout just in case something breaks.
+//            long startTime = System.currentTimeMillis();
+//            long timeout = 3500; // 3.5 seconds in milliseconds
+//
+//            while(getAvgArmPosition() > 0 && (System.currentTimeMillis() - startTime) < timeout) {
+//                leftArmMotor.setPower(0.8);
+//                rightArmMotor.setPower(0.8);
+//            }
+//            // Stop the Motor
+//            leftArmMotor.setPower(0);
+//            rightArmMotor.setPower(0);
+//            // Reset Positions
+//            rightArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//            leftArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        } else {
+//            leftArmMotor.setPower(0.8);
+//            rightArmMotor.setPower(0.8);
+//        }
     }
 
-    
+    public void stopResetArm() {
+        leftArmMotor.setPower(0);
+        rightArmMotor.setPower(0);
+
+        leftArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
 
   public int getAvgArmPosition() {
         return (leftArmMotor.getCurrentPosition() + rightArmMotor.getCurrentPosition()) / 2;
