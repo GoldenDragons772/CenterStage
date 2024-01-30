@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -121,16 +122,22 @@ public class Solo extends CommandOpMode {
              .whenPressed(new InstantCommand(() -> {
                  dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
                  armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
-                 int timeout = 1200;
-                 int epsilon = 550; // Machine epsilon
-                 while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {
-                     try {
-                         Thread.sleep(20);
-                     } catch (InterruptedException e) {
-                         throw new RuntimeException(e);
-                     }
-                 }
+//                 long startTime = System.currentTimeMillis();
+//                 int timeout = 1200;
+//                 int epsilon = 10; // Machine epsilon
+//                 while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {
+//                     if((System.currentTimeMillis() - startTime) > timeout) {
+//                         break;
+//                     } else {
+//                         try {
+//                             Thread.sleep(20);
+//                         } catch (InterruptedException e) {
+//                             throw new RuntimeException(e);
+//                         }
+//                     }
+//                 }
                  bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
+                 //armMotor.stopResetArm();
              }));
 
         gpad1.getGamepadButton(GamepadKeys.Button.Y)
@@ -152,6 +159,9 @@ public class Solo extends CommandOpMode {
 
     @Override
     public void run() {
+
+        CommandScheduler.getInstance().run();
+
         double strafe = Math.pow(gamepad1.right_stick_x, 2) * Math.signum(gamepad1.right_stick_x);
         double forward = Math.pow(gamepad1.right_stick_y, 2) * Math.signum(gamepad1.right_stick_y);
         double spin = Math.pow(gamepad1.left_stick_x, 2) * Math.signum(gamepad1.left_stick_x);
