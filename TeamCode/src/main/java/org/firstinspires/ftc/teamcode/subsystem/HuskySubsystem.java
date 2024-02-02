@@ -7,9 +7,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class HuskySubsystem extends SubsystemBase {
 
     public enum SpikeLocation {
-        LEFT_POSITION,
-        CENTER_POSITION,
-        RIGHT_POSITION
+        LEFT,
+        CENTER,
+        RIGHT
     }
 
     private HuskyLens husky;
@@ -40,11 +40,11 @@ public class HuskySubsystem extends SubsystemBase {
         int spikeBlock = getSpikeX();
 
         if (spikeBlock > 100 && spikeBlock < 170) {
-            return SpikeLocation.LEFT_POSITION;
+            return SpikeLocation.LEFT;
         } else if (spikeBlock > 170 && spikeBlock < 285) {
-            return SpikeLocation.CENTER_POSITION;
+            return SpikeLocation.CENTER;
         } else {
-            return SpikeLocation.RIGHT_POSITION;
+            return SpikeLocation.RIGHT;
         }
     }
 }
