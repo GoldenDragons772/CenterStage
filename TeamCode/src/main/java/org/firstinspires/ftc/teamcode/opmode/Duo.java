@@ -9,6 +9,8 @@ import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystem.ArmMotorSubsystem;
@@ -18,6 +20,7 @@ import org.firstinspires.ftc.teamcode.subsystem.DipperSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.DroneSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.MecanumDriveSubsystem;
+import org.firstinspires.ftc.teamcode.utils.GamepadTrigger;
 
 @TeleOp(name = "Duo", group = "TeleOp")
 public class Duo extends CommandOpMode {
@@ -120,18 +123,30 @@ public class Duo extends CommandOpMode {
                 .whenPressed(new InstantCommand(() -> {
                     dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
                     armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
-                    // Wait for Arm Before going to Loading Position.
-                    int timeout = 1200;
-                    int epsilon = 550; // Machine epsilon
-                    while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {
-                        try {
-                            Thread.sleep(20);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
+//                    // Wait for Arm Before going to Loading Position.
+//                    int timeout = 1200;
+//                    int epsilon = 550; // Machine epsilon
+//                    while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {
+//                        try {
+//                            Thread.sleep(20);
+//                        } catch (InterruptedException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//                    }
                     bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
                 }));
+
+        // Arm Manual Control
+        gpad2.getGamepadButton(GamepadKeys.Button.X)
+            .whenPressed(new InstantCommand(() -> {
+                armMotor.setArmMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            }));
+
+        gpad2.getGamepadButton(GamepadKeys.Button.B)
+            .whenPressed(new InstantCommand(() -> {
+                armMotor.setArmMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                gamepad2.rumble(1000);
+            }));
 
         gpad1.getGamepadButton(GamepadKeys.Button.Y)
                 .whenPressed(new InstantCommand(() -> {
@@ -162,6 +177,12 @@ public class Duo extends CommandOpMode {
                 spin * speedMultiplier
         );
 
+        // Manual Arm Control (Make sure to Un-Lock First)
+        double armPower = gamepad2.right_trigger - gamepad2.left_trigger;
+        if(armPower > 0.1 || armPower < -0.1) {
+            armMotor.setArmPower(armPower);
+        }
+
         drive.update();
         Pose2d poseEstimate = drive.getPoseEstimate();
         telemetry.addData("x", poseEstimate.getX());
@@ -171,8 +192,7 @@ public class Duo extends CommandOpMode {
         telemetry.addData("RightArmPos", armMotor.rightArmMotor.getCurrentPosition());
         telemetry.addData("PIDError", 1500 - (armMotor.leftArmMotor.getCurrentPosition() + armMotor.rightArmMotor.getCurrentPosition()) / 2);
         telemetry.addData("Correction", armMotor.correction);
-//            telemetry.addData("DipperRightServo", dipper.rightDipperServo.getPosition());
-//            telemetry.addData("DipperLeftServo", dipper.leftDipperServo.getPosition());
+        telemetry.addData("ManualArmPower", armPower);
         telemetry.update();
 
     }

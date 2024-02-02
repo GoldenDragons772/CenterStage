@@ -28,6 +28,8 @@ public class Auto extends LinearOpMode {
 
     private TrajectoryFollowerCommand driveToSpike;
 
+    private TrajectoryFollowerCommand driveToCenter;
+
     private HuskySubsystem husky;
 
     private HuskySubsystem.SpikeLocation currentSpikeLocation;
@@ -44,13 +46,13 @@ public class Auto extends LinearOpMode {
 
     private String spikePos = "ERROR_404";
 
-    private String autoName;
+    private String autoName = "NOT_SELECTED";
 
-    Pose2d LD_RED_STARTPOS = new Pose2d(-37, -62, Math.toRadians(180));
+    Pose2d LD_RED_STARTPOS = new Pose2d(-37, -62, Math.toRadians(90));
 
-    Pose2d SD_RED_STARTPOS = new Pose2d(15, -62, Math.toRadians(270));
+    Pose2d SD_RED_STARTPOS = new Pose2d(15, -62, Math.toRadians(90));
 
-    Pose2d LD_BLUE_STARTPOS = new Pose2d(-37, 62, Math.toRadians(180));
+    Pose2d LD_BLUE_STARTPOS = new Pose2d(-37, 62, Math.toRadians(270));
 
     Pose2d SD_BLUE_STARTPOS = new Pose2d(15, 62, Math.toRadians(270));
 
@@ -91,24 +93,28 @@ public class Auto extends LinearOpMode {
 
             // Red Long Distance Path
             Trajectory LD_RED_FOLLOW = drive.trajectoryBuilder(LD_RED_STARTPOS)
-                    .strafeRight(45)
-                    .splineToConstantHeading(new Vector2d(10, -10), Math.toRadians(0))
+                    .forward(30)
+                    .build();
+
+            Trajectory LD_RED_SPIKE = drive.trajectoryBuilder(LD_RED_FOLLOW.end())
+                    .lineToLinearHeading(poseManager.getSpikeLocation(spikeLocation))
                     .build();
 
             Trajectory LD_RED_BACKBOARD = drive.trajectoryBuilder(LD_RED_FOLLOW.end())
-                    .lineTo(new Vector2d(30, -10))
-                    .splineToConstantHeading(new Vector2d(54, -25), Math.toRadians(0))
+                    .splineToLinearHeading(BackDropPos, Math.toRadians(0))
                     .build();
 
             // Blue Long Distance Auto Path
             Trajectory LD_BLUE_FOLLOW = drive.trajectoryBuilder(LD_BLUE_STARTPOS)
-                    .strafeLeft(45)
-                    .splineToConstantHeading(new Vector2d(10, 10), Math.toRadians(0))
+                    .forward(30)
                     .build();
 
-            Trajectory LD_BLUE_BACKBOARD = drive.trajectoryBuilder(LD_BLUE_FOLLOW.end())
-                    .lineTo(new Vector2d(30, 10))
-                    .splineToConstantHeading(new Vector2d(54, 25), Math.toRadians(90))
+            Trajectory LD_BLUE_SPIKE = drive.trajectoryBuilder(LD_BLUE_FOLLOW.end())
+                    .lineToLinearHeading(poseManager.getSpikeLocation(spikeLocation))
+                    .build();
+
+            Trajectory LD_BLUE_BACKBOARD = drive.trajectoryBuilder(LD_BLUE_SPIKE.end())
+                    .splineToLinearHeading(BackDropPos, Math.toRadians(0))
                     .build();
 
 
@@ -119,7 +125,6 @@ public class Auto extends LinearOpMode {
 
             // Short Distance Blue Spike.
             Trajectory SD_BLUE_SPIKE = drive.trajectoryBuilder(SD_BLUE_FOLLOW.end())
-//                    .lineToLinearHeading(new Pose2d(32, 29, Math.toRadians(180)))
                     .lineToLinearHeading(poseManager.getSpikeLocation(spikeLocation))
                     .build();
 
@@ -160,39 +165,77 @@ public class Auto extends LinearOpMode {
                 autoName = "SD_BLUE";
             }
 
-            currentSpikeLocation = husky.getSpikeLocation();
+            currentSpikeLocation = husky.getSpikeLocation(autoName.contains("SD_RED") || autoName.contains("LD_BLUE"));
 
             // Determine the Prop location
 
             if(currentSpikeLocation == HuskySubsystem.SpikeLocation.LEFT_POSITION) {
                 spikePos = "LEFT_POSITION";
-                BackDropPos = new Pose2d(54, 41, Math.toRadians(180));
+                if(autoName.contains("BLUE")) {
+                    // Blue Backdrop Left Position
+                    BackDropPos = new Pose2d(54, 41, Math.toRadians(180));
+                } else {
+                    // Red Backdrop Left Position
+                    BackDropPos = new Pose2d(54, -27, Math.toRadians(180));
+                }
                 driveToBackdrop = new TrajectoryFollowerCommand(drive, SD_BLUE_BACKBOARD);
                 // Check if Auto is Short Distance Blue
                 if(autoName == "SD_BLUE") {
                     spikeLocation = PoseManager.spikeLocations.SD_BLUE_LEFT;
                     driveToSpike = new TrajectoryFollowerCommand(drive, SD_BLUE_SPIKE);
+                } else if(autoName == "LD_BLUE") {
+                    spikeLocation = PoseManager.spikeLocations.LD_BLUE_LEFT;
+                    driveToSpike = new TrajectoryFollowerCommand(drive, LD_BLUE_SPIKE);
+                } else if(autoName == "SD_RED") {
+                    spikeLocation = PoseManager.spikeLocations.SD_RED_LEFT;
+                    driveToSpike = new TrajectoryFollowerCommand(drive, SD_RED_SPIKE);
+                } else if(autoName == "LD_RED") {
+                    spikeLocation = PoseManager.spikeLocations.LD_RED_LEFT;
+                    driveToSpike = new TrajectoryFollowerCommand(drive, LD_RED_SPIKE);
                 }
             } else if(currentSpikeLocation == HuskySubsystem.SpikeLocation.RIGHT_POSITION) {
                 // Right Position
                 spikePos = "RIGHT_POSITION";
-                BackDropPos = new Pose2d(54, 27, Math.toRadians(180));
+                if(autoName.contains("BLUE")) {
+                    BackDropPos = new Pose2d(54, 27, Math.toRadians(180));
+                } else {
+                    BackDropPos = new Pose2d(54, -41, Math.toRadians(180));
+                }
                 driveToBackdrop = new TrajectoryFollowerCommand(drive, SD_BLUE_BACKBOARD);
                 if(autoName == "SD_BLUE") {
                     spikeLocation = PoseManager.spikeLocations.SD_BLUE_RIGHT;
                     driveToSpike = new TrajectoryFollowerCommand(drive, SD_BLUE_SPIKE);
+                } else if(autoName == "LD_BLUE") {
+                    spikeLocation = PoseManager.spikeLocations.LD_BLUE_RIGHT;
+                    driveToSpike = new TrajectoryFollowerCommand(drive, LD_BLUE_SPIKE);
                 } else if(autoName == "SD_RED") {
                     spikeLocation = PoseManager.spikeLocations.SD_RED_RIGHT;
                     driveToSpike = new TrajectoryFollowerCommand(drive, SD_RED_SPIKE);
+                } else if(autoName == "LD_RED") {
+                    spikeLocation = PoseManager.spikeLocations.LD_RED_RIGHT;
+                    driveToSpike = new TrajectoryFollowerCommand(drive, LD_RED_SPIKE);
                 }
             } else {
                 spikePos = "CENTER_POSITION";
-                BackDropPos = new Pose2d(54, 34, Math.toRadians(180));
+                if(autoName.contains("BLUE")) {
+                    BackDropPos = new Pose2d(54, 34, Math.toRadians(180));
+                } else {
+                    BackDropPos = new Pose2d(54, -34, Math.toRadians(180));
+                }
                 driveToBackdrop = new TrajectoryFollowerCommand(drive, SD_BLUE_BACKBOARD);
                 // Check if Auto is in short Distance Blue.
                 if(autoName == "SD_BLUE") {
                     spikeLocation = PoseManager.spikeLocations.SD_BLUE_CENTER;
                     driveToSpike = new TrajectoryFollowerCommand(drive, SD_BLUE_SPIKE);
+                } else if(autoName == "LD_BLUE") {
+                    spikeLocation = PoseManager.spikeLocations.LD_BLUE_CENTER;
+                    driveToSpike = new TrajectoryFollowerCommand(drive, LD_BLUE_SPIKE);
+                } else if(autoName == "SD_RED") {
+                    spikeLocation = PoseManager.spikeLocations.SD_RED_CENTER;
+                    driveToSpike = new TrajectoryFollowerCommand(drive, SD_RED_SPIKE);
+                } else if(autoName == "LD_RED") {
+                    spikeLocation = PoseManager.spikeLocations.LD_RED_CENTER;
+                    driveToSpike = new TrajectoryFollowerCommand(drive, LD_RED_SPIKE);
                 }
             }
 

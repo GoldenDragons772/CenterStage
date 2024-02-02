@@ -36,15 +36,25 @@ public class HuskySubsystem extends SubsystemBase {
     }
 
 
-    public SpikeLocation getSpikeLocation() {
+    public SpikeLocation getSpikeLocation(boolean rightHand) {
         int spikeBlock = getSpikeX();
 
-        if (spikeBlock > 100 && spikeBlock < 170) {
-            return SpikeLocation.LEFT_POSITION;
-        } else if (spikeBlock > 170 && spikeBlock < 285) {
-            return SpikeLocation.CENTER_POSITION;
+        if(rightHand) {
+            if (spikeBlock > 0 && spikeBlock < 100) {
+                return SpikeLocation.LEFT_POSITION;
+            } else if (spikeBlock > 100 && spikeBlock < 240) {
+                return SpikeLocation.CENTER_POSITION;
+            } else {
+                return SpikeLocation.RIGHT_POSITION;
+            }
         } else {
-            return SpikeLocation.RIGHT_POSITION;
+            if (spikeBlock > 100 && spikeBlock < 170) {
+                return SpikeLocation.LEFT_POSITION;
+            } else if (spikeBlock > 170 && spikeBlock < 285) {
+                return SpikeLocation.CENTER_POSITION;
+            } else {
+                return SpikeLocation.RIGHT_POSITION;
+            }
         }
     }
 }
