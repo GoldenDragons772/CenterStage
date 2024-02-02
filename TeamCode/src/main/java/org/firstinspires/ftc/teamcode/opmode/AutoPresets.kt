@@ -11,13 +11,13 @@ enum class AutoPresets(val index: Int) {
 
     public companion object {
         @JvmField
-        public var LD_RED_STARTPOS: Pose2d = Pose2d(-37.0, -62.0, Math.toRadians(180.0))
+        public var LD_RED_STARTPOS: Pose2d = Pose2d(-37.0, -62.0, Math.toRadians(90.0))
 
         @JvmField
-        public var SD_RED_STARTPOS: Pose2d = Pose2d(15.0, -62.0, Math.toRadians(270.0))
+        public var SD_RED_STARTPOS: Pose2d = Pose2d(15.0, -62.0, Math.toRadians(90.0))
 
         @JvmField
-        public var LD_BLUE_STARTPOS: Pose2d = Pose2d(-37.0, 62.0, Math.toRadians(180.0))
+        public var LD_BLUE_STARTPOS: Pose2d = Pose2d(-37.0, 62.0, Math.toRadians(270.0))
 
         @JvmField
         public var SD_BLUE_STARTPOS: Pose2d = Pose2d(15.0, 62.0, Math.toRadians(270.0))
@@ -32,16 +32,40 @@ enum class AutoPresets(val index: Int) {
                 39.0,
                 Math.toRadians(270.0)
             )
-            if (switchString === this.name(Alliance.BLUE, Distance.SHORT, SpikeLocation.CENTER)) return Pose2d(
-                21.0,
-                24.0,
-                Math.toRadians(180.0)
-            )
-            if (switchString === this.name(Alliance.BLUE, Distance.SHORT, SpikeLocation.RIGHT)) return Pose2d(
-                0.0,
-                37.0,
-                Math.toRadians(270.0)
-            )
+            if (switchString === this.name(Alliance.BLUE, Distance.SHORT, SpikeLocation.CENTER)) {
+                return Pose2d(21.0, 24.0, Math.toRadians(180.0))
+            }
+            if (switchString === this.name(Alliance.BLUE, Distance.SHORT, SpikeLocation.RIGHT)) {
+                return Pose2d(0.0, 37.0, Math.toRadians(270.0))
+            }
+            if (switchString === this.name(Alliance.BLUE, Distance.LONG, SpikeLocation.LEFT)) {
+                return Pose2d(-22.0, 39.0, Math.toRadians(270.0))
+            }
+            if (switchString === this.name(Alliance.BLUE, Distance.LONG, SpikeLocation.CENTER)) {
+                return Pose2d(-42.0, 24.0, Math.toRadians(0.0))
+            }
+            if (switchString === this.name(Alliance.BLUE, Distance.LONG, SpikeLocation.RIGHT)) {
+                return Pose2d(-46.0, 39.0, Math.toRadians(270.0))
+            }
+
+            if (switchString === this.name(Alliance.RED, Distance.SHORT, SpikeLocation.LEFT)) {
+                return Pose2d(0.0, -37.0, Math.toRadians(90.0))
+            }
+            if (switchString === this.name(Alliance.RED, Distance.SHORT, SpikeLocation.CENTER)) {
+                return Pose2d(21.0, -24.0, Math.toRadians(180.0))
+            }
+            if (switchString === this.name(Alliance.RED, Distance.SHORT, SpikeLocation.RIGHT)) {
+                return Pose2d(22.0, -39.0, Math.toRadians(90.0))
+            }
+            if (switchString === this.name(Alliance.RED, Distance.LONG, SpikeLocation.LEFT)) {
+                return Pose2d(-46.0, -18.0, Math.toRadians(270.0))
+            }
+            if (switchString === this.name(Alliance.RED, Distance.LONG, SpikeLocation.CENTER)) {
+                return Pose2d(-42.0, -24.0, Math.toRadians(0.0))
+            }
+            if (switchString === this.name(Alliance.RED, Distance.LONG, SpikeLocation.RIGHT)) {
+                return Pose2d(-32.0, -30.0, Math.toRadians(0.0))
+            }
             return null
         }
 

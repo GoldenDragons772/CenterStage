@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -43,7 +42,6 @@ public class Auto extends LinearOpMode {
 
     private IntakeSubsystem intake;
 
-    private String autoName;
     private Alliance alliance;
     private Distance distance;
 
@@ -100,29 +98,47 @@ public class Auto extends LinearOpMode {
                 distance = Distance.SHORT;
                 follower = new TrajectoryFollowerCommand(drive, getTrajectory(Alliance.BLUE, Distance.SHORT, Type.FOLLOW));
             }
+/*
+x value is constant
 
+               if (autoName.contains("BLUE")) {
+                   // Blue Backdrop Left Position
+                   BackDropPos = new Pose2d(54, 41, Math.toRadians(180));
+               } else {
+                   // Red Backdrop Left Position
+                   BackDropPos = new Pose2d(54, -27, Math.toRadians(180));
+               }
+                  blue right position
+               if(autoName.contains("BLUE")) {
+                    BackDropPos = new Pose2d(54, 27, Math.toRadians(180));
+                } else {
+                    BackDropPos = new Pose2d(54, -41, Math.toRadians(180));
+                }
+                blue center position
+
+                 if(autoName.contains("BLUE")) {
+                    BackDropPos = new Pose2d(54, 34, Math.toRadians(180));
+                } else {
+                    BackDropPos = new Pose2d(54, -34, Math.toRadians(180));
+                }
+*/
             currentSpikeLocation = husky.getSpikeLocation();
-
             // Determine the Prop location
             switch (currentSpikeLocation) {
                 case LEFT: {
-                    backDropPos = new Pose2d(54, 41, Math.toRadians(180));
+                    backDropPos = new Pose2d(54, (alliance == Alliance.BLUE) ? 41 : -27, Math.toRadians(180));
                     driveToBackdrop = new TrajectoryFollowerCommand(drive, getTrajectory(alliance, distance, Type.BACKBOARD));
                 }
                 case RIGHT: {
-                    backDropPos = new Pose2d(54, 27, Math.toRadians(180));
+                    backDropPos = new Pose2d(54, (alliance == Alliance.BLUE) ? 27 : -41, Math.toRadians(180));
                     driveToBackdrop = new TrajectoryFollowerCommand(drive, getTrajectory(alliance, distance, Type.BACKBOARD));
                 }
                 case CENTER: {
-                    backDropPos = new Pose2d(54, 34, Math.toRadians(180));
+                    backDropPos = new Pose2d(54, (alliance == Alliance.BLUE) ? 34 : -34, Math.toRadians(180));
                     driveToBackdrop = new TrajectoryFollowerCommand(drive, getTrajectory(alliance, distance, Type.BACKBOARD));
                 }
             }
-            // TODO: Add long distance.
-            // CRITICAL: THIS WILL PROBABLY CRASH IN RED AUTO
-            if (distance == Distance.SHORT) {
-                driveToSpike = new TrajectoryFollowerCommand(drive, getTrajectory(alliance, distance, Type.SPIKE));
-            }
+            driveToSpike = new TrajectoryFollowerCommand(drive, getTrajectory(alliance, distance, Type.SPIKE));
 
             telemetry.addData("CurrentSpike Location", currentSpikeLocation.name());
             telemetry.addData("Current Auto", alliance.name() + " " + distance.name());
@@ -183,25 +199,28 @@ public class Auto extends LinearOpMode {
         switch (alliance) {
             case RED: {
                 Trajectory LD_RED_FOLLOW = drive.trajectoryBuilder(LD_RED_STARTPOS)
-                                                .strafeRight(45.0)
-                                                .splineToConstantHeading(new Vector2d(10.0, -10.0), Math.toRadians(0.0))
-                                                .build();
+                        .forward(30)
+                        .build();
                 Trajectory SD_RED_FOLLOW = drive.trajectoryBuilder(SD_RED_STARTPOS)
-                                                .forward(30.0)
-                                                .build();
+                        .forward(30.0)
+                        .build();
                 Trajectory SD_RED_SPIKE = drive.trajectoryBuilder(SD_RED_FOLLOW.end())
-                                               .lineToLinearHeading(getSpikeLocation(alliance, distance, currentSpikeLocation))
-                                               .build();
+                        .lineToLinearHeading(getSpikeLocation(alliance, distance, currentSpikeLocation))
+                        .build();
+                Trajectory LD_RED_SPIKE = drive.trajectoryBuilder(LD_RED_FOLLOW.end())
+                        .lineToLinearHeading(getSpikeLocation(alliance, distance, currentSpikeLocation))
+                        .build();
                 Trajectory SD_RED_BACKBOARD = drive.trajectoryBuilder(SD_RED_FOLLOW.end())
-                                                   .lineToLinearHeading(backDropPos)
-                                                   .build();
-                Trajectory LD_RED_BACKBOARD = drive.trajectoryBuilder(LD_RED_FOLLOW.end())
-                                                   .lineTo(new Vector2d(30.0, -10.0))
-                                                   .splineToConstantHeading(new Vector2d(54.0, -25.0), Math.toRadians(0.0))
-                                                   .build();
+                        .lineToLinearHeading(backDropPos)
+                        .build();
+                Trajectory LD_RED_BACKBOARD = drive.trajectoryBuilder(LD_RED_SPIKE.end())
+                        .splineToLinearHeading(backDropPos, Math.toRadians(0.0))
+                        .build();
+
                 choices.put("LD_RED_FOLLOW", LD_RED_FOLLOW);
                 choices.put("SD_RED_FOLLOW", SD_RED_FOLLOW);
                 choices.put("SD_RED_SPIKE", SD_RED_SPIKE);
+                choices.put("LD_RED_SPIKE", LD_RED_SPIKE);
                 choices.put("SD_RED_BACKBOARD", SD_RED_BACKBOARD);
                 choices.put("LD_RED_BACKBOARD", LD_RED_BACKBOARD);
             }
@@ -210,26 +229,33 @@ public class Auto extends LinearOpMode {
 
 
                 Trajectory LD_BLUE_FOLLOW = drive.trajectoryBuilder(LD_BLUE_STARTPOS)
-                                                 .strafeLeft(45.0)
-                                                 .splineToConstantHeading(new Vector2d(10.0, 10.0), Math.toRadians(0.0))
-                                                 .build();
+                        .forward(30)
+                        .build();
+
                 Trajectory SD_BLUE_FOLLOW = drive.trajectoryBuilder(SD_BLUE_STARTPOS)
-                                                 .forward(30.0)
-                                                 .build();
+                        .forward(30.0)
+                        .build();
+
                 Trajectory SD_BLUE_SPIKE =
                         drive.trajectoryBuilder(SD_BLUE_FOLLOW.end()) //                    .lineToLinearHeading(new Pose2d(32, 29, Math.toRadians(180)))
-                             .lineToLinearHeading(getSpikeLocation(alliance, distance, currentSpikeLocation))
-                             .build();
+                                .lineToLinearHeading(getSpikeLocation(alliance, distance, currentSpikeLocation))
+                                .build();
+                Trajectory LD_BLUE_SPIKE = drive.trajectoryBuilder(LD_BLUE_FOLLOW.end())
+                        .lineToLinearHeading(getSpikeLocation(alliance, distance, currentSpikeLocation))
+                        .build();
+
                 Trajectory SD_BLUE_BACKBOARD = drive.trajectoryBuilder(SD_BLUE_SPIKE.end())
-                                                    .lineToLinearHeading(backDropPos)
-                                                    .build();
-                Trajectory LD_BLUE_BACKBOARD = drive.trajectoryBuilder(LD_BLUE_FOLLOW.end())
-                                                    .lineTo(new Vector2d(30.0, 10.0))
-                                                    .splineToConstantHeading(new Vector2d(54.0, 25.0), Math.toRadians(90.0))
-                                                    .build();
+                        .lineToLinearHeading(backDropPos)
+                        .build();
+
+                Trajectory LD_BLUE_BACKBOARD = drive.trajectoryBuilder(LD_BLUE_SPIKE.end())
+                        .splineToLinearHeading(backDropPos, Math.toRadians(0.0))
+                        .build();
+
                 choices.put("LD_BLUE_FOLLOW", LD_BLUE_FOLLOW);
                 choices.put("SD_BLUE_FOLLOW", SD_BLUE_FOLLOW);
                 choices.put("SD_BLUE_SPIKE", SD_BLUE_SPIKE);
+                choices.put("LD_BLUE_SPIKE", LD_BLUE_SPIKE);
                 choices.put("SD_BLUE_BACKBOARD", SD_BLUE_BACKBOARD);
                 choices.put("LD_BLUE_BACKBOARD", LD_BLUE_BACKBOARD);
             }
@@ -237,12 +263,12 @@ public class Auto extends LinearOpMode {
         switch (distance) {
             case LONG: {
                 choices.keySet().stream().filter(s -> s.contains("SD")).collect(Collectors.toList())
-                       .forEach(choices.keySet()::remove);
+                        .forEach(choices.keySet()::remove);
             }
 
             case SHORT: {
                 choices.keySet().stream().filter(s -> s.contains("LD")).collect(Collectors.toList())
-                       .forEach(choices.keySet()::remove);
+                        .forEach(choices.keySet()::remove);
             }
         }
         switch (type) {
