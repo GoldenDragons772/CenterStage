@@ -3,11 +3,7 @@ package org.firstinspires.ftc.teamcode.opmode
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import org.firstinspires.ftc.teamcode.subsystem.HuskySubsystem.SpikeLocation
 
-enum class AutoPresets(val index: Int) {
-    LD_BLUE(0),
-    SD_BLUE(1),
-    LD_RED(2),
-    SD_RED(3);
+class AutoPresets {
 
     public companion object {
         @JvmField
@@ -73,11 +69,6 @@ enum class AutoPresets(val index: Int) {
             return alliance.toString() + distance.toString() + spikeLoc.toString()
         }
     }
-
-    val distance: Distance
-        get() = if ((this.toString().contains("LD"))) Distance.LONG else Distance.SHORT
-    val alliance: Alliance
-        get() = if ((this.toString().contains("BLUE"))) Alliance.BLUE else Alliance.RED
 
     enum class Distance {
         SHORT,
