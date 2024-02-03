@@ -165,7 +165,7 @@ public class Auto extends LinearOpMode {
                 autoName = "SD_BLUE";
             }
 
-            currentSpikeLocation = husky.getSpikeLocation(autoName.contains("SD_RED") || autoName.contains("LD_BLUE"));
+            currentSpikeLocation = husky.getSpikeLocation(autoName);
 
             // Determine the Prop location
 

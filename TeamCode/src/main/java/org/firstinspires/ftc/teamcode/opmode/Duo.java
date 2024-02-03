@@ -177,12 +177,6 @@ public class Duo extends CommandOpMode {
                 spin * speedMultiplier
         );
 
-        // Manual Arm Control (Make sure to Un-Lock First)
-        double armPower = gamepad2.right_trigger - gamepad2.left_trigger;
-        if(armPower > 0.1 || armPower < -0.1) {
-            armMotor.setArmPower(armPower);
-        }
-
         drive.update();
         Pose2d poseEstimate = drive.getPoseEstimate();
         telemetry.addData("x", poseEstimate.getX());
@@ -192,7 +186,6 @@ public class Duo extends CommandOpMode {
         telemetry.addData("RightArmPos", armMotor.rightArmMotor.getCurrentPosition());
         telemetry.addData("PIDError", 1500 - (armMotor.leftArmMotor.getCurrentPosition() + armMotor.rightArmMotor.getCurrentPosition()) / 2);
         telemetry.addData("Correction", armMotor.correction);
-        telemetry.addData("ManualArmPower", armPower);
         telemetry.update();
 
     }

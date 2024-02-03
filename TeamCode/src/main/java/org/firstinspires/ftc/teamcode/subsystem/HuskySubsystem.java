@@ -36,10 +36,10 @@ public class HuskySubsystem extends SubsystemBase {
     }
 
 
-    public SpikeLocation getSpikeLocation(boolean rightHand) {
+    public SpikeLocation getSpikeLocation(String auto) {
         int spikeBlock = getSpikeX();
 
-        if(rightHand) {
+        if(auto == "SD_RED" || auto == "LD_BLUE") {
             if (spikeBlock > 0 && spikeBlock < 100) {
                 return SpikeLocation.LEFT_POSITION;
             } else if (spikeBlock > 100 && spikeBlock < 240) {
