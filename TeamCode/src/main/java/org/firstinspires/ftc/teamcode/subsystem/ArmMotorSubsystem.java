@@ -20,7 +20,7 @@ public class ArmMotorSubsystem implements Subsystem {
 
     public enum ArmPos {
         HIGH(2200),
-        MIDDLE(1500),
+        MIDDLE(1250),
         LOW(750),
         HOME(0);
         final private int position;
@@ -59,14 +59,14 @@ public class ArmMotorSubsystem implements Subsystem {
     }
 
     public void stopResetArm() {
+//        leftArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        rightArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftArmMotor.setPower(0);
         rightArmMotor.setPower(0);
-
-        leftArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public void setArmToPos(int pos) {
+
         leftArmMotor.setTargetPosition(pos);
         rightArmMotor.setTargetPosition(pos);
 
@@ -77,16 +77,27 @@ public class ArmMotorSubsystem implements Subsystem {
         rightArmMotor.setPower(0.8);
 
         if(pos == 0) {
+            if(getAvgArmPosition() > 50) {
+                try {
+                    tt.cancel();
+                } catch (Exception e) {
+                    // Do Nothing
+                } finally {
+                    t = new Timer();
+                    tt = new TimerTask() {
+                        @Override
+                        public void run() {
+                            stopResetArm();
+                        };
+                    };
 
-            t = new Timer();
-            tt = new TimerTask() {
-                @Override
-                public void run() {
-                    stopResetArm();
-                };
-            };
-
-            t.schedule(tt,3500);
+                    t.schedule(tt,3000);
+                }
+            } else {
+                // Stop the Motor Since We are already at Home
+                leftArmMotor.setPower(0);
+                rightArmMotor.setPower(0);
+            }
         } else {
             try {
                 tt.cancel();
@@ -96,6 +107,17 @@ public class ArmMotorSubsystem implements Subsystem {
         }
     }
 
+    public void setArmPower(double power) {
+        leftArmMotor.setPower(power);
+        rightArmMotor.setPower(power);
+    }
+
+    public void setArmMode(DcMotor.RunMode mode) {
+        if(mode != leftArmMotor.getMode() || mode != rightArmMotor.getMode()) {
+            leftArmMotor.setMode(mode);
+            rightArmMotor.setMode(mode);
+        }
+    }
 
 
   public int getAvgArmPosition() {

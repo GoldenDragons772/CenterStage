@@ -28,6 +28,8 @@ public class Auto extends LinearOpMode {
 
     private TrajectoryFollowerCommand driveToSpike;
 
+    private TrajectoryFollowerCommand driveToCenter;
+
     private HuskySubsystem husky;
 
     private HuskySubsystem.SpikeLocation currentSpikeLocation;
@@ -122,7 +124,8 @@ x value is constant
                     BackDropPos = new Pose2d(54, -34, Math.toRadians(180));
                 }
 */
-            currentSpikeLocation = husky.getSpikeLocation();
+            currentSpikeLocation = husky.getSpikeLocation((alliance == Alliance.RED && distance == Distance.SHORT)
+                    || (alliance == Alliance.BLUE && distance == Distance.LONG));
             // Determine the Prop location
             switch (currentSpikeLocation) {
                 case LEFT: {
@@ -199,23 +202,23 @@ x value is constant
         switch (alliance) {
             case RED: {
                 Trajectory LD_RED_FOLLOW = drive.trajectoryBuilder(LD_RED_STARTPOS)
-                        .forward(30)
-                        .build();
+                                                .forward(30)
+                                                .build();
                 Trajectory SD_RED_FOLLOW = drive.trajectoryBuilder(SD_RED_STARTPOS)
-                        .forward(30.0)
-                        .build();
+                                                .forward(30.0)
+                                                .build();
                 Trajectory SD_RED_SPIKE = drive.trajectoryBuilder(SD_RED_FOLLOW.end())
-                        .lineToLinearHeading(getSpikeLocation(alliance, distance, currentSpikeLocation))
-                        .build();
+                                               .lineToLinearHeading(getSpikeLocation(alliance, distance, currentSpikeLocation))
+                                               .build();
                 Trajectory LD_RED_SPIKE = drive.trajectoryBuilder(LD_RED_FOLLOW.end())
-                        .lineToLinearHeading(getSpikeLocation(alliance, distance, currentSpikeLocation))
-                        .build();
+                                               .lineToLinearHeading(getSpikeLocation(alliance, distance, currentSpikeLocation))
+                                               .build();
                 Trajectory SD_RED_BACKBOARD = drive.trajectoryBuilder(SD_RED_FOLLOW.end())
-                        .lineToLinearHeading(backDropPos)
-                        .build();
+                                                   .lineToLinearHeading(backDropPos)
+                                                   .build();
                 Trajectory LD_RED_BACKBOARD = drive.trajectoryBuilder(LD_RED_SPIKE.end())
-                        .splineToLinearHeading(backDropPos, Math.toRadians(0.0))
-                        .build();
+                                                   .splineToLinearHeading(backDropPos, Math.toRadians(0.0))
+                                                   .build();
 
                 choices.put("LD_RED_FOLLOW", LD_RED_FOLLOW);
                 choices.put("SD_RED_FOLLOW", SD_RED_FOLLOW);
@@ -229,28 +232,28 @@ x value is constant
 
 
                 Trajectory LD_BLUE_FOLLOW = drive.trajectoryBuilder(LD_BLUE_STARTPOS)
-                        .forward(30)
-                        .build();
+                                                 .forward(30)
+                                                 .build();
 
                 Trajectory SD_BLUE_FOLLOW = drive.trajectoryBuilder(SD_BLUE_STARTPOS)
-                        .forward(30.0)
-                        .build();
+                                                 .forward(30.0)
+                                                 .build();
 
                 Trajectory SD_BLUE_SPIKE =
                         drive.trajectoryBuilder(SD_BLUE_FOLLOW.end()) //                    .lineToLinearHeading(new Pose2d(32, 29, Math.toRadians(180)))
-                                .lineToLinearHeading(getSpikeLocation(alliance, distance, currentSpikeLocation))
-                                .build();
+                             .lineToLinearHeading(getSpikeLocation(alliance, distance, currentSpikeLocation))
+                             .build();
                 Trajectory LD_BLUE_SPIKE = drive.trajectoryBuilder(LD_BLUE_FOLLOW.end())
-                        .lineToLinearHeading(getSpikeLocation(alliance, distance, currentSpikeLocation))
-                        .build();
+                                                .lineToLinearHeading(getSpikeLocation(alliance, distance, currentSpikeLocation))
+                                                .build();
 
                 Trajectory SD_BLUE_BACKBOARD = drive.trajectoryBuilder(SD_BLUE_SPIKE.end())
-                        .lineToLinearHeading(backDropPos)
-                        .build();
+                                                    .lineToLinearHeading(backDropPos)
+                                                    .build();
 
                 Trajectory LD_BLUE_BACKBOARD = drive.trajectoryBuilder(LD_BLUE_SPIKE.end())
-                        .splineToLinearHeading(backDropPos, Math.toRadians(0.0))
-                        .build();
+                                                    .splineToLinearHeading(backDropPos, Math.toRadians(0.0))
+                                                    .build();
 
                 choices.put("LD_BLUE_FOLLOW", LD_BLUE_FOLLOW);
                 choices.put("SD_BLUE_FOLLOW", SD_BLUE_FOLLOW);
@@ -263,12 +266,12 @@ x value is constant
         switch (distance) {
             case LONG: {
                 choices.keySet().stream().filter(s -> s.contains("SD")).collect(Collectors.toList())
-                        .forEach(choices.keySet()::remove);
+                       .forEach(choices.keySet()::remove);
             }
 
             case SHORT: {
                 choices.keySet().stream().filter(s -> s.contains("LD")).collect(Collectors.toList())
-                        .forEach(choices.keySet()::remove);
+                       .forEach(choices.keySet()::remove);
             }
         }
         switch (type) {

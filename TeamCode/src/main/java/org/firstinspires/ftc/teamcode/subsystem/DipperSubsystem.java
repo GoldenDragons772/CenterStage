@@ -7,10 +7,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @Config
 public class DipperSubsystem extends SubsystemBase {
-    public final static double rightLoadingPos = 0.235;
-    public final static double leftLoadingPos = 0.195;
-    public final static double rightScoringPos = 0.973;
-    public final static double leftScoringPos = 0.95;
+    public static double rightLoadingPos = 0.235;
+    public static double leftLoadingPos = 0.195;
+    public static double rightScoringPos = 0.973;
+    public static double leftScoringPos = 0.95;
     private static double leftDestinationPos = 0.0;
     private static double rightDestinationPos = 0.0;
     private final Servo right, left;
