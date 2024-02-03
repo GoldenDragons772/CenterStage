@@ -1,14 +1,9 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
-import androidx.core.os.TraceKt;
-
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.path.Path;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
-import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
@@ -23,47 +18,27 @@ public class Auto extends LinearOpMode {
 
     private MecanumDriveSubsystem drive;
     private TrajectoryFollowerCommand follower;
-
     private TrajectoryFollowerCommand driveToBackdrop;
-
     private TrajectoryFollowerCommand driveToSpike;
-
     private TrajectoryFollowerCommand driveToCenter;
-
     private HuskySubsystem husky;
-
     private HuskySubsystem.SpikeLocation currentSpikeLocation;
-
     private BucketSubsystem bucket;
-
     private BucketPivotSubsystem bucketPivot;
-
     private DipperSubsystem dipper;
-
     private ArmMotorSubsystem armMotor;
-
     private IntakeSubsystem intake;
-
     private String spikePos = "ERROR_404";
-
     private String autoName = "NOT_SELECTED";
-
     Pose2d LD_RED_STARTPOS = new Pose2d(-37, -62, Math.toRadians(90));
-
     Pose2d SD_RED_STARTPOS = new Pose2d(15, -62, Math.toRadians(90));
-
     Pose2d LD_BLUE_STARTPOS = new Pose2d(-37, 62, Math.toRadians(270));
-
     Pose2d SD_BLUE_STARTPOS = new Pose2d(15, 62, Math.toRadians(270));
-
     // Backdrop
     Pose2d BackDropPos = new Pose2d(0, 0, Math.toRadians(0));
-
     // StorePose
     StorePos storePos = new StorePos();
-
     PoseManager poseManager = new PoseManager();
-
     PoseManager.spikeLocations spikeLocation = PoseManager.spikeLocations.SD_BLUE_LEFT;
 
     @Override
