@@ -6,17 +6,17 @@ import org.firstinspires.ftc.teamcode.subsystem.HuskySubsystem.SpikeLocation
 class AutoPresets {
 
     public companion object {
+        private const val xFar = -37.0;
+        private const val xNear = 15.0;
+        private const val y = 62.0;
         @JvmField
-        public var LD_RED_STARTPOS: Pose2d = Pose2d(-37.0, -62.0, Math.toRadians(90.0))
-
+        public var LD_RED_STARTPOS: Pose2d = Pose2d(xFar, -y, Math.toRadians(90.0))
         @JvmField
-        public var SD_RED_STARTPOS: Pose2d = Pose2d(15.0, -62.0, Math.toRadians(90.0))
-
+        public var SD_RED_STARTPOS: Pose2d = Pose2d(xNear, -y, Math.toRadians(90.0))
         @JvmField
-        public var LD_BLUE_STARTPOS: Pose2d = Pose2d(-37.0, 62.0, Math.toRadians(270.0))
-
+        public var LD_BLUE_STARTPOS: Pose2d = Pose2d(xFar, y, Math.toRadians(270.0))
         @JvmField
-        public var SD_BLUE_STARTPOS: Pose2d = Pose2d(15.0, 62.0, Math.toRadians(270.0))
+        public var SD_BLUE_STARTPOS: Pose2d = Pose2d(xNear, y, Math.toRadians(270.0))
 
         @JvmStatic
         public fun getSpikeLocation(alliance: Alliance, distance: Distance, spikeLoc: SpikeLocation): Pose2d? {

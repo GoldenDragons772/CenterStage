@@ -23,27 +23,16 @@ public class Auto extends LinearOpMode {
 
     private MecanumDriveSubsystem drive;
     private TrajectoryFollowerCommand follower;
-
     private TrajectoryFollowerCommand driveToBackdrop;
-
     private TrajectoryFollowerCommand driveToSpike;
-
     private TrajectoryFollowerCommand driveToCenter;
-
     private HuskySubsystem husky;
-
     private HuskySubsystem.SpikeLocation currentSpikeLocation;
-
     private BucketSubsystem bucket;
-
     private BucketPivotSubsystem bucketPivot;
-
     private DipperSubsystem dipper;
-
     private ArmMotorSubsystem armMotor;
-
     private IntakeSubsystem intake;
-
     private Alliance alliance;
     private Distance distance;
 
@@ -59,17 +48,11 @@ public class Auto extends LinearOpMode {
         CommandScheduler.getInstance().reset();
 
         drive = new MecanumDriveSubsystem(new MainMecanumDrive(hardwareMap), false);
-
         husky = new HuskySubsystem(hardwareMap);
-
         bucket = new BucketSubsystem(hardwareMap);
-
         bucketPivot = new BucketPivotSubsystem(hardwareMap);
-
         dipper = new DipperSubsystem(hardwareMap);
-
         armMotor = new ArmMotorSubsystem(hardwareMap);
-
         intake = new IntakeSubsystem(hardwareMap);
 
 
@@ -150,44 +133,40 @@ x value is constant
         }
 
         waitForStart();
+        SequentialCommandGroup commandGroup = new SequentialCommandGroup();
+        commandGroup.addCommands(follower);
+        commandGroup.addCommands(driveToSpike);
+        commandGroup.addCommands(new InstantCommand(() -> {
+            intake.spikePixel();
+            sleep(500);
+            intake.stopIntake();
+        }));
+        commandGroup.addCommands(new InstantCommand(() -> {
+            armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.LOW);
+            dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
+            bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
+        }));
+        commandGroup.addCommands(new WaitCommand(750));
+        commandGroup.addCommands(driveToBackdrop);
+        commandGroup.addCommands(new InstantCommand(() -> bucket.dispensePixels()));
+        commandGroup.addCommands(new WaitCommand(2000));
+        commandGroup.addCommands(new InstantCommand(() -> {
+            bucket.stopBucket();
+            dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
+            armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
+            int timeout = 1200;
+            int epsilon = 550; // Machine epsilon
+            while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {
+                try {
+                    Thread.sleep(20);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
+        }));
 
-        CommandScheduler.getInstance().schedule(
-                new SequentialCommandGroup(
-                        follower,
-                        driveToSpike,
-                        new InstantCommand(() -> {
-                            intake.spikePixel();
-                            sleep(500);
-                            intake.stopIntake();
-                        }),
-                        new InstantCommand(() -> {
-                            armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.LOW);
-                            dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
-                            bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
-                        }),
-                        new WaitCommand(750),
-                        driveToBackdrop,
-                        new InstantCommand(() -> {
-                            bucket.dispensePixels();
-                        }),
-                        new WaitCommand(2000),
-                        new InstantCommand(() -> {
-                            bucket.stopBucket();
-                            dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
-                            armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
-                            int timeout = 1200;
-                            int epsilon = 550; // Machine epsilon
-                            while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {
-                                try {
-                                    Thread.sleep(20);
-                                } catch (InterruptedException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            }
-                            bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
-                        })
-                )
-        );
+        CommandScheduler.getInstance().schedule();
 
         while (opModeIsActive()) {
             CommandScheduler.getInstance().run();
