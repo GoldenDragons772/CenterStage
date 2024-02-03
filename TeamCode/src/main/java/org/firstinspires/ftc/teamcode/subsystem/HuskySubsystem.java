@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystem;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.teamcode.opmode.AutoPresets;
 
 public class HuskySubsystem extends SubsystemBase {
 
@@ -36,10 +37,10 @@ public class HuskySubsystem extends SubsystemBase {
     }
 
 
-    public SpikeLocation getSpikeLocation(boolean rightHand) {
+    public SpikeLocation getSpikeLocation(AutoPresets.Alliance alliance, AutoPresets.Distance distance) {
         int spikeBlock = getSpikeX();
 
-        if (rightHand) {
+        if ((alliance == AutoPresets.Alliance.RED && distance == AutoPresets.Distance.SHORT) || (alliance == AutoPresets.Alliance.BLUE && distance == AutoPresets.Distance.LONG)) {
             if (spikeBlock > 0 && spikeBlock < 100) {
                 return SpikeLocation.LEFT;
             } else if (spikeBlock > 100 && spikeBlock < 240) {

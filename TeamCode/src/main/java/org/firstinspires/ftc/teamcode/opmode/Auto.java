@@ -21,20 +21,21 @@ import static org.firstinspires.ftc.teamcode.opmode.AutoPresets.*;
 @Autonomous(name = "GDAutoTest", group = "Auto")
 public class Auto extends LinearOpMode {
 
-    private MecanumDriveSubsystem drive;
     private TrajectoryFollowerCommand follower;
     private TrajectoryFollowerCommand driveToBackdrop;
     private TrajectoryFollowerCommand driveToSpike;
-    private TrajectoryFollowerCommand driveToCenter;
-    private HuskySubsystem husky;
+
     private HuskySubsystem.SpikeLocation currentSpikeLocation;
+    private Alliance alliance;
+    private Distance distance;
+
+    private MecanumDriveSubsystem drive;
+    private HuskySubsystem husky;
     private BucketSubsystem bucket;
     private BucketPivotSubsystem bucketPivot;
     private DipperSubsystem dipper;
     private ArmMotorSubsystem armMotor;
     private IntakeSubsystem intake;
-    private Alliance alliance;
-    private Distance distance;
 
     // Backdrop
     Pose2d backDropPos = new Pose2d(0, 0, Math.toRadians(0));
@@ -56,7 +57,6 @@ public class Auto extends LinearOpMode {
         intake = new IntakeSubsystem(hardwareMap);
 
 
-        // Set Algorithm
         husky.setAlgorithm(HuskyLens.Algorithm.COLOR_RECOGNITION);
 
         while (opModeInInit()) {
@@ -83,32 +83,8 @@ public class Auto extends LinearOpMode {
                 distance = Distance.SHORT;
                 follower = new TrajectoryFollowerCommand(drive, getTrajectory(Alliance.BLUE, Distance.SHORT, Type.FOLLOW));
             }
-/*
-x value is constant
 
-               if (autoName.contains("BLUE")) {
-                   // Blue Backdrop Left Position
-                   BackDropPos = new Pose2d(54, 41, Math.toRadians(180));
-               } else {
-                   // Red Backdrop Left Position
-                   BackDropPos = new Pose2d(54, -27, Math.toRadians(180));
-               }
-                  blue right position
-               if(autoName.contains("BLUE")) {
-                    BackDropPos = new Pose2d(54, 27, Math.toRadians(180));
-                } else {
-                    BackDropPos = new Pose2d(54, -41, Math.toRadians(180));
-                }
-                blue center position
-
-                 if(autoName.contains("BLUE")) {
-                    BackDropPos = new Pose2d(54, 34, Math.toRadians(180));
-                } else {
-                    BackDropPos = new Pose2d(54, -34, Math.toRadians(180));
-                }
-*/
-            currentSpikeLocation = husky.getSpikeLocation((alliance == Alliance.RED && distance == Distance.SHORT)
-                    || (alliance == Alliance.BLUE && distance == Distance.LONG));
+            currentSpikeLocation = husky.getSpikeLocation(alliance, distance);
             // Determine the Prop location
             switch (currentSpikeLocation) {
                 case LEFT: {
@@ -141,32 +117,34 @@ x value is constant
             sleep(500);
             intake.stopIntake();
         }));
-        commandGroup.addCommands(new InstantCommand(() -> {
-            armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.LOW);
-            dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
-            bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
-        }));
-        commandGroup.addCommands(new WaitCommand(750));
-        commandGroup.addCommands(driveToBackdrop);
-        commandGroup.addCommands(new InstantCommand(() -> bucket.dispensePixels()));
-        commandGroup.addCommands(new WaitCommand(2000));
-        commandGroup.addCommands(new InstantCommand(() -> {
-            bucket.stopBucket();
-            dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
-            armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
-            int timeout = 1200;
-            int epsilon = 550; // Machine epsilon
-            while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {
-                try {
-                    Thread.sleep(20);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+        if (distance == Distance.SHORT) { // TODO: create a transition from pppp (PurPle Pixel Placing) to placing on the backdrop.
+            commandGroup.addCommands(new InstantCommand(() -> {
+                armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.LOW);
+                dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
+                bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
+            }));
+            commandGroup.addCommands(new WaitCommand(750));
+            commandGroup.addCommands(driveToBackdrop);
+            commandGroup.addCommands(new InstantCommand(() -> bucket.dispensePixels()));
+            commandGroup.addCommands(new WaitCommand(2000));
+            commandGroup.addCommands(new InstantCommand(() -> {
+                bucket.stopBucket();
+                dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
+                armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
+                int timeout = 1200;
+                int epsilon = 550; // Machine epsilon
+                while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {
+                    try {
+                        Thread.sleep(20);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-            }
-            bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
-        }));
+                bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
+            }));
+        }
 
-        CommandScheduler.getInstance().schedule();
+        CommandScheduler.getInstance().schedule(commandGroup);
 
         while (opModeIsActive()) {
             CommandScheduler.getInstance().run();
@@ -178,79 +156,43 @@ x value is constant
 
     Trajectory getTrajectory(Alliance alliance, Distance distance, Type type) {
         HashMap<String, Trajectory> choices = new HashMap<>();
-        switch (alliance) {
-            case RED: {
-                Trajectory LD_RED_FOLLOW = drive.trajectoryBuilder(LD_RED_STARTPOS)
-                                                .forward(30)
-                                                .build();
-                Trajectory SD_RED_FOLLOW = drive.trajectoryBuilder(SD_RED_STARTPOS)
-                                                .forward(30.0)
-                                                .build();
-                Trajectory SD_RED_SPIKE = drive.trajectoryBuilder(SD_RED_FOLLOW.end())
-                                               .lineToLinearHeading(getSpikeLocation(alliance, distance, currentSpikeLocation))
-                                               .build();
-                Trajectory LD_RED_SPIKE = drive.trajectoryBuilder(LD_RED_FOLLOW.end())
-                                               .lineToLinearHeading(getSpikeLocation(alliance, distance, currentSpikeLocation))
-                                               .build();
-                Trajectory SD_RED_BACKBOARD = drive.trajectoryBuilder(SD_RED_FOLLOW.end())
-                                                   .lineToLinearHeading(backDropPos)
-                                                   .build();
-                Trajectory LD_RED_BACKBOARD = drive.trajectoryBuilder(LD_RED_SPIKE.end())
-                                                   .splineToLinearHeading(backDropPos, Math.toRadians(0.0))
-                                                   .build();
+        int reflection = alliance == Alliance.RED ? -1 : 1;
+        Pose2d spikeLoc = getSpikeLocation(alliance, distance, currentSpikeLocation);
 
-                choices.put("LD_RED_FOLLOW", LD_RED_FOLLOW);
-                choices.put("SD_RED_FOLLOW", SD_RED_FOLLOW);
-                choices.put("SD_RED_SPIKE", SD_RED_SPIKE);
-                choices.put("LD_RED_SPIKE", LD_RED_SPIKE);
-                choices.put("SD_RED_BACKBOARD", SD_RED_BACKBOARD);
-                choices.put("LD_RED_BACKBOARD", LD_RED_BACKBOARD);
-            }
+        Trajectory LD_FOLLOW = drive.trajectoryBuilder(new Pose2d(LD_BLUE_STARTPOS.getX(), LD_BLUE_STARTPOS.getY() * reflection))
+                .forward(30)
+                .build();
+        Trajectory SD_FOLLOW = drive.trajectoryBuilder(new Pose2d(SD_BLUE_STARTPOS.getX(), SD_BLUE_STARTPOS.getY() * reflection))
+                .forward(30.0)
+                .build();
+        Trajectory SD_SPIKE = drive.trajectoryBuilder(SD_FOLLOW.end())
+                .lineToLinearHeading(spikeLoc)
+                .build();
+        Trajectory LD_SPIKE = drive.trajectoryBuilder(LD_FOLLOW.end())
+                .lineToLinearHeading(spikeLoc)
+                .build();
+        Trajectory SD_BACKBOARD = drive.trajectoryBuilder(SD_FOLLOW.end())
+                .lineToLinearHeading(backDropPos)
+                .build();
+        Trajectory LD_BACKBOARD = drive.trajectoryBuilder(LD_SPIKE.end())
+                .splineToLinearHeading(backDropPos, Math.toRadians(0.0))
+                .build();
 
-            case BLUE: {
-
-
-                Trajectory LD_BLUE_FOLLOW = drive.trajectoryBuilder(LD_BLUE_STARTPOS)
-                                                 .forward(30)
-                                                 .build();
-
-                Trajectory SD_BLUE_FOLLOW = drive.trajectoryBuilder(SD_BLUE_STARTPOS)
-                                                 .forward(30.0)
-                                                 .build();
-
-                Trajectory SD_BLUE_SPIKE =
-                        drive.trajectoryBuilder(SD_BLUE_FOLLOW.end()) //                    .lineToLinearHeading(new Pose2d(32, 29, Math.toRadians(180)))
-                             .lineToLinearHeading(getSpikeLocation(alliance, distance, currentSpikeLocation))
-                             .build();
-                Trajectory LD_BLUE_SPIKE = drive.trajectoryBuilder(LD_BLUE_FOLLOW.end())
-                                                .lineToLinearHeading(getSpikeLocation(alliance, distance, currentSpikeLocation))
-                                                .build();
-
-                Trajectory SD_BLUE_BACKBOARD = drive.trajectoryBuilder(SD_BLUE_SPIKE.end())
-                                                    .lineToLinearHeading(backDropPos)
-                                                    .build();
-
-                Trajectory LD_BLUE_BACKBOARD = drive.trajectoryBuilder(LD_BLUE_SPIKE.end())
-                                                    .splineToLinearHeading(backDropPos, Math.toRadians(0.0))
-                                                    .build();
-
-                choices.put("LD_BLUE_FOLLOW", LD_BLUE_FOLLOW);
-                choices.put("SD_BLUE_FOLLOW", SD_BLUE_FOLLOW);
-                choices.put("SD_BLUE_SPIKE", SD_BLUE_SPIKE);
-                choices.put("LD_BLUE_SPIKE", LD_BLUE_SPIKE);
-                choices.put("SD_BLUE_BACKBOARD", SD_BLUE_BACKBOARD);
-                choices.put("LD_BLUE_BACKBOARD", LD_BLUE_BACKBOARD);
-            }
-        }
+        choices.put("LD_FOLLOW", LD_FOLLOW);
+        choices.put("SD_FOLLOW", SD_FOLLOW);
+        choices.put("SD_SPIKE", SD_SPIKE);
+        choices.put("LD_SPIKE", LD_SPIKE);
+        choices.put("SD_BACKBOARD", SD_BACKBOARD);
+        choices.put("LD_BACKBOARD", LD_BACKBOARD);
         switch (distance) {
             case LONG: {
                 choices.keySet().stream().filter(s -> s.contains("SD")).collect(Collectors.toList())
-                       .forEach(choices.keySet()::remove);
+                        .forEach(choices.keySet()::remove);
             }
 
             case SHORT: {
                 choices.keySet().stream().filter(s -> s.contains("LD")).collect(Collectors.toList())
-                       .forEach(choices.keySet()::remove);
+                        .forEach(choices.keySet()::remove);
             }
         }
         switch (type) {

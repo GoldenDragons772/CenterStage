@@ -23,11 +23,8 @@ class AutoPresets {
             // hacky af
             // TODO: We're missing spike movement locations for all RED and all LONG BLUE
             val switchString = alliance.toString() + distance.toString() + spikeLoc.toString()
-            if (switchString === this.name(Alliance.BLUE, Distance.SHORT, SpikeLocation.LEFT)) return Pose2d(
-                22.0,
-                39.0,
-                Math.toRadians(270.0)
-            )
+            if (switchString === this.name(Alliance.BLUE, Distance.SHORT, SpikeLocation.LEFT)) {
+                return Pose2d( 22.0, 39.0, Math.toRadians(270.0) )}
             if (switchString === this.name(Alliance.BLUE, Distance.SHORT, SpikeLocation.CENTER)) {
                 return Pose2d(21.0, 24.0, Math.toRadians(180.0))
             }
