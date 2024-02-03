@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystem.*;
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.TrajectoryFollowerCommand;
 
-@Autonomous(name = "GDAutoTest", group = "Auto")
+@Autonomous(name = "GDAuto", group = "Auto")
 public class Auto extends LinearOpMode {
 
     private MecanumDriveSubsystem drive;
