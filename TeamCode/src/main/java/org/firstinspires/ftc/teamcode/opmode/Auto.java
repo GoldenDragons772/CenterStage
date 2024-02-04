@@ -62,45 +62,17 @@ public class Auto extends LinearOpMode {
         while (opModeInInit()) {
 
             // Auto Selector
-            if (gamepad1.dpad_right) { // Long Distance Red Auto
-                drive.setPoseEstimate(LD_RED_STARTPOS);
-                distance = Distance.LONG;
-                alliance = Alliance.RED;
-                follower = new TrajectoryFollowerCommand(drive, getTrajectory(Alliance.RED, Distance.LONG, Type.FOLLOW));
-            } else if (gamepad1.dpad_left) { // Short Distance Red Auto
-                drive.setPoseEstimate(SD_RED_STARTPOS);
-                alliance = Alliance.RED;
-                distance = Distance.SHORT;
-                follower = new TrajectoryFollowerCommand(drive, getTrajectory(Alliance.RED, Distance.SHORT, Type.FOLLOW));
-            } else if (gamepad1.dpad_up) { // Long Distance Blue Auto
-                drive.setPoseEstimate(LD_BLUE_STARTPOS);
-                alliance = Alliance.BLUE;
-                distance = Distance.LONG;
-                follower = new TrajectoryFollowerCommand(drive, getTrajectory(Alliance.BLUE, Distance.LONG, Type.FOLLOW));
-            } else if (gamepad1.dpad_down) { // Short Distance Blue Auto
-                drive.setPoseEstimate(SD_BLUE_STARTPOS);
-                alliance = Alliance.BLUE;
-                distance = Distance.SHORT;
-                follower = new TrajectoryFollowerCommand(drive, getTrajectory(Alliance.BLUE, Distance.SHORT, Type.FOLLOW));
-            }
+            selectAuto();
 
+            follower = new TrajectoryFollowerCommand(drive, getTrajectory(alliance, distance, Type.FOLLOW));
+            drive.setPoseEstimate(getStartPosition(alliance,distance));
             currentSpikeLocation = husky.getSpikeLocation(alliance, distance);
-            // Determine the Prop location
-            switch (currentSpikeLocation) {
-                case LEFT: {
-                    backDropPos = new Pose2d(54, (alliance == Alliance.BLUE) ? 41 : -27, Math.toRadians(180));
-                    driveToBackdrop = new TrajectoryFollowerCommand(drive, getTrajectory(alliance, distance, Type.BACKBOARD));
-                }
-                case RIGHT: {
-                    backDropPos = new Pose2d(54, (alliance == Alliance.BLUE) ? 27 : -41, Math.toRadians(180));
-                    driveToBackdrop = new TrajectoryFollowerCommand(drive, getTrajectory(alliance, distance, Type.BACKBOARD));
-                }
-                case CENTER: {
-                    backDropPos = new Pose2d(54, (alliance == Alliance.BLUE) ? 34 : -34, Math.toRadians(180));
-                    driveToBackdrop = new TrajectoryFollowerCommand(drive, getTrajectory(alliance, distance, Type.BACKBOARD));
-                }
-            }
+
+            backDropPos = getBackdropPos();
+
+            driveToBackdrop = new TrajectoryFollowerCommand(drive, getTrajectory(alliance, distance, Type.BACKBOARD));
             driveToSpike = new TrajectoryFollowerCommand(drive, getTrajectory(alliance, distance, Type.SPIKE));
+
 
             telemetry.addData("CurrentSpike Location", currentSpikeLocation.name());
             telemetry.addData("Current Auto", alliance.name() + " " + distance.name());
@@ -109,6 +81,17 @@ public class Auto extends LinearOpMode {
         }
 
         waitForStart();
+
+        CommandScheduler.getInstance().schedule(createCommandGroup());
+
+        while (opModeIsActive()) {
+            CommandScheduler.getInstance().run();
+        }
+        // Store End Pose
+        storePos.StorePos(drive.getPoseEstimate());
+    }
+
+    private SequentialCommandGroup createCommandGroup() {
         SequentialCommandGroup commandGroup = new SequentialCommandGroup();
         commandGroup.addCommands(follower);
         commandGroup.addCommands(driveToSpike);
@@ -127,7 +110,7 @@ public class Auto extends LinearOpMode {
             commandGroup.addCommands(driveToBackdrop);
             commandGroup.addCommands(new InstantCommand(() -> bucket.dispensePixels()));
             commandGroup.addCommands(new WaitCommand(2000));
-            commandGroup.addCommands(new InstantCommand(() -> {
+            commandGroup.addCommands(new InstantCommand(() -> { // TODO: Figure out how to make this into a function.
                 bucket.stopBucket();
                 dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
                 armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
@@ -143,26 +126,50 @@ public class Auto extends LinearOpMode {
                 bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
             }));
         }
-
-        CommandScheduler.getInstance().schedule(commandGroup);
-
-        while (opModeIsActive()) {
-            CommandScheduler.getInstance().run();
-            //drive.update();
-        }
-        // Store End Pose
-        storePos.StorePos(drive.getPoseEstimate());
+        return commandGroup;
     }
 
-    Trajectory getTrajectory(Alliance alliance, Distance distance, Type type) {
+    private void selectAuto() {
+        if (gamepad1.dpad_right) { // Long Distance Red Auto
+            distance = Distance.LONG;
+            alliance = Alliance.RED;
+        } else if (gamepad1.dpad_left) { // Short Distance Red Auto
+            alliance = Alliance.RED;
+            distance = Distance.SHORT;
+        } else if (gamepad1.dpad_up) { // Long Distance Blue Auto
+            alliance = Alliance.BLUE;
+            distance = Distance.LONG;
+        } else if (gamepad1.dpad_down) { // Short Distance Blue Auto
+            alliance = Alliance.BLUE;
+            distance = Distance.SHORT;
+        }
+
+    }
+
+    private Pose2d getBackdropPos() {
+        switch (currentSpikeLocation) {
+            case LEFT: {
+                return new Pose2d(54, (alliance == Alliance.BLUE) ? 41 : -27, Math.toRadians(180));
+            }
+            case RIGHT: {
+                return new Pose2d(54, (alliance == Alliance.BLUE) ? 27 : -41, Math.toRadians(180));
+            }
+            case CENTER: {
+                return new Pose2d(54, (alliance == Alliance.BLUE) ? 34 : -34, Math.toRadians(180));
+            }
+        }
+        return null;
+    }
+
+    private Trajectory getTrajectory(Alliance alliance, Distance distance, Type type) {
         HashMap<String, Trajectory> choices = new HashMap<>();
         int reflection = alliance == Alliance.RED ? -1 : 1;
         Pose2d spikeLoc = getSpikeLocation(alliance, distance, currentSpikeLocation);
-
-        Trajectory LD_FOLLOW = drive.trajectoryBuilder(new Pose2d(LD_BLUE_STARTPOS.getX(), LD_BLUE_STARTPOS.getY() * reflection))
+        Pose2d startPos = getStartPosition(alliance, distance);
+        Trajectory LD_FOLLOW = drive.trajectoryBuilder(new Pose2d(startPos.getX(), startPos.getY() * reflection))
                 .forward(30)
                 .build();
-        Trajectory SD_FOLLOW = drive.trajectoryBuilder(new Pose2d(SD_BLUE_STARTPOS.getX(), SD_BLUE_STARTPOS.getY() * reflection))
+        Trajectory SD_FOLLOW = drive.trajectoryBuilder(new Pose2d(startPos.getX(), startPos.getY() * reflection))
                 .forward(30.0)
                 .build();
         Trajectory SD_SPIKE = drive.trajectoryBuilder(SD_FOLLOW.end())
