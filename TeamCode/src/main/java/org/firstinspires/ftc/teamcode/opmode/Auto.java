@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 import org.firstinspires.ftc.teamcode.rr.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystem.*;
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.TrajectoryFollowerCommand;
-
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
@@ -37,7 +36,7 @@ public class Auto extends LinearOpMode {
     private DipperSubsystem dipper;
     private ArmMotorSubsystem armMotor;
     private IntakeSubsystem intake;
-
+  
     // Backdrop
     Pose2d backDropPos = new Pose2d(0, 0, Math.toRadians(0));
 
