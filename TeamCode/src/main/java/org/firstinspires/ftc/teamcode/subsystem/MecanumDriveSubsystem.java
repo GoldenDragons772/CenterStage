@@ -9,6 +9,8 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
+import org.firstinspires.ftc.teamcode.rr.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.rr.trajectorysequence.TrajectorySequenceBuilder;
 
 import java.util.List;
 
@@ -55,8 +57,17 @@ public class MecanumDriveSubsystem extends SubsystemBase {
         return drive.trajectoryBuilder(startPose, startHeading);
     }
 
+    public TrajectorySequenceBuilder trajectorySequenceBuilder(Pose2d startPose) {
+        return drive.trajectorySequenceBuilder(startPose);
+    }
+
+
     public void followTrajectory(Trajectory trajectory) {
         drive.followTrajectoryAsync(trajectory);
+    }
+
+    public void followTrajectory(TrajectorySequence trajectorySequence) {
+        drive.followTrajectorySequenceAsync(trajectorySequence);
     }
 
     public void turn(double radians) {

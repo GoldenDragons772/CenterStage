@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
-import androidx.core.os.TraceKt;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
@@ -21,6 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystem.DroneSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.MecanumDriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.TrajectoryFollowerCommand;
+import org.firstinspires.ftc.teamcode.helper.StorePos;
 
 @TeleOp(name = "TuningOpMode", group = "Debug")
 public class TuningOpMode extends CommandOpMode {
