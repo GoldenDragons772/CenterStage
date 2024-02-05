@@ -32,18 +32,17 @@ public class Solo extends CommandOpMode {
                 new Pair<>(GamepadKeys.Button.Y, 1),           // Shoot
                 new Pair<>(GamepadKeys.Button.X, 1)            // Load
         );
-
         driveManager = new DriveManager(hardwareMap, keymap, gamepad1, gamepad2);
 
         // Auto Drive Cmds
-        Trajectory BACKDROP_BLUE_LEFT = driveManager.getDrive().trajectoryBuilder(driveManager.getDrive().getPoseEstimate())
-                .lineToLinearHeading(new Pose2d(54, 41, Math.toRadians(180)))
-                .build();
-
-        driveToBackDropBlue = new TrajectoryFollowerCommand(driveManager.getDrive(), BACKDROP_BLUE_LEFT);
-
-        // Auto Align Feature
-        driveManager.setBinding(GamepadKeys.Button.X, 1, driveToBackDropBlue);
+//        Trajectory BACKDROP_BLUE_LEFT = driveManager.getDrive().trajectoryBuilder(driveManager.getDrive().getPoseEstimate())
+//                .lineToLinearHeading(new Pose2d(54, 41, Math.toRadians(180)))
+//                .build();
+//
+//        driveToBackDropBlue = new TrajectoryFollowerCommand(driveManager.getDrive(), BACKDROP_BLUE_LEFT);
+//
+//        // Auto Align Feature
+//        driveManager.setBinding(GamepadKeys.Button.X, 1, driveToBackDropBlue);
     }
 
     @Override

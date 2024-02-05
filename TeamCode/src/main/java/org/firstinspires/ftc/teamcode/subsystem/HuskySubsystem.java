@@ -39,7 +39,6 @@ public class HuskySubsystem extends SubsystemBase {
 
     public SpikeLocation getSpikeLocation(AutoPresets.Alliance alliance, AutoPresets.Distance distance) {
         int spikeBlock = getSpikeX();
-
         if ((alliance == AutoPresets.Alliance.RED && distance == AutoPresets.Distance.SHORT) || (alliance == AutoPresets.Alliance.BLUE && distance == AutoPresets.Distance.LONG)) {
             if (spikeBlock > 0 && spikeBlock < 100) {
                 return SpikeLocation.LEFT;

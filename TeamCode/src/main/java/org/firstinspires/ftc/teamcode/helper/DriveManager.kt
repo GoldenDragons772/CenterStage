@@ -8,8 +8,6 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.Gamepad
 import com.qualcomm.robotcore.hardware.HardwareMap
-import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1
-import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad2
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive
 import org.firstinspires.ftc.teamcode.subsystem.*
 import kotlin.math.pow
@@ -39,23 +37,21 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
         CommandScheduler.getInstance().run()
 
         // Drive System
-        val strafe: Double = gamepad1.right_stick_x.pow(2) * sign(gamepad1.right_stick_x.toDouble())
-        val forward: Double = gamepad1.right_stick_y.pow(2) * sign(gamepad1.right_stick_y.toDouble())
-        val spin: Double = gamepad1.left_stick_x.pow(2) * sign(gamepad1.left_stick_x.toDouble())
+        val strafe: Double = gpad1.gamepad.right_stick_x.pow(2) * sign(gpad1.gamepad.right_stick_x.toDouble())
+        val forward: Double = gpad1.gamepad.right_stick_y.pow(2) * sign(gpad1.gamepad.right_stick_y.toDouble())
+        val spin: Double = gpad1.gamepad.left_stick_x.pow(2) * sign(gpad1.gamepad.left_stick_x.toDouble())
 
         val speedMultiplier = 1.0
 
         drive.drive(
-            forward * speedMultiplier,
-            strafe * speedMultiplier,
-            spin * speedMultiplier
+            forward * speedMultiplier, strafe * speedMultiplier, spin * speedMultiplier
         )
 
-        // Manual Arm Control (Make sure to Un-Lock First)
-        val armPower = (gamepad2.right_trigger - gamepad2.left_trigger).toDouble()
-        if (armPower > 0.1 || armPower < -0.1) {
-            armMotor.setArmPower(armPower)
-        }
+//        // Manual Arm Control (Make sure to Un-Lock First)
+//        val armPower = (gpad2.gamepad.right_trigger - gpad2.gamepad.left_trigger).toDouble()
+//        if (armPower > 0.1 || armPower < -0.1) {
+//            armMotor.setArmPower(armPower)
+//        }
 
         drive.update()
 
@@ -63,9 +59,10 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
 
     }
 
-    public fun setBinding(button: GamepadKeys.Button, gamepad: Int, command: Command) {
+    public fun setHeldBinding(button: GamepadKeys.Button, gamepad: Int, command: Command) {
         getGamepad(gamepad).getGamepadButton(button).whenHeld(command)
     }
+
     private fun initializeBindings() {
         // Intake: In
         getGamepad(this.keymap.intakeMap.second).getGamepadButton(this.keymap.intakeMap.first)
