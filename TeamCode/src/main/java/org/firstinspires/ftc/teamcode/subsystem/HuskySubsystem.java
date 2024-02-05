@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystem;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import org.firstinspires.ftc.teamcode.opmode.AutoPresets;
+import org.firstinspires.ftc.teamcode.helper.AutoPresets;
 
 public class HuskySubsystem extends SubsystemBase {
 

@@ -12,13 +12,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystem.*;
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.TrajectoryFollowerCommand;
+import org.firstinspires.ftc.teamcode.helper.StorePos;
 
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
-import static org.firstinspires.ftc.teamcode.opmode.AutoPresets.*;
+import static org.firstinspires.ftc.teamcode.helper.AutoPresets.*;
 
-@Autonomous(name = "GDAutoTest", group = "Auto")
+@Autonomous(name = "GDAuto", group = "Auto")
 public class Auto extends LinearOpMode {
 
     private TrajectoryFollowerCommand follower;
