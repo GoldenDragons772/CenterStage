@@ -62,13 +62,12 @@ public class MecanumDriveSubsystem extends SubsystemBase {
     }
 
 
-    public <T> void followTrajectory(T trajectory) {
-        if (trajectory instanceof Trajectory) {
-            drive.followTrajectoryAsync((Trajectory) trajectory);
-        }
-        if (trajectory instanceof TrajectorySequence) {
-            drive.followTrajectorySequenceAsync((TrajectorySequence) trajectory);
-        }
+    public void followTrajectory(Trajectory trajectory) {
+        drive.followTrajectoryAsync(trajectory);
+    }
+
+    public void followTrajectory(TrajectorySequence trajectorySequence) {
+        drive.followTrajectorySequenceAsync(trajectorySequence);
     }
 
     public void turn(double radians) {
