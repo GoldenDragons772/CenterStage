@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
@@ -9,10 +8,11 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import org.firstinspires.ftc.teamcode.helper.StorePos;
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
+import org.firstinspires.ftc.teamcode.rr.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystem.*;
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.TrajectoryFollowerCommand;
-import org.firstinspires.ftc.teamcode.helper.StorePos;
 
 import java.util.HashMap;
 import java.util.stream.Collectors;
@@ -22,9 +22,9 @@ import static org.firstinspires.ftc.teamcode.helper.AutoPresets.*;
 @Autonomous(name = "GDAuto", group = "Auto")
 public class Auto extends LinearOpMode {
 
-    private TrajectoryFollowerCommand follower;
-    private TrajectoryFollowerCommand driveToBackdrop;
-    private TrajectoryFollowerCommand driveToSpike;
+    private TrajectoryFollowerCommand<TrajectorySequence> follower;
+    private TrajectoryFollowerCommand<TrajectorySequence> driveToBackdrop;
+    private TrajectoryFollowerCommand<TrajectorySequence> driveToSpike;
 
     private HuskySubsystem.SpikeLocation currentSpikeLocation;
     private Alliance alliance;
@@ -64,15 +64,14 @@ public class Auto extends LinearOpMode {
 
             // Auto Selector
             selectAuto();
-
-            follower = new TrajectoryFollowerCommand(drive, getTrajectory(alliance, distance, Type.FOLLOW));
-            drive.setPoseEstimate(getStartPosition(alliance,distance));
+            follower = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.FOLLOW));
+            drive.setPoseEstimate(getStartPosition(alliance, distance));
             currentSpikeLocation = husky.getSpikeLocation(alliance, distance);
 
             backDropPos = getBackdropPos();
 
-            driveToBackdrop = new TrajectoryFollowerCommand(drive, getTrajectory(alliance, distance, Type.BACKBOARD));
-            driveToSpike = new TrajectoryFollowerCommand(drive, getTrajectory(alliance, distance, Type.SPIKE));
+            driveToBackdrop = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.BACKBOARD));
+            driveToSpike = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.SPIKE));
 
 
             telemetry.addData("CurrentSpike Location", currentSpikeLocation.name());
@@ -162,27 +161,27 @@ public class Auto extends LinearOpMode {
         return null;
     }
 
-    private Trajectory getTrajectory(Alliance alliance, Distance distance, Type type) {
-        HashMap<String, Trajectory> choices = new HashMap<>();
+    private TrajectorySequence getTrajectory(Alliance alliance, Distance distance, Type type) {
+        HashMap<String, TrajectorySequence> choices = new HashMap<>();
         int reflection = alliance == Alliance.RED ? -1 : 1;
         Pose2d spikeLoc = getSpikeLocation(alliance, distance, currentSpikeLocation);
         Pose2d startPos = getStartPosition(alliance, distance);
-        Trajectory LD_FOLLOW = drive.trajectoryBuilder(new Pose2d(startPos.getX(), startPos.getY() * reflection))
+        TrajectorySequence LD_FOLLOW = drive.trajectorySequenceBuilder(new Pose2d(startPos.getX(), startPos.getY() * reflection))
                 .forward(30)
                 .build();
-        Trajectory SD_FOLLOW = drive.trajectoryBuilder(new Pose2d(startPos.getX(), startPos.getY() * reflection))
+        TrajectorySequence SD_FOLLOW = drive.trajectorySequenceBuilder(new Pose2d(startPos.getX(), startPos.getY() * reflection))
                 .forward(30.0)
                 .build();
-        Trajectory SD_SPIKE = drive.trajectoryBuilder(SD_FOLLOW.end())
+        TrajectorySequence SD_SPIKE = drive.trajectorySequenceBuilder(SD_FOLLOW.end())
                 .lineToLinearHeading(spikeLoc)
                 .build();
-        Trajectory LD_SPIKE = drive.trajectoryBuilder(LD_FOLLOW.end())
+        TrajectorySequence LD_SPIKE = drive.trajectorySequenceBuilder(LD_FOLLOW.end())
                 .lineToLinearHeading(spikeLoc)
                 .build();
-        Trajectory SD_BACKBOARD = drive.trajectoryBuilder(SD_FOLLOW.end())
+        TrajectorySequence SD_BACKBOARD = drive.trajectorySequenceBuilder(SD_FOLLOW.end())
                 .lineToLinearHeading(backDropPos)
                 .build();
-        Trajectory LD_BACKBOARD = drive.trajectoryBuilder(LD_SPIKE.end())
+        TrajectorySequence LD_BACKBOARD = drive.trajectorySequenceBuilder(LD_SPIKE.end())
                 .splineToLinearHeading(backDropPos, Math.toRadians(0.0))
                 .build();
 
