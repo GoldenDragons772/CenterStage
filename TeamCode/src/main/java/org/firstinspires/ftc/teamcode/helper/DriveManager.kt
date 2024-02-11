@@ -100,8 +100,9 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
         // Drone: Load
         getGamepad(this.keymap.loadDroneMap.second).getGamepadButton(this.keymap.loadDroneMap.first)
             .whenHeld(InstantCommand({ loadDrone() }))
+
         getGamepad(this.keymap.orientMap.second).getGamepadButton(this.keymap.orientMap.first)
-            .whenHeld(InstantCommand({ orient() }))
+            .whenHeld(InstantCommand({ drive.orient() }))
 
     }
 
@@ -203,9 +204,6 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
 
     private fun loadDrone() {
         drone.loadDrone();
-    }
-    private fun orient(){
-        drive.turn(-drive.poseEstimate.heading)
     }
 
 }
