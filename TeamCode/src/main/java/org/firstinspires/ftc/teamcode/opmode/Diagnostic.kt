@@ -7,7 +7,6 @@ import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.arcrobotics.ftclib.command.CommandScheduler
 import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive
@@ -20,20 +19,22 @@ import kotlin.math.sqrt
 
 @TeleOp(name = "Diagnostic")
 class Diagnostic : LinearOpMode() {
-    private lateinit var mecDrive: MainMecanumDrive;
+    private lateinit var mecDrive: MainMecanumDrive
     private lateinit var armMotorSubsystem: ArmMotorSubsystem
     private lateinit var dipperSubsystem: DipperSubsystem
     private lateinit var intakeSubsystem: IntakeSubsystem
     private lateinit var ftcDashboard: FtcDashboard
     private lateinit var bucketPivotSubsystem: BucketPivotSubsystem
-    private val strafeLength = 3.0;
+    private val strafeLength = 3.0
     override fun runOpMode() {
         ftcDashboard = FtcDashboard.getInstance()
         mecDrive = MainMecanumDrive(hardwareMap)
-        armMotorSubsystem = ArmMotorSubsystem(hardwareMap)
+        armMotorSubsystem =
+            ArmMotorSubsystem(hardwareMap)
         dipperSubsystem = DipperSubsystem(hardwareMap)
         intakeSubsystem = IntakeSubsystem(hardwareMap)
-        bucketPivotSubsystem = BucketPivotSubsystem(hardwareMap)
+        bucketPivotSubsystem =
+            BucketPivotSubsystem(hardwareMap)
         CommandScheduler.getInstance().reset()
         val gpad = GamepadEx(gamepad1)
         waitForStart()
@@ -54,23 +55,13 @@ class Diagnostic : LinearOpMode() {
         var lastTest = 0
         gpad.getGamepadButton(GamepadKeys.Button.A).whenPressed(Runnable {
             tests[lastTest]()
-            lastTest++;
+            lastTest++
         })
         // Filibuster
         while (opModeIsActive()) {
             CommandScheduler.getInstance().run()
         }
     }
-
-
-
-    private fun waitForConfirmation() {
-        sleep(500)
-        while (!gamepad1.a) {
-            sleep(10)
-        }
-    }
-
 
     private fun testCircleDrive() {
         val telemetryStrings = mutableListOf<String>()

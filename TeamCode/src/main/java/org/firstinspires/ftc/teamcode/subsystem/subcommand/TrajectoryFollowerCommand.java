@@ -2,15 +2,15 @@ package org.firstinspires.ftc.teamcode.subsystem.subcommand;
 
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.arcrobotics.ftclib.command.CommandBase;
-
+import org.firstinspires.ftc.teamcode.rr.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystem.MecanumDriveSubsystem;
 
-public class TrajectoryFollowerCommand extends CommandBase {
+public class TrajectoryFollowerCommand<T> extends CommandBase {
 
     private final MecanumDriveSubsystem drive;
-    private final Trajectory trajectory;
+    private final T trajectory;
 
-    public TrajectoryFollowerCommand(MecanumDriveSubsystem drive, Trajectory trajectory) {
+    public TrajectoryFollowerCommand(MecanumDriveSubsystem drive, T trajectory) {
         this.drive = drive;
         this.trajectory = trajectory;
 
@@ -19,7 +19,12 @@ public class TrajectoryFollowerCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        drive.followTrajectory(trajectory);
+        if (trajectory instanceof Trajectory) {
+            drive.followTrajectory((Trajectory) trajectory);
+        }
+        if (trajectory instanceof TrajectorySequence) {
+            drive.followTrajectory((TrajectorySequence) trajectory);
+        }
     }
 
     @Override

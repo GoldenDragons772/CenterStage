@@ -16,11 +16,6 @@ public class DipperSubsystem extends SubsystemBase {
     private final Servo right, left;
 
 
-    public enum DipperPositions {
-        LOADING_POSITION,
-        SCORING_POSITION
-    }
-
     public void waitForIdle() {
         while (this.right.getPosition() != leftDestinationPos || this.left.getPosition() != leftDestinationPos){
             continue;
@@ -38,14 +33,14 @@ public class DipperSubsystem extends SubsystemBase {
         left.setPosition(leftLoadingPos);
     }
 
-    public void setDipperPosition(DipperPositions pos) {
+    public void setDipperPosition(BucketPivotSubsystem.BucketPivotPos pos) {
 
-        if (pos == DipperPositions.LOADING_POSITION) {
+        if (pos == BucketPivotSubsystem.BucketPivotPos.LOADING_POS) {
             right.setPosition(rightLoadingPos + 0.025); // 0.025 offset
             left.setPosition(leftLoadingPos);
             rightDestinationPos = rightLoadingPos;
             leftDestinationPos = leftLoadingPos;
-        } else if (pos == DipperPositions.SCORING_POSITION) {
+        } else if (pos == BucketPivotSubsystem.BucketPivotPos.DROPPING_POS) {
             right.setPosition(rightScoringPos);
             left.setPosition(leftScoringPos - 0.06); // - 0.06 offset
             rightDestinationPos = rightScoringPos;

@@ -3,13 +3,14 @@ package org.firstinspires.ftc.teamcode.subsystem;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
+import org.firstinspires.ftc.teamcode.helper.TrajectoryManager;
+@Deprecated
 public class HuskySubsystem extends SubsystemBase {
 
     public enum SpikeLocation {
-        LEFT_POSITION,
-        CENTER_POSITION,
-        RIGHT_POSITION
+        LEFT,
+        CENTER,
+        RIGHT
     }
 
     private HuskyLens husky;
@@ -27,7 +28,7 @@ public class HuskySubsystem extends SubsystemBase {
     public int getSpikeX() {
         blocks = husky.blocks();
 
-        if(blocks.length != 0) {
+        if (blocks.length != 0) {
             HuskyLens.Block spikeBlock = blocks[0];
 
             return spikeBlock.x;
@@ -36,15 +37,24 @@ public class HuskySubsystem extends SubsystemBase {
     }
 
 
-    public SpikeLocation getSpikeLocation() {
+    public SpikeLocation getSpikeLocation(TrajectoryManager.Alliance alliance, TrajectoryManager.Distance distance) {
         int spikeBlock = getSpikeX();
-
-        if (spikeBlock > 100 && spikeBlock < 170) {
-            return SpikeLocation.LEFT_POSITION;
-        } else if (spikeBlock > 170 && spikeBlock < 285) {
-            return SpikeLocation.CENTER_POSITION;
+        if ((alliance == TrajectoryManager.Alliance.RED && distance == TrajectoryManager.Distance.SHORT) || (alliance == TrajectoryManager.Alliance.BLUE && distance == TrajectoryManager.Distance.LONG)) {
+            if (spikeBlock > 0 && spikeBlock < 100) {
+                return SpikeLocation.LEFT;
+            } else if (spikeBlock > 100 && spikeBlock < 240) {
+                return SpikeLocation.CENTER;
+            } else {
+                return SpikeLocation.RIGHT;
+            }
         } else {
-            return SpikeLocation.RIGHT_POSITION;
+            if (spikeBlock > 100 && spikeBlock < 170) {
+                return SpikeLocation.LEFT;
+            } else if (spikeBlock > 170 && spikeBlock < 285) {
+                return SpikeLocation.CENTER;
+            } else {
+                return SpikeLocation.RIGHT;
+            }
         }
     }
 }
