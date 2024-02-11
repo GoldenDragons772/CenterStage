@@ -72,34 +72,34 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
             .whenHeld(InstantCommand({ dispense() })).whenReleased(InstantCommand({ stopDispense() }));
         // Arms: Climb
         getGamepad(this.keymap.climbMap.second).getGamepadButton(this.keymap.climbMap.first)
-            .whenHeld(InstantCommand({ climb() }));
+            .whenPressed(InstantCommand({ climb() }));
         // Arms: Hang
         getGamepad(this.keymap.hangMap.second).getGamepadButton(this.keymap.hangMap.first)
-            .whenHeld(InstantCommand({ hang() }));
+            .whenPressed(InstantCommand({ hang() }));
         // Arms: Low
         getGamepad(this.keymap.lowPositionMap.second).getGamepadButton(this.keymap.lowPositionMap.first)
-            .whenHeld(InstantCommand({ lowPosition() }));
+            .whenPressed(InstantCommand({ lowPosition() }));
         // Arms: Middle
         getGamepad(this.keymap.middlePositionMap.second).getGamepadButton(this.keymap.middlePositionMap.first)
-            .whenHeld(InstantCommand({ middlePosition() }));
+            .whenPressed(InstantCommand({ middlePosition() }));
         // Arms: High
         getGamepad(this.keymap.highPositionMap.second).getGamepadButton(this.keymap.highPositionMap.first)
-            .whenHeld(InstantCommand({ topPosition() }));
+            .whenPressed(InstantCommand({ topPosition() }));
         // Arms: High
         getGamepad(this.keymap.homePositionMap.second).getGamepadButton(this.keymap.homePositionMap.first)
-            .whenHeld(InstantCommand({ homePosition() }));
+            .whenPressed(InstantCommand({ homePosition() }));
         // Arm Manual Control: Enable
         getGamepad(this.keymap.enableManualControlMap.second).getGamepadButton(this.keymap.enableManualControlMap.first)
-            .whenHeld(InstantCommand({ enableManualControl() }))
+            .whenPressed(InstantCommand({ enableManualControl() }))
         // Arm Manual Control: Disable
         getGamepad(this.keymap.disableManualControlMap.second).getGamepadButton(this.keymap.disableManualControlMap.first)
-            .whenHeld(InstantCommand({ disableManualControl(this.keymap.disableManualControlMap.second) }))
+            .whenPressed(InstantCommand({ disableManualControl(this.keymap.disableManualControlMap.second) }))
         // Drone: Shoot
         getGamepad(this.keymap.shootDroneMap.second).getGamepadButton(this.keymap.shootDroneMap.first)
-            .whenHeld(InstantCommand({ shootDrone() }))
+            .whenPressed(InstantCommand({ shootDrone() }))
         // Drone: Load
         getGamepad(this.keymap.loadDroneMap.second).getGamepadButton(this.keymap.loadDroneMap.first)
-            .whenHeld(InstantCommand({ loadDrone() }))
+            .whenPressed(InstantCommand({ loadDrone() }))
 
 
     }
