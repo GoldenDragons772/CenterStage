@@ -1,6 +1,6 @@
-# CenterStage
+# Centerstage
 **Welcome to GoldenDragons FTC Team #772 from SCGSSM 🐉!**
-This repo contains TeamCode and information regarding the Robot used for the Year 2024 CenterStage Game.
+This repo contains TeamCode and information regarding the Robot used for the Year 2024 Centerstage Game.
 
 ---
 ### Getting Started
