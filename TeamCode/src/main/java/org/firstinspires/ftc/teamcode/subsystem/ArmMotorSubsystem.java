@@ -73,8 +73,8 @@ public class ArmMotorSubsystem implements Subsystem {
         leftArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        leftArmMotor.setPower(0.8);
-        rightArmMotor.setPower(0.8);
+        leftArmMotor.setPower(1);
+        rightArmMotor.setPower(1);
 
         if(pos == 0) {
             if(getAvgArmPosition() > 50) {
