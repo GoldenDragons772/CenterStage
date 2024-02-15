@@ -10,16 +10,11 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
-import org.firstinspires.ftc.teamcode.subsystem.ArmMotorSubsystem;
-import org.firstinspires.ftc.teamcode.subsystem.BucketPivotSubsystem;
-import org.firstinspires.ftc.teamcode.subsystem.BucketSubsystem;
-import org.firstinspires.ftc.teamcode.subsystem.DipperSubsystem;
-import org.firstinspires.ftc.teamcode.subsystem.DroneSubsystem;
-import org.firstinspires.ftc.teamcode.subsystem.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystem.MecanumDriveSubsystem;
-import org.firstinspires.ftc.teamcode.subsystem.subcommand.TrajectoryFollowerCommand;
 import org.firstinspires.ftc.teamcode.helper.StorePos;
+import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
+import org.firstinspires.ftc.teamcode.subsystem.*;
+import org.firstinspires.ftc.teamcode.subsystem.subcommand.CarriageCommand;
+import org.firstinspires.ftc.teamcode.subsystem.subcommand.TrajectoryFollowerCommand;
 
 @TeleOp(name = "TuningOpMode", group = "Debug")
 public class TuningOpMode extends CommandOpMode {
@@ -30,7 +25,6 @@ public class TuningOpMode extends CommandOpMode {
 
     private ArmMotorSubsystem armMotor;
 
-    private BucketSubsystem bucket;
 
     private DipperSubsystem dipper;
 
@@ -52,7 +46,6 @@ public class TuningOpMode extends CommandOpMode {
         gpad1 = new GamepadEx(gamepad1);
         intake = new IntakeSubsystem(hardwareMap);
         armMotor = new ArmMotorSubsystem(hardwareMap);
-        bucket = new BucketSubsystem(hardwareMap);
         dipper = new DipperSubsystem(hardwareMap);
         bucketPivot = new BucketPivotSubsystem(hardwareMap);
         drone = new DroneSubsystem(hardwareMap);
@@ -73,46 +66,33 @@ public class TuningOpMode extends CommandOpMode {
                         new InstantCommand(() -> {
                             if (armMotor.getArmPos() != ArmMotorSubsystem.ArmPos.HOME) return;
                             intake.runIntake();
-                            bucket.intakePixels();
                         })
                 )
                 .whenReleased(new InstantCommand(() -> {
                     intake.stopIntake();
-                    bucket.stopBucket();
                 }));
 
 
         // Dispense Pixels.
         gpad1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whenHeld(new InstantCommand(() -> {
-                    bucket.dispensePixels();
                     intake.dispenseIntake();
 
                 }))
                 .whenReleased(new InstantCommand(() -> {
-                    bucket.stopBucket();
                     intake.stopIntake();
                 }));
 
         gpad1.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whenPressed(new InstantCommand(() -> {
-                    armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HIGH);
-                    dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
-                    bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
-                }));
+                .whenPressed(new CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.HIGH));
 
 
         gpad1.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
-                .whenPressed(new InstantCommand(() -> {
-                    armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.MIDDLE);
-                    dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
-                    bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
-                }));
+                .whenPressed(new CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.MIDDLE));
 
         gpad1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
                 .whenPressed(new InstantCommand(() -> {
-                    dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
-                    armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
+                    new CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.MIDDLE).execute();
                     int timeout = 1200;
                     int epsilon = 550; // Machine epsilon
                     while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {

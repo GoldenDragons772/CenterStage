@@ -12,11 +12,14 @@ import org.firstinspires.ftc.teamcode.helper.StorePos;
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 import org.firstinspires.ftc.teamcode.rr.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystem.*;
+import org.firstinspires.ftc.teamcode.subsystem.ArmMotorSubsystem;
+import org.firstinspires.ftc.teamcode.subsystem.BucketPivotSubsystem;
+import org.firstinspires.ftc.teamcode.subsystem.DipperSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.TrajectoryFollowerCommand;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
-import static org.firstinspires.ftc.teamcode.helper.AutoPresets.*;
+import static org.firstinspires.ftc.teamcode.helper.TrajectoryManager.*;
 
 @Autonomous(name = "GDAuto", group = "Auto")
 public class Auto extends LinearOpMode {
@@ -31,7 +34,6 @@ public class Auto extends LinearOpMode {
 
     private MecanumDriveSubsystem drive;
     private HuskySubsystem husky;
-    private BucketSubsystem bucket;
     private BucketPivotSubsystem bucketPivot;
     private DipperSubsystem dipper;
     private ArmMotorSubsystem armMotor;
@@ -50,7 +52,6 @@ public class Auto extends LinearOpMode {
 
         drive = new MecanumDriveSubsystem(new MainMecanumDrive(hardwareMap), false);
         husky = new HuskySubsystem(hardwareMap);
-        bucket = new BucketSubsystem(hardwareMap);
         bucketPivot = new BucketPivotSubsystem(hardwareMap);
         dipper = new DipperSubsystem(hardwareMap);
         armMotor = new ArmMotorSubsystem(hardwareMap);
@@ -102,16 +103,16 @@ public class Auto extends LinearOpMode {
         if (distance == Distance.SHORT) { // TODO: create a transition from pppp (PurPle Pixel Placing) to placing on the backdrop.
             commandGroup.addCommands(new InstantCommand(() -> {
                 armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.LOW);
-                dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
+                dipper.setDipperPosition(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
                 bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
             }));
             commandGroup.addCommands(new WaitCommand(750));
             commandGroup.addCommands(driveToBackdrop);
-            commandGroup.addCommands(new InstantCommand(() -> bucket.dispensePixels()));
+            commandGroup.addCommands(new InstantCommand(() -> intake.specialDispenseJustForAutoPixelDispenseThing()));
             commandGroup.addCommands(new WaitCommand(2000));
             commandGroup.addCommands(new InstantCommand(() -> { // TODO: Figure out how to make this into a function.
-                bucket.stopBucket();
-                dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
+                intake.stopIntake();
+                dipper.setDipperPosition(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
                 armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
                 int timeout = 1200;
                 int epsilon = 550; // Machine epsilon

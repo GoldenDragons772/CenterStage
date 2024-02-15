@@ -10,6 +10,8 @@ import com.qualcomm.robotcore.hardware.Gamepad
 import com.qualcomm.robotcore.hardware.HardwareMap
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive
 import org.firstinspires.ftc.teamcode.subsystem.*
+import org.firstinspires.ftc.teamcode.subsystem.subcommand.CarriageCommand
+import org.firstinspires.ftc.teamcode.subsystem.subcommand.ClimbCommand
 import kotlin.math.pow
 import kotlin.math.sign
 
@@ -18,16 +20,18 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
 
     val drive: MecanumDriveSubsystem = MecanumDriveSubsystem(MainMecanumDrive(hardwareMap), false)
     private val intake: IntakeSubsystem = IntakeSubsystem(hardwareMap)
-    private val bucket: BucketSubsystem = BucketSubsystem(hardwareMap)
-    private val bucketPivot: BucketPivotSubsystem = BucketPivotSubsystem(hardwareMap)
-    private val dipper: DipperSubsystem = DipperSubsystem(hardwareMap)
-    private val armMotor: ArmMotorSubsystem = ArmMotorSubsystem(hardwareMap)
+    private val bucketPivot: BucketPivotSubsystem =
+        BucketPivotSubsystem(hardwareMap)
+    private val dipper: DipperSubsystem =
+        DipperSubsystem(hardwareMap)
+    private val armMotor: ArmMotorSubsystem =
+        ArmMotorSubsystem(hardwareMap)
     private val drone: DroneSubsystem = DroneSubsystem(hardwareMap)
     private val gpad1: GamepadEx = GamepadEx(gamepad1)
     private val gpad2: GamepadEx = GamepadEx(gamepad2)
 
     init {
-        CommandScheduler.getInstance().reset();
+        CommandScheduler.getInstance().reset()
         initializeBindings()
         drive.poseEstimate = StorePos.OdoPose
     }
@@ -59,47 +63,71 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
 
     }
 
-    public fun setHeldBinding(button: GamepadKeys.Button, gamepad: Int, command: Command) {
+    fun setHeldBinding(button: GamepadKeys.Button, gamepad: Int, command: Command) {
         getGamepad(gamepad).getGamepadButton(button).whenHeld(command)
+    }
+
+    fun setPressedBinding(pair: Pair<GamepadKeys.Button, Int>, command: Command) {
+        getGamepad(pair.second).getGamepadButton(pair.first).whenPressed(command)
     }
 
     private fun initializeBindings() {
         // Intake: In
         getGamepad(this.keymap.intakeMap.second).getGamepadButton(this.keymap.intakeMap.first)
-            .whenHeld(InstantCommand({ runIntake() })).whenReleased(InstantCommand({ stopIntake() }));
+            .whenHeld(InstantCommand({ intake.runIntake() })).whenReleased(InstantCommand({ intake.stopIntake() }))
         // Intake: Dispense
         getGamepad(this.keymap.dispenseMap.second).getGamepadButton(this.keymap.dispenseMap.first)
-            .whenHeld(InstantCommand({ dispense() })).whenReleased(InstantCommand({ stopDispense() }));
+            .whenHeld(InstantCommand({ intake.dispenseIntake() })).whenReleased(InstantCommand({ intake.stopIntake() }))
         // Arms: Climb
-        getGamepad(this.keymap.climbMap.second).getGamepadButton(this.keymap.climbMap.first)
-            .whenPressed(InstantCommand({ climb() }));
+        setPressedBinding(
+            this.keymap.climbMap,
+            ClimbCommand(armMotor, bucketPivot, dipper, true)
+        )
         // Arms: Hang
-        getGamepad(this.keymap.hangMap.second).getGamepadButton(this.keymap.hangMap.first)
-            .whenPressed(InstantCommand({ hang() }));
+        setPressedBinding(
+            this.keymap.hangMap,
+            ClimbCommand(armMotor, bucketPivot, dipper, false)
+        )
         // Arms: Low
-        getGamepad(this.keymap.lowPositionMap.second).getGamepadButton(this.keymap.lowPositionMap.first)
-            .whenPressed(InstantCommand({ lowPosition() }));
+        setPressedBinding(
+            this.keymap.lowPositionMap,
+            CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.LOW)
+        )
         // Arms: Middle
-        getGamepad(this.keymap.middlePositionMap.second).getGamepadButton(this.keymap.middlePositionMap.first)
-            .whenPressed(InstantCommand({ middlePosition() }));
+        setPressedBinding(
+            this.keymap.middlePositionMap,
+            CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.MIDDLE)
+        )
         // Arms: High
-        getGamepad(this.keymap.highPositionMap.second).getGamepadButton(this.keymap.highPositionMap.first)
-            .whenPressed(InstantCommand({ topPosition() }));
-        // Arms: High
-        getGamepad(this.keymap.homePositionMap.second).getGamepadButton(this.keymap.homePositionMap.first)
-            .whenPressed(InstantCommand({ homePosition() }));
+        setPressedBinding(
+            this.keymap.highPositionMap,
+            CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.HIGH)
+        )
+        // Arms: Home
+        setPressedBinding(
+            this.keymap.homePositionMap,
+            CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.HOME)
+        )
         // Arm Manual Control: Enable
-        getGamepad(this.keymap.enableManualControlMap.second).getGamepadButton(this.keymap.enableManualControlMap.first)
-            .whenPressed(InstantCommand({ enableManualControl() }))
+        setPressedBinding(
+            this.keymap.enableManualControlMap,
+            InstantCommand({ enableManualControl() })
+        )
         // Arm Manual Control: Disable
-        getGamepad(this.keymap.disableManualControlMap.second).getGamepadButton(this.keymap.disableManualControlMap.first)
-            .whenPressed(InstantCommand({ disableManualControl(this.keymap.disableManualControlMap.second) }))
+        setPressedBinding(
+            this.keymap.disableManualControlMap,
+            InstantCommand({ disableManualControl(this.keymap.disableManualControlMap.second) })
+        )
         // Drone: Shoot
-        getGamepad(this.keymap.shootDroneMap.second).getGamepadButton(this.keymap.shootDroneMap.first)
-            .whenPressed(InstantCommand({ shootDrone() }))
+        setPressedBinding(
+            this.keymap.shootDroneMap,
+            InstantCommand({ drone.shootDrone() })
+        )
         // Drone: Load
-        getGamepad(this.keymap.loadDroneMap.second).getGamepadButton(this.keymap.loadDroneMap.first)
-            .whenPressed(InstantCommand({ loadDrone() }))
+        setPressedBinding(
+            this.keymap.loadDroneMap,
+            InstantCommand({ drone.loadDrone() })
+        )
 
 
     }
@@ -129,78 +157,13 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
         }
     }
 
-    private fun runIntake() {
-        if (armMotor.armPos != ArmMotorSubsystem.ArmPos.HOME) return
-        intake.runIntake();
-        bucket.intakePixels();
-    }
-
-    private fun stopIntake() {
-        intake.stopIntake();
-        bucket.stopBucket();
-    }
-
-    private fun dispense() {
-        bucket.dispensePixels()
-        intake.dispenseIntake()
-    }
-
-    private fun stopDispense() {
-        bucket.stopBucket()
-        intake.stopIntake()
-    }
-
-    private fun climb() {
-        dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
-        bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
-        armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HIGH);
-    }
-
-    private fun hang() {
-        dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
-        bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
-        armMotor.setArmToPos(100);
-    }
-
-    private fun middlePosition() {
-        armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.MIDDLE);
-        dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
-        bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
-    }
-
-    private fun lowPosition() {
-        armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.LOW);
-        dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
-        bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
-    }
-
-    private fun topPosition() {
-        armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HIGH);
-        dipper.setDipperPosition(DipperSubsystem.DipperPositions.SCORING_POSITION);
-        bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
-    }
-
-    private fun homePosition() {
-        armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
-        dipper.setDipperPosition(DipperSubsystem.DipperPositions.LOADING_POSITION);
-        bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
-    }
-
     private fun enableManualControl() {
-        armMotor.setArmMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        armMotor.setArmMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER)
     }
 
     private fun disableManualControl(id: Int) {
-        armMotor.setArmMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        getGamepad(id).gamepad.rumble(1000);
-    }
-
-    private fun shootDrone() {
-        drone.shootDrone();
-    }
-
-    private fun loadDrone() {
-        drone.loadDrone();
+        armMotor.setArmMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER)
+        getGamepad(id).gamepad.rumble(1000)
     }
 
 }

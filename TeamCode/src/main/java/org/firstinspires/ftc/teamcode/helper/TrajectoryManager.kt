@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.helper
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import org.firstinspires.ftc.teamcode.subsystem.HuskySubsystem.SpikeLocation
 
-class AutoPresets {
+class TrajectoryManager {
 
     public companion object {
 

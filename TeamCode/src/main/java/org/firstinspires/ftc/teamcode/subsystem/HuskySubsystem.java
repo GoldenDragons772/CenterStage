@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode.subsystem;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import org.firstinspires.ftc.teamcode.helper.AutoPresets;
-
+import org.firstinspires.ftc.teamcode.helper.TrajectoryManager;
+@Deprecated
 public class HuskySubsystem extends SubsystemBase {
 
     public enum SpikeLocation {
@@ -37,9 +37,9 @@ public class HuskySubsystem extends SubsystemBase {
     }
 
 
-    public SpikeLocation getSpikeLocation(AutoPresets.Alliance alliance, AutoPresets.Distance distance) {
+    public SpikeLocation getSpikeLocation(TrajectoryManager.Alliance alliance, TrajectoryManager.Distance distance) {
         int spikeBlock = getSpikeX();
-        if ((alliance == AutoPresets.Alliance.RED && distance == AutoPresets.Distance.SHORT) || (alliance == AutoPresets.Alliance.BLUE && distance == AutoPresets.Distance.LONG)) {
+        if ((alliance == TrajectoryManager.Alliance.RED && distance == TrajectoryManager.Distance.SHORT) || (alliance == TrajectoryManager.Alliance.BLUE && distance == TrajectoryManager.Distance.LONG)) {
             if (spikeBlock > 0 && spikeBlock < 100) {
                 return SpikeLocation.LEFT;
             } else if (spikeBlock > 100 && spikeBlock < 240) {
