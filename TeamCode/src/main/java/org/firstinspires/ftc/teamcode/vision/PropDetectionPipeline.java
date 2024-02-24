@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.vision;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.helper.TrajectoryManager;
+import org.firstinspires.ftc.teamcode.opmode.Auto;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -26,6 +28,8 @@ public class PropDetectionPipeline extends OpenCvPipeline {
 
     private int spikeX = 0;
 
+    private boolean debug = false;
+
     Mat mat = new Mat();
     Mat thresh = new Mat();
 
@@ -33,7 +37,8 @@ public class PropDetectionPipeline extends OpenCvPipeline {
 
     Mat hierarchy = new Mat();
 
-    public PropDetectionPipeline(Telemetry telemetry) {
+    public PropDetectionPipeline(Telemetry telemetry, boolean debug) {
+        this.debug = debug;
         this.telemetry = telemetry;
     }
 
@@ -54,12 +59,17 @@ public class PropDetectionPipeline extends OpenCvPipeline {
         // We create a HSV range for yellow to detect regular stones
         // NOTE: In OpenCV's implementation,
         // Hue values are half the real value
-//        Scalar lowHSV = new Scalar(0, 116, 44); // lower bound HSV for Red
-//        Scalar highHSV = new Scalar(179, 243, 138); // higher bound HSV for Red
 
-        // lower bound for Blue
-        Scalar lowHSV = new Scalar(104, 90, 78); // lower bound HSV for Blue
-        Scalar highHSV = new Scalar(134, 241, 255); // higher bound HSV for Blue
+        Scalar lowHSV; // lower bound HSV for Red
+        Scalar highHSV; // higher bound HSV for Red
+
+        if(Auto.alliance == TrajectoryManager.Alliance.RED) {
+            lowHSV = new Scalar(0, 116, 44);
+            highHSV = new Scalar(179, 243, 138);
+        } else {
+            lowHSV = new Scalar(107, 102, 57); // lower bound HSV for Blue
+            highHSV = new Scalar(114, 255, 103); // higher bound HSV for Blue
+        }
 
 
         // We'll get a black and white image. The white regions represent the regular stones.
@@ -95,24 +105,19 @@ public class PropDetectionPipeline extends OpenCvPipeline {
 
         // Draw one contour for each rectangle
 
+        // SetDefault
+        spikeX = 0;
+
         for (int i = 0; i != boundRect.length; i++) {
             // If the area of the rectangle is greater than 2000, then its a Spike
-            if (boundRect[i].area() > 2000) {
+            if (boundRect[i].area() > 2500) {
 
-                spikeX = boundRect[i].x + boundRect[i].width / 2;
                 int y = boundRect[i].y + boundRect[i].height / 2;
 
                 if(y > 150) {
                     Imgproc.rectangle(mat, boundRect[i], new Scalar(255, 255, 255), 2);
 
-                    // Find the center of the rectangle
-
-
-                    // Print the center of the rectangle
-                    telemetry.addData("Prop Position", spikeX);
-                    telemetry.addData("Prop Y Position", y);
-                    telemetry.addData("Prop Location", propPosString());
-                    telemetry.update();
+                    spikeX = boundRect[i].x + boundRect[i].width / 2;
 
                     // Draw a circle at the center of the rectangle
                     Imgproc.circle(mat, new Point(spikeX, y), 5, new Scalar(255, 255, 255), 1);
@@ -120,6 +125,13 @@ public class PropDetectionPipeline extends OpenCvPipeline {
             }
         }
 
+        if(debug) {
+            // Print the center of the rectangle
+            telemetry.addData("Prop Position", spikeX);
+            //telemetry.addData("Prop Y Position", y);
+            telemetry.addData("Prop Location", propPosString());
+            telemetry.update();
+        }
         Imgproc.cvtColor(mat, mat, Imgproc.COLOR_HSV2RGB);
 
         return mat; // return the mat with rectangles drawn
@@ -127,25 +139,34 @@ public class PropDetectionPipeline extends OpenCvPipeline {
 
 
     public propPos getCurrentPropPos() {
-        if(spikeX < 100) {
-            return propPos.LEFT;
-        } else if(spikeX > 150 && spikeX < 500) {
-            return propPos.CENTER;
+        if ((Auto.alliance == TrajectoryManager.Alliance.RED && Auto.distance == TrajectoryManager.Distance.SHORT) || (Auto.alliance == TrajectoryManager.Alliance.BLUE && Auto.distance == TrajectoryManager.Distance.LONG)) {
+            if(spikeX > 1 && spikeX < 150) {
+                return propPos.LEFT;
+            } else if(spikeX > 150 && spikeX < 500) {
+                return propPos.CENTER;
+            } else {
+                return propPos.RIGHT;
+            }
         } else {
-            return propPos.RIGHT;
+            if(spikeX > 100 && spikeX < 300) {
+                return propPos.LEFT;
+            } else if(spikeX > 300 && spikeX < 600) {
+                return propPos.CENTER;
+            } else {
+                return propPos.RIGHT;
+            }
         }
     }
 
     public String propPosString() {
         propPos currPos = getCurrentPropPos();
-        switch(currPos) {
-            case LEFT:
-                return "PROP_LEFT";
-            case CENTER:
-                return "PROP_CENTER";
-            case RIGHT:
-                return "PROP_RIGHT";
+        if(currPos == propPos.LEFT) {
+            return "PROP_LEFT";
+        } else if(currPos == propPos.CENTER) {
+            return "PROP_CENTER";
+        } else if(currPos == propPos.RIGHT) {
+            return  "PROP_RIGHT";
         }
-        return "404";
-    }
+        return "NOT_FOUND";
+    };
 }

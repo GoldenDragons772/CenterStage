@@ -66,7 +66,7 @@ public class TuningOpMode extends CommandOpMode {
 
         camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName);
 
-        detectProp = new PropDetectionPipeline(telemetry);
+        detectProp = new PropDetectionPipeline(telemetry, true);
 
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
