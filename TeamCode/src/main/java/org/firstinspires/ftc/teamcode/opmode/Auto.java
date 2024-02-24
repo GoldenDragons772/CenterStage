@@ -8,6 +8,8 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.helper.StorePos;
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 import org.firstinspires.ftc.teamcode.rr.trajectorysequence.TrajectorySequence;
@@ -16,6 +18,10 @@ import org.firstinspires.ftc.teamcode.subsystem.ArmMotorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.BucketPivotSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.DipperSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.TrajectoryFollowerCommand;
+import org.firstinspires.ftc.teamcode.vision.PropDetectionPipeline;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
@@ -28,7 +34,9 @@ public class Auto extends LinearOpMode {
     private TrajectoryFollowerCommand<TrajectorySequence> driveToBackdrop;
     private TrajectoryFollowerCommand<TrajectorySequence> driveToSpike;
 
-    private HuskySubsystem.SpikeLocation currentSpikeLocation;
+    private PropDetectionPipeline detectProp;
+
+    private PropDetectionPipeline.propPos currentSpikeLocation;
     private Alliance alliance;
     private Distance distance;
 
@@ -38,6 +46,13 @@ public class Auto extends LinearOpMode {
     private DipperSubsystem dipper;
     private ArmMotorSubsystem armMotor;
     private IntakeSubsystem intake;
+
+    private OpenCvCamera camera;
+
+    // Trajectory Settings
+    private Pose2d spikeLoc;
+    private Pose2d startPos;
+
   
     // Backdrop
     Pose2d backDropPos = new Pose2d(0, 0, Math.toRadians(0));
@@ -51,22 +66,68 @@ public class Auto extends LinearOpMode {
         CommandScheduler.getInstance().reset();
 
         drive = new MecanumDriveSubsystem(new MainMecanumDrive(hardwareMap), false);
-        husky = new HuskySubsystem(hardwareMap);
+        //husky = new HuskySubsystem(hardwareMap);
         bucketPivot = new BucketPivotSubsystem(hardwareMap);
         dipper = new DipperSubsystem(hardwareMap);
         armMotor = new ArmMotorSubsystem(hardwareMap);
         intake = new IntakeSubsystem(hardwareMap);
 
+        detectProp = new PropDetectionPipeline(telemetry);
 
-        husky.setAlgorithm(HuskyLens.Algorithm.COLOR_RECOGNITION);
+        // Initalize
+        alliance = Alliance.RED;
+        distance = Distance.SHORT;
+
+        // Trajectory Init
+        spikeLoc = new Pose2d(0, 0, Math.toRadians(0));
+        startPos = new Pose2d(0, 0, Math.toRadians(0));
+
+        currentSpikeLocation = PropDetectionPipeline.propPos.RIGHT;
+
+        WebcamName webcamName = hardwareMap.get(WebcamName.class, "gdeye");
+
+        camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName);
+
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                camera.startStreaming(320, 240);
+                camera.setPipeline(detectProp);
+            }
+
+            @Override
+            public void onError(int errorCode) {
+
+            }
+        });
+
+
+
+        //husky.setAlgorithm(HuskyLens.Algorithm.COLOR_RECOGNITION);
 
         while (opModeInInit()) {
 
+            currentSpikeLocation = detectProp.getCurrentPropPos();//husky.getSpikeLocation(alliance, distance);
+
             // Auto Selector
-            selectAuto();
+            if (gamepad1.dpad_right) { // Long Distance Red Auto
+                distance = Distance.LONG;
+                alliance = Alliance.RED;
+            } else if (gamepad1.dpad_left) { // Short Distance Red Auto
+                alliance = Alliance.RED;
+                distance = Distance.SHORT;
+            } else if (gamepad1.dpad_up) { // Long Distance Blue Auto
+                alliance = Alliance.BLUE;
+                distance = Distance.LONG;
+            } else if (gamepad1.dpad_down) { // Short Distance Blue Auto
+                alliance = Alliance.BLUE;
+                distance = Distance.SHORT;
+            }
+
+
             follower = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.FOLLOW));
             drive.setPoseEstimate(getStartPosition(alliance, distance));
-            currentSpikeLocation = husky.getSpikeLocation(alliance, distance);
+
 
             backDropPos = getBackdropPos();
 
@@ -76,11 +137,14 @@ public class Auto extends LinearOpMode {
 
             telemetry.addData("CurrentSpike Location", currentSpikeLocation.name());
             telemetry.addData("Current Auto", alliance.name() + " " + distance.name());
-            telemetry.addData("Prop Location", husky.getSpikeX());
+           // telemetry.addData("Prop Location", husky.getSpikeX());
             telemetry.update();
         }
 
         waitForStart();
+
+        // Stop the Camera...
+        camera.stopStreaming();
 
         CommandScheduler.getInstance().schedule(createCommandGroup());
 
@@ -129,22 +193,6 @@ public class Auto extends LinearOpMode {
         return commandGroup;
     }
 
-    private void selectAuto() {
-        if (gamepad1.dpad_right) { // Long Distance Red Auto
-            distance = Distance.LONG;
-            alliance = Alliance.RED;
-        } else if (gamepad1.dpad_left) { // Short Distance Red Auto
-            alliance = Alliance.RED;
-            distance = Distance.SHORT;
-        } else if (gamepad1.dpad_up) { // Long Distance Blue Auto
-            alliance = Alliance.BLUE;
-            distance = Distance.LONG;
-        } else if (gamepad1.dpad_down) { // Short Distance Blue Auto
-            alliance = Alliance.BLUE;
-            distance = Distance.SHORT;
-        }
-
-    }
 
     private Pose2d getBackdropPos() {
         switch (currentSpikeLocation) {
@@ -164,8 +212,8 @@ public class Auto extends LinearOpMode {
     private TrajectorySequence getTrajectory(Alliance alliance, Distance distance, Type type) {
         HashMap<String, TrajectorySequence> choices = new HashMap<>();
         int reflection = alliance == Alliance.RED ? -1 : 1;
-        Pose2d spikeLoc = getSpikeLocation(alliance, distance, currentSpikeLocation);
-        Pose2d startPos = getStartPosition(alliance, distance);
+        spikeLoc = getSpikeLocation(alliance, distance, currentSpikeLocation);
+        startPos = getStartPosition(alliance, distance);
         TrajectorySequence LD_FOLLOW = drive.trajectorySequenceBuilder(new Pose2d(startPos.getX(), startPos.getY() * reflection))
                 .forward(30)
                 .build();

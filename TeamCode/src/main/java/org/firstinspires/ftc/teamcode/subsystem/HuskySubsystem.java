@@ -37,24 +37,24 @@ public class HuskySubsystem extends SubsystemBase {
     }
 
 
-    public SpikeLocation getSpikeLocation(TrajectoryManager.Alliance alliance, TrajectoryManager.Distance distance) {
-        int spikeBlock = getSpikeX();
-        if ((alliance == TrajectoryManager.Alliance.RED && distance == TrajectoryManager.Distance.SHORT) || (alliance == TrajectoryManager.Alliance.BLUE && distance == TrajectoryManager.Distance.LONG)) {
-            if (spikeBlock > 0 && spikeBlock < 100) {
-                return SpikeLocation.LEFT;
-            } else if (spikeBlock > 100 && spikeBlock < 240) {
-                return SpikeLocation.CENTER;
-            } else {
-                return SpikeLocation.RIGHT;
-            }
-        } else {
-            if (spikeBlock > 100 && spikeBlock < 170) {
-                return SpikeLocation.LEFT;
-            } else if (spikeBlock > 170 && spikeBlock < 285) {
-                return SpikeLocation.CENTER;
-            } else {
-                return SpikeLocation.RIGHT;
-            }
-        }
-    }
+//    public SpikeLocation getSpikeLocation(TrajectoryManager.Alliance alliance, TrajectoryManager.Distance distance) {
+//        int spikeBlock = getSpikeX();
+//        if ((alliance == TrajectoryManager.Alliance.RED && distance == TrajectoryManager.Distance.SHORT) || (alliance == TrajectoryManager.Alliance.BLUE && distance == TrajectoryManager.Distance.LONG)) {
+//            if (spikeBlock > 0 && spikeBlock < 100) {
+//                return SpikeLocation.LEFT;
+//            } else if (spikeBlock > 100 && spikeBlock < 240) {
+//                return SpikeLocation.CENTER;
+//            } else {
+//                return SpikeLocation.RIGHT;
+//            }
+//        } else {
+//            if (spikeBlock > 100 && spikeBlock < 170) {
+//                return SpikeLocation.LEFT;
+//            } else if (spikeBlock > 170 && spikeBlock < 285) {
+//                return SpikeLocation.CENTER;
+//            } else {
+//                return SpikeLocation.RIGHT;
+//            }
+//        }
+//    }
 }

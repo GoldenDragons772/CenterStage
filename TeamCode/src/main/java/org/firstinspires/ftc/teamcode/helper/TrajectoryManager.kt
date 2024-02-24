@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.helper
 
 import com.acmerobotics.roadrunner.geometry.Pose2d
 import org.firstinspires.ftc.teamcode.subsystem.HuskySubsystem.SpikeLocation
+import org.firstinspires.ftc.teamcode.vision.PropDetectionPipeline
 
 class TrajectoryManager {
 
@@ -24,7 +25,7 @@ class TrajectoryManager {
         }
 
         @JvmStatic
-        public fun getSpikeLocation(alliance: Alliance, distance: Distance, spikeLoc: SpikeLocation): Pose2d? {
+        public fun getSpikeLocation(alliance: Alliance, distance: Distance, spikeLoc: PropDetectionPipeline.propPos): Pose2d? {
             // hacky af
             val switchString = alliance.toString() + distance.toString() + spikeLoc.toString()
             if (switchString === name(Alliance.BLUE, Distance.SHORT, SpikeLocation.LEFT)) {
@@ -64,7 +65,7 @@ class TrajectoryManager {
             if (switchString === name(Alliance.RED, Distance.LONG, SpikeLocation.RIGHT)) {
                 return Pose2d(-32.0, -30.0, Math.toRadians(0.0))
             }
-            return null
+            return Pose2d(22.0, -39.0, Math.toRadians(90.0))
         }
 
         private fun name(alliance: Alliance, distance: Distance, spikeLoc: SpikeLocation): String {

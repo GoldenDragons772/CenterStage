@@ -24,7 +24,7 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
         BucketPivotSubsystem(hardwareMap)
     private val dipper: DipperSubsystem =
         DipperSubsystem(hardwareMap)
-    private val armMotor: ArmMotorSubsystem =
+    val armMotor: ArmMotorSubsystem =
         ArmMotorSubsystem(hardwareMap)
     private val drone: DroneSubsystem = DroneSubsystem(hardwareMap)
     private val gpad1: GamepadEx = GamepadEx(gamepad1)
