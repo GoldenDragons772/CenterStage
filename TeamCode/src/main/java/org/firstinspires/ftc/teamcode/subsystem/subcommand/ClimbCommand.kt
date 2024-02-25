@@ -17,11 +17,9 @@ class ClimbCommand(
         addRequirements(armMotor, bucketPivot, dipper)
     }
 
-    override fun execute() {
-        super.execute()
-        dipper.setDipperPosition(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS)
+    override fun initialize() {
+        dipper.setDipperPosition(BucketPivotSubsystem.BucketPivotPos.LOADING_POS)
         bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS)
-
         armMotor.setArmToPos(if (climb) ArmMotorSubsystem.ArmPos.HIGH.position else 100)
     }
 

@@ -164,38 +164,40 @@ public class Auto extends LinearOpMode {
     private SequentialCommandGroup createCommandGroup() {
         SequentialCommandGroup commandGroup = new SequentialCommandGroup();
         commandGroup.addCommands(follower);
-//        commandGroup.addCommands(driveToSpike);
-//        commandGroup.addCommands(new InstantCommand(() -> {
-//            intake.spikePixel();
-//            sleep(500);
-//            intake.stopIntake();
-//        }));
-//        if (distance == Distance.SHORT) { // TODO: create a transition from pppp (PurPle Pixel Placing) to placing on the backdrop.
-//            commandGroup.addCommands(new InstantCommand(() -> {
-//                armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.LxOW);
-//                dipper.setDipperPosition(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
-//                bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
-//            }));
-//            commandGroup.addCommands(new WaitCommand(750));
-//            commandGroup.addCommands(driveToBackdrop);
-//            commandGroup.addCommands(new InstantCommand(() -> intake.specialDispenseJustForAutoPixelDispenseThing()));
-//            commandGroup.addCommands(new WaitCommand(2000));
-//            commandGroup.addCommands(new InstantCommand(() -> { // TODO: Figure out how to make this into a function.
-//                intake.stopIntake();
-//                dipper.setDipperPosition(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
-//                armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
-//                int timeout = 1200;
-//                int epsilon = 550; // Machine epsilon
-//                while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {
-//                    try {
-//                        Thread.sleep(20);
-//                    } catch (InterruptedException e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                }
-//                bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
-//            }));
-//        }
+        commandGroup.addCommands(driveToSpike);
+        commandGroup.addCommands(new InstantCommand(() -> {
+            intake.spikePixel();
+            sleep(500);
+            intake.stopIntake();
+        }));
+        if (distance == Distance.SHORT) { // TODO: create a transition from pppp (PurPle Pixel Placing) to placing on the backdrop.
+            commandGroup.addCommands(new InstantCommand(() -> {
+                armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.LOW);
+                dipper.setDipperPosition(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
+                bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
+            }));
+            commandGroup.addCommands(new WaitCommand(750));
+            commandGroup.addCommands(driveToBackdrop);
+            commandGroup.addCommands(new InstantCommand(() -> intake.specialDispenseJustForAutoPixelDispenseThing()));
+            commandGroup.addCommands(new WaitCommand(2000));
+            commandGroup.addCommands(new InstantCommand(() -> { // TODO: Figure out how to make this into a function.
+                intake.stopIntake();
+                dipper.setDipperPosition(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
+                armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
+                int timeout = 1200;
+                int epsilon = 550; // Machine epsilon
+                while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {
+                    try {
+                        Thread.sleep(20);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
+            }));
+        } else {
+
+        }
         return commandGroup;
     }
 
@@ -217,27 +219,33 @@ public class Auto extends LinearOpMode {
 
     private TrajectorySequence getTrajectory(Alliance alliance, Distance distance, Type type) {
         HashMap<String, TrajectorySequence> choices = new HashMap<>();
-        int reflection = alliance == Alliance.RED ? 1 : -1;
+        //int reflection = alliance == Alliance.RED ? 1 : -1;
         int heading = alliance == Alliance.RED ? 90 : 270;
         spikeLoc = getSpikeLocation(alliance, distance, currentSpikeLocation);
         startPos = getStartPosition(alliance, distance);
+
         TrajectorySequence LD_FOLLOW = drive.trajectorySequenceBuilder(new Pose2d(startPos.getX(), startPos.getY(), Math.toRadians(heading)))
                 .forward(30.0)
                 .build();
+
         TrajectorySequence SD_FOLLOW = drive.trajectorySequenceBuilder(new Pose2d(startPos.getX(), startPos.getY(), Math.toRadians(heading)))
                 .forward(30.0)
                 .build();
+
         TrajectorySequence SD_SPIKE = drive.trajectorySequenceBuilder(SD_FOLLOW.end())
                 .lineToLinearHeading(spikeLoc)
                 .forward(1)
                 .build();
+
         TrajectorySequence LD_SPIKE = drive.trajectorySequenceBuilder(LD_FOLLOW.end())
                 .lineToLinearHeading(spikeLoc)
                 .forward(1)
                 .build();
+
         TrajectorySequence SD_BACKBOARD = drive.trajectorySequenceBuilder(SD_SPIKE.end())
                 .lineToLinearHeading(backDropPos)
                 .build();
+
         TrajectorySequence LD_BACKBOARD = drive.trajectorySequenceBuilder(LD_SPIKE.end())
                 .splineToLinearHeading(backDropPos, Math.toRadians(0.0))
                 .build();
@@ -248,15 +256,18 @@ public class Auto extends LinearOpMode {
         choices.put("LD_SPIKE", LD_SPIKE);
         choices.put("SD_BACKBOARD", SD_BACKBOARD);
         choices.put("LD_BACKBOARD", LD_BACKBOARD);
+
         switch (distance) {
             case LONG: {
                 choices.keySet().stream().filter(s -> s.contains("SD")).collect(Collectors.toList())
                         .forEach(choices.keySet()::remove);
+                break;
             }
 
             case SHORT: {
                 choices.keySet().stream().filter(s -> s.contains("LD")).collect(Collectors.toList())
                         .forEach(choices.keySet()::remove);
+                break;
             }
         }
         switch (type) {
@@ -266,6 +277,7 @@ public class Auto extends LinearOpMode {
                         return choices.get(key);
                     }
                 }
+                break;
             }
 
             case SPIKE: {
@@ -274,6 +286,7 @@ public class Auto extends LinearOpMode {
                         return choices.get(key);
                     }
                 }
+                break;
             }
             case BACKBOARD: {
                 for (String key : choices.keySet()) {
@@ -281,6 +294,7 @@ public class Auto extends LinearOpMode {
                         return choices.get(key);
                     }
                 }
+                break;
             }
 
         }

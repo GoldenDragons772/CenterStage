@@ -40,7 +40,7 @@ class TrajectoryManager {
                     name(Alliance.RED, Distance.SHORT, PropDetectionPipeline.propPos.RIGHT) to Pose2d(22.0, -39.0, Math.toRadians(90.0)),
                     name(Alliance.RED, Distance.LONG, PropDetectionPipeline.propPos.LEFT) to Pose2d(-46.0, -18.0, Math.toRadians(270.0)),
                     name(Alliance.RED, Distance.LONG, PropDetectionPipeline.propPos.CENTER) to Pose2d(-42.0, -24.0, Math.toRadians(0.0)),
-                    name(Alliance.RED, Distance.LONG, PropDetectionPipeline.propPos.RIGHT) to Pose2d(-32.0, -30.0, Math.toRadians(0.0))
+                    name(Alliance.RED, Distance.LONG, PropDetectionPipeline.propPos.RIGHT) to Pose2d(-32.0, -37.0, Math.toRadians(30.0))
             )
             return poseMap[switchString] ?: Pose2d(22.0, -39.0, Math.toRadians(90.0)) // Default
         }
