@@ -21,7 +21,7 @@ import kotlin.math.exp
 import kotlin.math.sqrt
 
 @TeleOp(name = "Diagnostic")
-class Diagnostic : LinearOpMode() {
+class Dino : LinearOpMode() {
     private lateinit var mecDrive: MecanumDriveSubsystem
     private lateinit var armMotorSubsystem: ArmMotorSubsystem
     private lateinit var dipperSubsystem: DipperSubsystem
