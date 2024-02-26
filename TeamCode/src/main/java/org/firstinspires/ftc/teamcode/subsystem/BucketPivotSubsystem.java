@@ -8,10 +8,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Config
 public class BucketPivotSubsystem extends SubsystemBase {
 
-    public static double LeftBucketPivotDroppingPos = 0.93;
-    public static double LeftBucketPivotLoadingPos = 0.35;
-    public static double RightBucketPivotDroppingPos = 0.69;
-    public static double RightBucketPivotLoadingPos = 0.15;
+    public static double LeftBucketPivotDroppingPos = 0.79;
+    public static double LeftBucketPivotLoadingPos = 0.1;
+    public static double RightBucketPivotDroppingPos = 0.79;
+    public static double RightBucketPivotLoadingPos = 0.1;
 
 
     public enum BucketPivotPos {

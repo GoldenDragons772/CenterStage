@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode.opmode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.constraints.AngularVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
@@ -32,16 +35,14 @@ import static org.firstinspires.ftc.teamcode.helper.TrajectoryManager.*;
 @Autonomous(name = "GDAuto", group = "Auto")
 public class Auto extends LinearOpMode {
 
-    private TrajectoryFollowerCommand<TrajectorySequence> follower;
-    private TrajectoryFollowerCommand<TrajectorySequence> driveToBackdrop;
-    private TrajectoryFollowerCommand<TrajectorySequence> driveToSpike;
-
+    private TrajectoryFollowerCommand<TrajectorySequence> follower, driveToBackdrop, driveToSpike, carrier;
     private PropDetectionPipeline detectProp;
-
     private PropDetectionPipeline.propPos currentSpikeLocation;
+
     public static Alliance alliance;
     public static Distance distance;
 
+    // Subsystems
     private MecanumDriveSubsystem drive;
     private HuskySubsystem husky;
     private BucketPivotSubsystem bucketPivot;
@@ -49,6 +50,7 @@ public class Auto extends LinearOpMode {
     private ArmMotorSubsystem armMotor;
     private IntakeSubsystem intake;
 
+    // Camera Instance
     private OpenCvCamera camera;
 
     // Trajectory Settings
@@ -132,6 +134,11 @@ public class Auto extends LinearOpMode {
                 curAuto = "SD_BLUE";
             }
 
+            // check if Distance is Long
+            if(distance == Distance.LONG) {
+                carrier = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.CARRIER));
+            }
+
             follower = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.FOLLOW));
             backDropPos = getBackdropPos();
 
@@ -170,34 +177,33 @@ public class Auto extends LinearOpMode {
             sleep(500);
             intake.stopIntake();
         }));
-        if (distance == Distance.SHORT) { // TODO: create a transition from pppp (PurPle Pixel Placing) to placing on the backdrop.
-            commandGroup.addCommands(new InstantCommand(() -> {
-                armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.LOW);
-                dipper.setDipperPosition(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
-                bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
-            }));
-            commandGroup.addCommands(new WaitCommand(750));
-            commandGroup.addCommands(driveToBackdrop);
-            commandGroup.addCommands(new InstantCommand(() -> intake.specialDispenseJustForAutoPixelDispenseThing()));
-            commandGroup.addCommands(new WaitCommand(2000));
-            commandGroup.addCommands(new InstantCommand(() -> { // TODO: Figure out how to make this into a function.
-                intake.stopIntake();
-                dipper.setDipperPosition(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
-                armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
-                int timeout = 1200;
-                int epsilon = 550; // Machine epsilon
-                while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {
-                    try {
-                        Thread.sleep(20);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
-            }));
-        } else {
-
+        if (distance == Distance.LONG) { // TODO: create a transition from pppp (PurPle Pixel Placing) to placing on the backdrop.
+            commandGroup.addCommands(carrier);
         }
+        commandGroup.addCommands(new InstantCommand(() -> {
+            armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.LOW);
+            dipper.setDipperPosition(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
+            bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
+        }));
+        commandGroup.addCommands(new WaitCommand(750));
+        commandGroup.addCommands(driveToBackdrop);
+        commandGroup.addCommands(new InstantCommand(() -> intake.specialDispenseJustForAutoPixelDispenseThing()));
+        commandGroup.addCommands(new WaitCommand(2000));
+        commandGroup.addCommands(new InstantCommand(() -> { // TODO: Figure out how to make this into a function.
+            intake.stopIntake();
+            dipper.setDipperPosition(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
+            armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
+            int timeout = 1200;
+            int epsilon = 550; // Machine epsilon
+            while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {
+                try {
+                    Thread.sleep(20);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
+        }));
         return commandGroup;
     }
 
@@ -219,14 +225,12 @@ public class Auto extends LinearOpMode {
 
     private TrajectorySequence getTrajectory(Alliance alliance, Distance distance, Type type) {
         HashMap<String, TrajectorySequence> choices = new HashMap<>();
-        //int reflection = alliance == Alliance.RED ? 1 : -1;
+        int reflection = alliance == Alliance.RED ? 1 : -1;
         int heading = alliance == Alliance.RED ? 90 : 270;
         spikeLoc = getSpikeLocation(alliance, distance, currentSpikeLocation);
         startPos = getStartPosition(alliance, distance);
 
-        TrajectorySequence LD_FOLLOW = drive.trajectorySequenceBuilder(new Pose2d(startPos.getX(), startPos.getY(), Math.toRadians(heading)))
-                .forward(30.0)
-                .build();
+        // Short Distance Auto
 
         TrajectorySequence SD_FOLLOW = drive.trajectorySequenceBuilder(new Pose2d(startPos.getX(), startPos.getY(), Math.toRadians(heading)))
                 .forward(30.0)
@@ -237,24 +241,39 @@ public class Auto extends LinearOpMode {
                 .forward(1)
                 .build();
 
+        TrajectorySequence SD_BACKBOARD = drive.trajectorySequenceBuilder(SD_SPIKE.end())
+                .lineToLinearHeading(backDropPos)
+                .build();
+
+        // Long Distance Auto
+        TrajectorySequence LD_FOLLOW = drive.trajectorySequenceBuilder(new Pose2d(startPos.getX(), startPos.getY(), Math.toRadians(heading)))
+                .forward(30.0)
+                .build();
+
+
         TrajectorySequence LD_SPIKE = drive.trajectorySequenceBuilder(LD_FOLLOW.end())
                 .lineToLinearHeading(spikeLoc)
                 .forward(1)
                 .build();
 
-        TrajectorySequence SD_BACKBOARD = drive.trajectorySequenceBuilder(SD_SPIKE.end())
-                .lineToLinearHeading(backDropPos)
+        TrajectorySequence LD_CARRIER = drive.trajectorySequenceBuilder(LD_SPIKE.end())
+                .forward(2)
+                .back(10)
+                .lineToLinearHeading(new Pose2d(-35, -10 * reflection, Math.toRadians(180)))
+                .lineToConstantHeading(new Vector2d(10, -10 * reflection))
                 .build();
 
-        TrajectorySequence LD_BACKBOARD = drive.trajectorySequenceBuilder(LD_SPIKE.end())
-                .splineToLinearHeading(backDropPos, Math.toRadians(0.0))
+        TrajectorySequence LD_BACKBOARD = drive.trajectorySequenceBuilder(LD_CARRIER.end())
+                .setConstraints(new AngularVelocityConstraint(30), new ProfileAccelerationConstraint(30))
+                .splineToConstantHeading(new Vector2d(backDropPos.getX(), backDropPos.getY()), Math.toRadians(-180))
                 .build();
 
-        choices.put("LD_FOLLOW", LD_FOLLOW);
         choices.put("SD_FOLLOW", SD_FOLLOW);
         choices.put("SD_SPIKE", SD_SPIKE);
-        choices.put("LD_SPIKE", LD_SPIKE);
         choices.put("SD_BACKBOARD", SD_BACKBOARD);
+        choices.put("LD_FOLLOW", LD_FOLLOW);
+        choices.put("LD_SPIKE", LD_SPIKE);
+        choices.put("LD_CARRIER", LD_CARRIER);
         choices.put("LD_BACKBOARD", LD_BACKBOARD);
 
         switch (distance) {
@@ -296,7 +315,14 @@ public class Auto extends LinearOpMode {
                 }
                 break;
             }
-
+            case CARRIER: {
+                for(String key : choices.keySet()) {
+                    if(key.contains("CARRIER")) {
+                        return choices.get(key);
+                    }
+                }
+                break;
+            }
         }
         return null;
     }

@@ -59,7 +59,7 @@ class TrajectoryManager {
     }
 
     enum class Type {
-        SPIKE, FOLLOW, BACKBOARD
+        SPIKE, FOLLOW, BACKBOARD, CARRIER
     }
 
 
