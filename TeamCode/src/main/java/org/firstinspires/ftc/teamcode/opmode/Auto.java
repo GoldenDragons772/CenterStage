@@ -257,7 +257,6 @@ public class Auto extends LinearOpMode {
                 .build();
 
         TrajectorySequence LD_CARRIER = drive.trajectorySequenceBuilder(LD_SPIKE.end())
-                .forward(2)
                 .back(10)
                 .lineToLinearHeading(new Pose2d(-35, -10 * reflection, Math.toRadians(180)))
                 .lineToConstantHeading(new Vector2d(10, -10 * reflection))
