@@ -67,8 +67,8 @@ public class PropDetectionPipeline extends OpenCvPipeline {
             lowHSV = new Scalar(0, 116, 44);
             highHSV = new Scalar(179, 243, 138);
         } else {
-            lowHSV = new Scalar(107, 102, 57); // lower bound HSV for Blue
-            highHSV = new Scalar(114, 255, 103); // higher bound HSV for Blue
+            lowHSV = new Scalar(86, 196, 38); // lower bound HSV for Blue
+            highHSV = new Scalar(118, 255, 96); // higher bound HSV for Blue
         }
 
 

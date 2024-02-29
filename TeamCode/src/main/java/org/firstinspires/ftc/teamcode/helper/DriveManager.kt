@@ -110,16 +110,16 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
             this.keymap.homePositionMap,
             CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.HOME)
         )
-        // Arm Manual Control: Enable
-        setPressedBinding(
-            this.keymap.enableManualControlMap,
-            InstantCommand({ enableManualControl() })
-        )
-        // Arm Manual Control: Disable
-        setPressedBinding(
-            this.keymap.disableManualControlMap,
-            InstantCommand({ disableManualControl(this.keymap.disableManualControlMap.second) })
-        )
+//        // Arm Manual Control: Enable
+//        setPressedBinding(
+//            this.keymap.enableManualControlMap,
+//            InstantCommand({ enableManualControl() })
+//        )
+//        // Arm Manual Control: Disable
+//        setPressedBinding(
+//            this.keymap.disableManualControlMap,
+//            InstantCommand({ disableManualControl(this.keymap.disableManualControlMap.second) })
+//        )
         // Drone: Shoot
         setPressedBinding(
             this.keymap.shootDroneMap,

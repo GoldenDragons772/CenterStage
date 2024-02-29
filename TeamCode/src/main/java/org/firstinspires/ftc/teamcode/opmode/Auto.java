@@ -32,10 +32,12 @@ import java.util.stream.Collectors;
 
 import static org.firstinspires.ftc.teamcode.helper.TrajectoryManager.*;
 
+import androidx.core.os.TraceKt;
+
 @Autonomous(name = "GDAuto", group = "Auto")
 public class Auto extends LinearOpMode {
 
-    private TrajectoryFollowerCommand<TrajectorySequence> follower, driveToBackdrop, driveToSpike, carrier;
+    private TrajectoryFollowerCommand<TrajectorySequence> follower, driveToBackdrop, driveToSpike, carrier, park;
     private PropDetectionPipeline detectProp;
     private PropDetectionPipeline.propPos currentSpikeLocation;
 
@@ -44,7 +46,8 @@ public class Auto extends LinearOpMode {
 
     // Subsystems
     private MecanumDriveSubsystem drive;
-    private HuskySubsystem husky;
+
+    //    private HuskySubsystem husky; // Retired
     private BucketPivotSubsystem bucketPivot;
     private DipperSubsystem dipper;
     private ArmMotorSubsystem armMotor;
@@ -72,7 +75,7 @@ public class Auto extends LinearOpMode {
         CommandScheduler.getInstance().reset();
 
         drive = new MecanumDriveSubsystem(new MainMecanumDrive(hardwareMap), false);
-        //husky = new HuskySubsystem(hardwareMap);
+        //husky = new HuskySubsystem(hardwareMap); // retired
         bucketPivot = new BucketPivotSubsystem(hardwareMap);
         dipper = new DipperSubsystem(hardwareMap);
         armMotor = new ArmMotorSubsystem(hardwareMap);
@@ -145,6 +148,8 @@ public class Auto extends LinearOpMode {
             driveToSpike = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.SPIKE));
             driveToBackdrop = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.BACKBOARD));
 
+            park = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.PARK));
+
             telemetry.addData("CurrentSpike Location", currentSpikeLocation.toString());
             telemetry.addData("Current Auto", curAuto);
            // telemetry.addData("Prop Location", husky.getSpikeX());
@@ -204,6 +209,7 @@ public class Auto extends LinearOpMode {
             }
             bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
         }));
+        commandGroup.addCommands(park);
         return commandGroup;
     }
 
@@ -211,13 +217,13 @@ public class Auto extends LinearOpMode {
     private Pose2d getBackdropPos() {
         switch (currentSpikeLocation) {
             case LEFT: {
-                return new Pose2d(55, (alliance == Alliance.BLUE) ? 41 : -27, Math.toRadians(180));
+                return new Pose2d(56, (alliance == Alliance.BLUE) ? 41 : -27, Math.toRadians(180));
             }
             case RIGHT: {
-                return new Pose2d(55, (alliance == Alliance.BLUE) ? 27 : -41, Math.toRadians(180));
+                return new Pose2d(56, (alliance == Alliance.BLUE) ? 30 : -41, Math.toRadians(180));
             }
             case CENTER: {
-                return new Pose2d(55, (alliance == Alliance.BLUE) ? 34 : -34, Math.toRadians(180));
+                return new Pose2d(56, (alliance == Alliance.BLUE) ? 39 : -34, Math.toRadians(180));
             }
         }
         return null;
@@ -245,11 +251,15 @@ public class Auto extends LinearOpMode {
                 .lineToLinearHeading(backDropPos)
                 .build();
 
+        TrajectorySequence SD_PARK = drive.trajectorySequenceBuilder(SD_BACKBOARD.end())
+                .forward(2)
+                .lineToConstantHeading(new Vector2d(50, -60 * reflection))
+                .build();
+
         // Long Distance Auto
         TrajectorySequence LD_FOLLOW = drive.trajectorySequenceBuilder(new Pose2d(startPos.getX(), startPos.getY(), Math.toRadians(heading)))
                 .forward(30.0)
                 .build();
-
 
         TrajectorySequence LD_SPIKE = drive.trajectorySequenceBuilder(LD_FOLLOW.end())
                 .lineToLinearHeading(spikeLoc)
@@ -264,16 +274,29 @@ public class Auto extends LinearOpMode {
 
         TrajectorySequence LD_BACKBOARD = drive.trajectorySequenceBuilder(LD_CARRIER.end())
                 .setConstraints(new AngularVelocityConstraint(30), new ProfileAccelerationConstraint(30))
-                .splineToConstantHeading(new Vector2d(backDropPos.getX(), backDropPos.getY()), Math.toRadians(-180))
+                .splineToConstantHeading(new Vector2d(47, -35 * reflection), Math.toRadians(270 * reflection))
+                //.splineToConstantHeading(new Vector2d(backDropPos.getX(), backDropPos.getY()), Math.toRadians(-180))
+                .lineToLinearHeading(backDropPos)
                 .build();
 
+        TrajectorySequence LD_PARK = drive.trajectorySequenceBuilder(LD_BACKBOARD.end())
+                .forward(2)
+                .lineToConstantHeading(new Vector2d(52, -15 * reflection))
+                .build();
+
+
+        // Options for Short Distance
         choices.put("SD_FOLLOW", SD_FOLLOW);
         choices.put("SD_SPIKE", SD_SPIKE);
         choices.put("SD_BACKBOARD", SD_BACKBOARD);
+        choices.put("SD_PARK", SD_PARK);
+
+        // Options for Long Distance
         choices.put("LD_FOLLOW", LD_FOLLOW);
         choices.put("LD_SPIKE", LD_SPIKE);
         choices.put("LD_CARRIER", LD_CARRIER);
         choices.put("LD_BACKBOARD", LD_BACKBOARD);
+        choices.put("LD_PARK", LD_PARK);
 
         switch (distance) {
             case LONG: {
@@ -322,7 +345,15 @@ public class Auto extends LinearOpMode {
                 }
                 break;
             }
+            case PARK: {
+                for(String key : choices.keySet()) {
+                    if(key.contains("PARK")) {
+                        return choices.get(key);
+                    }
+                }
+                break;
+            }
         }
-        return null;
+        return null; //
     }
 }

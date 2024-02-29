@@ -14,7 +14,7 @@
             <goBILDA5202SeriesMotor name="FLMotor" port="1" />
             <goBILDA5202SeriesMotor name="BRMotor" port="2" />
             <goBILDA5202SeriesMotor name="BLMotor" port="3" />
-            <Servo name="LDipper" port="4" />
+            <Servo name="LDipper" port="1" />
             <Servo name="LBPivot" port="3" />
             <ContinuousRotationServo name="Bucket" port="5" />
             <LynxEmbeddedIMU name="imu" port="0" bus="0" />
