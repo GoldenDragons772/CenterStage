@@ -4,17 +4,23 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.helper.StorePos;
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystem.*;
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.CarriageCommand;
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.TrajectoryFollowerCommand;
+import org.firstinspires.ftc.teamcode.vision.PropDetectionPipeline;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @TeleOp(name = "TuningOpMode", group = "Debug")
 public class TuningOpMode extends CommandOpMode {
@@ -32,6 +38,10 @@ public class TuningOpMode extends CommandOpMode {
 
     private DroneSubsystem drone;
 
+    private OpenCvCamera camera;
+
+    private PropDetectionPipeline detectProp;
+
     GamepadEx gpad1;
 
     TrajectoryFollowerCommand driveToBackDropBlue;
@@ -40,7 +50,9 @@ public class TuningOpMode extends CommandOpMode {
     @Override
     public void initialize() {
 
-        Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
+        CommandScheduler.getInstance().reset();
+//
+//        Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
 
         drive = new MecanumDriveSubsystem(new MainMecanumDrive(hardwareMap), false);
         gpad1 = new GamepadEx(gamepad1);
@@ -49,6 +61,26 @@ public class TuningOpMode extends CommandOpMode {
         dipper = new DipperSubsystem(hardwareMap);
         bucketPivot = new BucketPivotSubsystem(hardwareMap);
         drone = new DroneSubsystem(hardwareMap);
+
+        WebcamName webcamName = hardwareMap.get(WebcamName.class, "gdeye");
+
+        camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName);
+
+        detectProp = new PropDetectionPipeline(telemetry, true);
+
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                camera.startStreaming(640, 360, OpenCvCameraRotation.UPRIGHT);
+                camera.setPipeline(detectProp);
+                FtcDashboard.getInstance().startCameraStream(camera, 100);
+            }
+
+            @Override
+            public void onError(int errorCode) {
+
+            }
+        });
 
         // Auto Drive Cmds
         Trajectory BACKDROP_BLUE_LEFT = drive.trajectoryBuilder(drive.getPoseEstimate())
@@ -146,6 +178,8 @@ public class TuningOpMode extends CommandOpMode {
             telemetry.addData("RightArmPos", armMotor.rightArmMotor.getCurrentPosition());
             telemetry.addData("PIDError", 1500 - (armMotor.leftArmMotor.getCurrentPosition() + armMotor.rightArmMotor.getCurrentPosition()) / 2);
             telemetry.addData("Correction", armMotor.correction);
+            telemetry.addData("PropPos", detectProp.propPosString());
+
 //            telemetry.addData("DipperRightServo", dipper.rightDipperServo.getPosition());
 //            telemetry.addData("DipperLeftServo", dipper.leftDipperServo.getPosition());
             telemetry.update();
@@ -154,6 +188,12 @@ public class TuningOpMode extends CommandOpMode {
 
     @Override
     public void run() {
-        super.run();
+        CommandScheduler.getInstance().run();
+
+        try {
+            camera.stopStreaming();
+        } catch (Exception e) {
+            // Do Nothing...
+        }
     }
 }

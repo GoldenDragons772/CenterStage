@@ -20,7 +20,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void spikePixel() {
-        intakeMotor.setPower(0.2);
+        intakeMotor.setPower(-0.2);
     }
 
     public void dispenseIntake() {
@@ -35,5 +35,7 @@ public class IntakeSubsystem extends SubsystemBase {
     public void specialDispenseJustForAutoPixelDispenseThing(){
         bucketServo.setPower(-1);
     }
+
+
 
 }

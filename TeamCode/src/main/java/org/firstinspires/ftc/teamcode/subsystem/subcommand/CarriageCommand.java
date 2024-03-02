@@ -30,15 +30,15 @@ public class CarriageCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        super.initialize();
-    }
-
-    @Override
-    public void execute() {
         BucketPivotSubsystem.BucketPivotPos bucketPivotPos = armPos == ArmMotorSubsystem.ArmPos.HOME ? LOADING_POS : DROPPING_POS;
         armMotor.setArmToPos(armPos);
         bucketPivot.runBucketPos(bucketPivotPos);
         dipper.setDipperPosition(bucketPivotPos);
-
     }
+
+//    @Override
+//    public void execute() {
+//
+//
+//    }
 }

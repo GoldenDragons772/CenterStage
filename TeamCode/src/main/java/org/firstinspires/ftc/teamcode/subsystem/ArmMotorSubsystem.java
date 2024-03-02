@@ -119,6 +119,21 @@ public class ArmMotorSubsystem implements Subsystem {
         }
     }
 
+    public void setArmManualControl(int power) {
+
+        setArmMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        int leftArmPos = leftArmMotor.getCurrentPosition();
+        int rightArmPos = rightArmMotor.getCurrentPosition();
+
+        leftArmMotor.setTargetPosition(leftArmPos + power);
+        rightArmMotor.setTargetPosition(rightArmPos + power);
+
+        if(leftArmMotor.getPower() == 0 || rightArmMotor.getPower() == 0) {
+            leftArmMotor.setPower(1);
+            rightArmMotor.setPower(1);
+        }
+    }
 
   public int getAvgArmPosition() {
         return (leftArmMotor.getCurrentPosition() + rightArmMotor.getCurrentPosition()) / 2;

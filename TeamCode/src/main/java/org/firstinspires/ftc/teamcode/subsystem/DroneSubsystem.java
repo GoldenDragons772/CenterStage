@@ -1,10 +1,16 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+@Config
 public class DroneSubsystem extends SubsystemBase {
+
+    public static double shootingPos = 1;
+
+    public static double loadingPos = 0.5;
 
     Servo drone;
 
@@ -13,10 +19,10 @@ public class DroneSubsystem extends SubsystemBase {
     }
 
     public void shootDrone() {
-        drone.setPosition(1);
+        drone.setPosition(shootingPos);
     }
 
     public void loadDrone() {
-        drone.setPosition(-1);
+        drone.setPosition(loadingPos);
     }
 }

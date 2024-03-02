@@ -49,6 +49,18 @@ public class Solo extends CommandOpMode {
     public void run() {
         driveManager.run();
 
+        // Manual Arm Control...
+
+//        // Increment ArmPos
+//        if(gamepad1.right_trigger > 0.1) {
+//            driveManager.getArmMotor().setArmManualControl((int) ((driveManager.getArmMotor().getAvgArmPosition()) + (100 * gamepad1.right_trigger)));
+//        }
+//
+//        // Decrease ArmPos
+//        if(gamepad1.left_trigger < 0.1) {
+//            driveManager.getArmMotor().setArmManualControl((int) ((driveManager.getArmMotor().getAvgArmPosition()) - (100 * gamepad1.left_trigger)));
+//        }
+
 //        Pose2d poseEstimate = drive.getPoseEstimate();
 //        telemetry.addData("x", poseEstimate.getX());
 //        telemetry.addData("y", poseEstimate.getY());

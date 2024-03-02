@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.vision;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.helper.TrajectoryManager;
+import org.firstinspires.ftc.teamcode.opmode.Auto;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -16,11 +18,27 @@ import java.util.List;
 
 public class PropDetectionPipeline extends OpenCvPipeline {
 
+    public enum propPos {
+        LEFT,
+        CENTER,
+        RIGHT
+    }
+
     Telemetry telemetry;
 
     private int spikeX = 0;
 
-    public PropDetectionPipeline(Telemetry telemetry) {
+    private boolean debug = false;
+
+    Mat mat = new Mat();
+    Mat thresh = new Mat();
+
+    Mat edges = new Mat();
+
+    Mat hierarchy = new Mat();
+
+    public PropDetectionPipeline(Telemetry telemetry, boolean debug) {
+        this.debug = debug;
         this.telemetry = telemetry;
     }
 
@@ -35,19 +53,24 @@ public class PropDetectionPipeline extends OpenCvPipeline {
         // If both are regular stones, it returns NONE to tell the robot to keep looking
 
         // Make a working copy of the input matrix in HSV
-        Mat mat = new Mat();
+
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
 
         // We create a HSV range for yellow to detect regular stones
         // NOTE: In OpenCV's implementation,
         // Hue values are half the real value
-        Scalar lowHSV = new Scalar(0, 116, 44); // lower bound HSV for Red
-        Scalar highHSV = new Scalar(179, 243, 138); // higher bound HSV for Red
 
-        // lower bound for Blue
-//        Scalar lowHSV = new Scalar(104, 90, 78); // lower bound HSV for Blue
-//        Scalar highHSV = new Scalar(134, 241, 255); // higher bound HSV for Blue
-        Mat thresh = new Mat();
+        Scalar lowHSV; // lower bound HSV for Red
+        Scalar highHSV; // higher bound HSV for Red
+
+        if(Auto.alliance == TrajectoryManager.Alliance.RED) {
+            lowHSV = new Scalar(0, 116, 44);
+            highHSV = new Scalar(179, 243, 138);
+        } else {
+            lowHSV = new Scalar(86, 196, 38); // lower bound HSV for Blue
+            highHSV = new Scalar(118, 255, 96); // higher bound HSV for Blue
+        }
+
 
         // We'll get a black and white image. The white regions represent the regular stones.
         // inRange(): thresh[i][j] = {255,255,255} if mat[i][i] is within the range
@@ -59,7 +82,6 @@ public class PropDetectionPipeline extends OpenCvPipeline {
         // Blur the Image alot to reduce noise
         Imgproc.GaussianBlur(thresh, thresh, new org.opencv.core.Size(5, 5), 1);
 
-        Mat edges = new Mat();
         Imgproc.Canny(thresh, edges, 200, 255);
 
         // https://docs.opencv.org/3.4/da/d0c/tutorial_bounding_rects_circles.html
@@ -67,7 +89,7 @@ public class PropDetectionPipeline extends OpenCvPipeline {
         // We then find the bounding rectangles of those contours
         // Merge the rectangles to form a single rectangle
         List<MatOfPoint> contours = new ArrayList<>();
-        Mat hierarchy = new Mat();
+
         Imgproc.findContours(edges, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
         MatOfPoint2f[] contoursPoly  = new MatOfPoint2f[contours.size()];
@@ -83,23 +105,19 @@ public class PropDetectionPipeline extends OpenCvPipeline {
 
         // Draw one contour for each rectangle
 
+        // SetDefault
+        spikeX = 0;
+
         for (int i = 0; i != boundRect.length; i++) {
             // If the area of the rectangle is greater than 2000, then its a Spike
-            if (boundRect[i].area() > 2000) {
+            if (boundRect[i].area() > 2500) {
 
-                spikeX = boundRect[i].x + boundRect[i].width / 2;
                 int y = boundRect[i].y + boundRect[i].height / 2;
 
                 if(y > 150) {
                     Imgproc.rectangle(mat, boundRect[i], new Scalar(255, 255, 255), 2);
 
-                    // Find the center of the rectangle
-
-
-                    // Print the center of the rectangle
-                    telemetry.addData("Prop Position", spikeX);
-                    telemetry.addData("Prop Y Position", y);
-                    telemetry.update();
+                    spikeX = boundRect[i].x + boundRect[i].width / 2;
 
                     // Draw a circle at the center of the rectangle
                     Imgproc.circle(mat, new Point(spikeX, y), 5, new Scalar(255, 255, 255), 1);
@@ -107,14 +125,48 @@ public class PropDetectionPipeline extends OpenCvPipeline {
             }
         }
 
+        if(debug) {
+            // Print the center of the rectangle
+            telemetry.addData("Prop Position", spikeX);
+            //telemetry.addData("Prop Y Position", y);
+            telemetry.addData("Prop Location", propPosString());
+            telemetry.update();
+        }
         Imgproc.cvtColor(mat, mat, Imgproc.COLOR_HSV2RGB);
 
         return mat; // return the mat with rectangles drawn
     }
 
-    public int getSpikeX() {
-        return 0;
+
+    public propPos getCurrentPropPos() {
+        if ((Auto.alliance == TrajectoryManager.Alliance.RED && Auto.distance == TrajectoryManager.Distance.SHORT) || (Auto.alliance == TrajectoryManager.Alliance.BLUE && Auto.distance == TrajectoryManager.Distance.LONG)) {
+            if(spikeX > 1 && spikeX < 150) {
+                return propPos.LEFT;
+            } else if(spikeX > 150 && spikeX < 500) {
+                return propPos.CENTER;
+            } else {
+                return propPos.RIGHT;
+            }
+        } else {
+            if(spikeX > 100 && spikeX < 300) {
+                return propPos.LEFT;
+            } else if(spikeX > 300 && spikeX < 600) {
+                return propPos.CENTER;
+            } else {
+                return propPos.RIGHT;
+            }
+        }
     }
 
-
+    public String propPosString() {
+        propPos currPos = getCurrentPropPos();
+        if(currPos == propPos.LEFT) {
+            return "PROP_LEFT";
+        } else if(currPos == propPos.CENTER) {
+            return "PROP_CENTER";
+        } else if(currPos == propPos.RIGHT) {
+            return  "PROP_RIGHT";
+        }
+        return "NOT_FOUND";
+    };
 }

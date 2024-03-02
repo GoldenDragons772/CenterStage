@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.helper
 import com.arcrobotics.ftclib.command.Command
 import com.arcrobotics.ftclib.command.CommandScheduler
 import com.arcrobotics.ftclib.command.InstantCommand
+import com.arcrobotics.ftclib.command.button.Trigger
 import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.qualcomm.robotcore.hardware.DcMotor
@@ -24,7 +25,7 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
         BucketPivotSubsystem(hardwareMap)
     private val dipper: DipperSubsystem =
         DipperSubsystem(hardwareMap)
-    private val armMotor: ArmMotorSubsystem =
+    val armMotor: ArmMotorSubsystem =
         ArmMotorSubsystem(hardwareMap)
     private val drone: DroneSubsystem = DroneSubsystem(hardwareMap)
     private val gpad1: GamepadEx = GamepadEx(gamepad1)
@@ -43,7 +44,7 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
         // Drive System
         val strafe: Double = gpad1.gamepad.right_stick_x.pow(2) * sign(gpad1.gamepad.right_stick_x.toDouble())
         val forward: Double = gpad1.gamepad.right_stick_y.pow(2) * sign(gpad1.gamepad.right_stick_y.toDouble())
-        val spin: Double = gpad1.gamepad.left_stick_x.pow(2) * sign(gpad1.gamepad.left_stick_x.toDouble())
+        val spin: Double = (gpad1.gamepad.left_stick_x.pow(2) * sign(gpad1.gamepad.left_stick_x.toDouble()) * 0.90)
 
         val speedMultiplier = 1.0
 
@@ -78,6 +79,7 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
         // Intake: Dispense
         getGamepad(this.keymap.dispenseMap.second).getGamepadButton(this.keymap.dispenseMap.first)
             .whenHeld(InstantCommand({ intake.dispenseIntake() })).whenReleased(InstantCommand({ intake.stopIntake() }))
+
         // Arms: Climb
         setPressedBinding(
             this.keymap.climbMap,
@@ -108,16 +110,16 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
             this.keymap.homePositionMap,
             CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.HOME)
         )
-        // Arm Manual Control: Enable
-        setPressedBinding(
-            this.keymap.enableManualControlMap,
-            InstantCommand({ enableManualControl() })
-        )
-        // Arm Manual Control: Disable
-        setPressedBinding(
-            this.keymap.disableManualControlMap,
-            InstantCommand({ disableManualControl(this.keymap.disableManualControlMap.second) })
-        )
+//        // Arm Manual Control: Enable
+//        setPressedBinding(
+//            this.keymap.enableManualControlMap,
+//            InstantCommand({ enableManualControl() })
+//        )
+//        // Arm Manual Control: Disable
+//        setPressedBinding(
+//            this.keymap.disableManualControlMap,
+//            InstantCommand({ disableManualControl(this.keymap.disableManualControlMap.second) })
+//        )
         // Drone: Shoot
         setPressedBinding(
             this.keymap.shootDroneMap,
