@@ -1,8 +1,8 @@
-package org.firstinspires.ftc.teamcode.vision;
+package org.firstinspires.ftc.teamcode.vision.sim;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.helper.TrajectoryManager;
-import org.firstinspires.ftc.teamcode.opmode.Auto;
+//import org.firstinspires.ftc.teamcode.helper.TrajectoryManager;
+//import org.firstinspires.ftc.teamcode.opmode.Auto;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -16,7 +16,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PropDetectionPipeline extends OpenCvPipeline {
+public class PropSim extends OpenCvPipeline {
 
     public enum propPos {
         LEFT,
@@ -37,8 +37,8 @@ public class PropDetectionPipeline extends OpenCvPipeline {
 
     Mat hierarchy = new Mat();
 
-    public PropDetectionPipeline(Telemetry telemetry, boolean debug) {
-        this.debug = debug;
+    public PropSim(Telemetry telemetry) {
+        this.debug = true;
         this.telemetry = telemetry;
     }
 
@@ -63,13 +63,13 @@ public class PropDetectionPipeline extends OpenCvPipeline {
         Scalar lowHSV; // lower bound HSV for Red
         Scalar highHSV; // higher bound HSV for Red
 
-        if(Auto.alliance == TrajectoryManager.Alliance.RED) {
+//        if(Auto.alliance == TrajectoryManager.Alliance.RED) {
             lowHSV = new Scalar(0, 41, 96); // RED
             highHSV = new Scalar(5, 234, 202); // RED
-        } else {
-            lowHSV = new Scalar(111, 196, 70); // lower bound HSV for Blue
-            highHSV = new Scalar(118, 255, 255); // higher bound HSV for Blue\
-        }
+//        } else {
+//            lowHSV = new Scalar(111, 196, 70); // lower bound HSV for Blue
+//            highHSV = new Scalar(118, 255, 255); // higher bound HSV for Blue
+//        }
 
 
         // We'll get a black and white image. The white regions represent the regular stones.
@@ -138,35 +138,35 @@ public class PropDetectionPipeline extends OpenCvPipeline {
     }
 
 
-    public propPos getCurrentPropPos() {
-        if ((Auto.alliance == TrajectoryManager.Alliance.RED && Auto.distance == TrajectoryManager.Distance.SHORT) || (Auto.alliance == TrajectoryManager.Alliance.BLUE && Auto.distance == TrajectoryManager.Distance.LONG)) {
-            if(spikeX > 1 && spikeX < 150) {
-                return propPos.LEFT;
-            } else if(spikeX > 150 && spikeX < 500) {
-                return propPos.CENTER;
-            } else {
-                return propPos.RIGHT;
-            }
-        } else {
-            if(spikeX > 100 && spikeX < 300) {
-                return propPos.LEFT;
-            } else if(spikeX > 300 && spikeX < 600) {
-                return propPos.CENTER;
-            } else {
-                return propPos.RIGHT;
-            }
-        }
-    }
-
-    public String propPosString() {
-        propPos currPos = getCurrentPropPos();
-        if(currPos == propPos.LEFT) {
-            return "PROP_LEFT";
-        } else if(currPos == propPos.CENTER) {
-            return "PROP_CENTER";
-        } else if(currPos == propPos.RIGHT) {
-            return  "PROP_RIGHT";
-        }
-        return "NOT_FOUND";
-    };
+//    public propPos getCurrentPropPos() {
+//        if ((Auto.alliance == TrajectoryManager.Alliance.RED && Auto.distance == TrajectoryManager.Distance.SHORT) || (Auto.alliance == TrajectoryManager.Alliance.BLUE && Auto.distance == TrajectoryManager.Distance.LONG)) {
+//            if(spikeX > 1 && spikeX < 150) {
+//                return propPos.LEFT;
+//            } else if(spikeX > 150 && spikeX < 500) {
+//                return propPos.CENTER;
+//            } else {
+//                return propPos.RIGHT;
+//            }
+//        } else {
+//            if(spikeX > 100 && spikeX < 300) {
+//                return propPos.LEFT;
+//            } else if(spikeX > 300 && spikeX < 600) {
+//                return propPos.CENTER;
+//            } else {
+//                return propPos.RIGHT;
+//            }
+//        }
+//    }
+//
+//    public String propPosString() {
+//        propPos currPos = getCurrentPropPos();
+//        if(currPos == propPos.LEFT) {
+//            return "PROP_LEFT";
+//        } else if(currPos == propPos.CENTER) {
+//            return "PROP_CENTER";
+//        } else if(currPos == propPos.RIGHT) {
+//            return  "PROP_RIGHT";
+//        }
+//        return "NOT_FOUND";
+//    };
 }
