@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.helper
 import com.arcrobotics.ftclib.command.Command
 import com.arcrobotics.ftclib.command.CommandScheduler
 import com.arcrobotics.ftclib.command.InstantCommand
-import com.arcrobotics.ftclib.command.button.Trigger
 import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.qualcomm.robotcore.hardware.DcMotor
@@ -21,12 +20,10 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
 
     val drive: MecanumDriveSubsystem = MecanumDriveSubsystem(MainMecanumDrive(hardwareMap), false)
     private val intake: IntakeSubsystem = IntakeSubsystem(hardwareMap)
-    private val bucketPivot: BucketPivotSubsystem =
-        BucketPivotSubsystem(hardwareMap)
-    private val dipper: DipperSubsystem =
-        DipperSubsystem(hardwareMap)
-    val armMotor: ArmMotorSubsystem =
-        ArmMotorSubsystem(hardwareMap)
+    private val bucketPivot: BucketPivotSubsystem = BucketPivotSubsystem(hardwareMap)
+    private val dipper: DipperSubsystem = DipperSubsystem(hardwareMap)
+    val armMotor: ArmMotorSubsystem = ArmMotorSubsystem(hardwareMap)
+    private val damper: BackboardDamper = BackboardDamper()
     private val drone: DroneSubsystem = DroneSubsystem(hardwareMap)
     private val gpad1: GamepadEx = GamepadEx(gamepad1)
     private val gpad2: GamepadEx = GamepadEx(gamepad2)
@@ -48,8 +45,10 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
 
         val speedMultiplier = 1.0
 
+        val damped = damper.damp(drive.poseEstimate, strafe * speedMultiplier, forward * speedMultiplier) ?:
+        mutableListOf(strafe * speedMultiplier, forward * speedMultiplier)
         drive.drive(
-            forward * speedMultiplier, strafe * speedMultiplier, spin * speedMultiplier
+            damped[1], damped[0], spin * speedMultiplier
         )
 
 //        // Manual Arm Control (Make sure to Un-Lock First)
@@ -82,18 +81,15 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
 
         // Arms: Climb
         setPressedBinding(
-            this.keymap.climbMap,
-            ClimbCommand(armMotor, bucketPivot, dipper, true)
+            this.keymap.climbMap, ClimbCommand(armMotor, bucketPivot, dipper, true)
         )
         // Arms: Hang
         setPressedBinding(
-            this.keymap.hangMap,
-            ClimbCommand(armMotor, bucketPivot, dipper, false)
+            this.keymap.hangMap, ClimbCommand(armMotor, bucketPivot, dipper, false)
         )
         // Arms: Low
         setPressedBinding(
-            this.keymap.lowPositionMap,
-            CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.LOW)
+            this.keymap.lowPositionMap, CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.LOW)
         )
         // Arms: Middle
         setPressedBinding(
@@ -102,13 +98,11 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
         )
         // Arms: High
         setPressedBinding(
-            this.keymap.highPositionMap,
-            CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.HIGH)
+            this.keymap.highPositionMap, CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.HIGH)
         )
         // Arms: Home
         setPressedBinding(
-            this.keymap.homePositionMap,
-            CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.HOME)
+            this.keymap.homePositionMap, CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.HOME)
         )
 //        // Arm Manual Control: Enable
 //        setPressedBinding(
@@ -122,13 +116,11 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
 //        )
         // Drone: Shoot
         setPressedBinding(
-            this.keymap.shootDroneMap,
-            InstantCommand({ drone.shootDrone() })
+            this.keymap.shootDroneMap, InstantCommand({ drone.shootDrone() })
         )
         // Drone: Load
         setPressedBinding(
-            this.keymap.loadDroneMap,
-            InstantCommand({ drone.loadDrone() })
+            this.keymap.loadDroneMap, InstantCommand({ drone.loadDrone() })
         )
 
 

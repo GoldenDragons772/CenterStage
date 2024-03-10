@@ -30,7 +30,7 @@ class BackboardDamper {
      */
     private val exitBound: Float = 25.0f;
 
-    /**
+   /**
      * The maximum distance to the backdrop wherein the damper will apply.
      */
     private val radius: Float = 5.0f;
@@ -43,7 +43,7 @@ class BackboardDamper {
     /**
      * The main function that outputs the speed at which the robot should move, factoring in all calculations etc.
      */
-    fun damp(currentPosition: Pose2d, xSpeed: Float, ySpeed: Float): MutableList<Float>? {
+    fun damp(currentPosition: Pose2d, xSpeed: Double, ySpeed: Double): MutableList<Double>? {
         if (!enabled) return mutableListOf(xSpeed, ySpeed)
         if (lastPosition == null) {
             lastPosition = currentPosition
