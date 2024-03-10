@@ -122,4 +122,12 @@ public class MecanumDriveSubsystem extends SubsystemBase {
         return drive.getLocalizer();
     }
 
+    public void orient() {
+        if (Math.abs(Math.PI * 2 - this.getPoseEstimate().getHeading()) < Math.abs(this.getPoseEstimate().getHeading())) {
+            this.turn(Math.PI * 2 - this.getPoseEstimate().getHeading());
+        } else {
+            this.turn(0 - this.getPoseEstimate().getHeading());
+        }
+    }
+
 }

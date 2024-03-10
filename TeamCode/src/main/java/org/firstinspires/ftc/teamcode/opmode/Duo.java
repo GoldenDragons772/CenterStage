@@ -27,7 +27,8 @@ public class Duo extends CommandOpMode {
                 new Pair<>(GamepadKeys.Button.X, 2),           // Arm Manual Control
                 new Pair<>(GamepadKeys.Button.B, 2),           // Arm Reset
                 new Pair<>(GamepadKeys.Button.Y, 1),           // Shoot
-                new Pair<>(GamepadKeys.Button.X, 1)            // Load
+                new Pair<>(GamepadKeys.Button.X, 1),            // Load
+                new Pair<>(GamepadKeys.Button.RIGHT_STICK_BUTTON,1) // Align to Backdrop
         );
         driveManager = new DriveManager(hardwareMap, keymap, gamepad1, gamepad2);
     }

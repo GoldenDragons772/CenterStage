@@ -27,10 +27,11 @@ public class Solo extends CommandOpMode {
                 new Pair<>(GamepadKeys.Button.DPAD_LEFT, 1),    // Low Position
                 new Pair<>(GamepadKeys.Button.DPAD_UP, 1),     // Top Position
                 new Pair<>(GamepadKeys.Button.DPAD_DOWN, 1),   // Home Position
-                new Pair<>(GamepadKeys.Button.X, 1),           // Arm Manual Control
+                new Pair<>(GamepadKeys.Button.A, 1),           // Arm Manual Control
                 new Pair<>(GamepadKeys.Button.B, 1),           // Arm Reset
                 new Pair<>(GamepadKeys.Button.Y, 1),           // Shoot
-                new Pair<>(GamepadKeys.Button.X, 1)            // Load
+                new Pair<>(GamepadKeys.Button.X, 1),           // Load
+                new Pair<>(GamepadKeys.Button.RIGHT_STICK_BUTTON,1) // Align to Backdrop
         );
         driveManager = new DriveManager(hardwareMap, keymap, gamepad1, gamepad2);
 
