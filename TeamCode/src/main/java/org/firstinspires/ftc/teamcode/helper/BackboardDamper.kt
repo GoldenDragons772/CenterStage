@@ -18,11 +18,11 @@ class BackboardDamper {
     private var lastPosition: Pose2d? = null;
 
     /**
-     *  The position of the backboard. TODO: Fix these values
+     *  The position of the backboard.
      */
     private val backboardPositions: MutableList<Pose2d> = mutableListOf(
-        Pose2d(50.0, 50.0),
-        Pose2d(50.0, -50.0)
+        Pose2d(60.0,  35.0),
+        Pose2d(60.0, -35.0)
     );
 
     /**
@@ -36,6 +36,11 @@ class BackboardDamper {
     private val radius: Float = 5.0f;
 
     /**
+     * The factor by which to damp when all requirements are met.
+     */
+    private val factor: Float = .75f;
+
+    /**
      * The main function that outputs the speed at which the robot should move, factoring in all calculations etc.
      */
     fun damp(currentPosition: Pose2d, xSpeed: Float, ySpeed: Float): MutableList<Float>? {
@@ -47,7 +52,7 @@ class BackboardDamper {
         if (!inRadius(currentPosition)) return null
         val direction = calculateDirection(currentPosition)
         if (canExit(direction)) return null
-        TODO("I went to sleep here")
+        return mutableListOf(xSpeed*factor, ySpeed*factor)
     }
 
     /**
