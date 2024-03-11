@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.helper
 import com.arcrobotics.ftclib.command.Command
 import com.arcrobotics.ftclib.command.CommandScheduler
 import com.arcrobotics.ftclib.command.InstantCommand
-import com.arcrobotics.ftclib.command.button.Trigger
 import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
 import com.qualcomm.robotcore.hardware.DcMotor
@@ -19,8 +18,11 @@ import kotlin.math.sign
 
 class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamepad, gamepad2: Gamepad) {
 
+    var precisionDrive = false;
+
     val drive: MecanumDriveSubsystem = MecanumDriveSubsystem(MainMecanumDrive(hardwareMap), false)
-    private val intake: IntakeSubsystem = IntakeSubsystem(hardwareMap)
+    val intake: IntakeSubsystem = IntakeSubsystem(hardwareMap)
+    val linkTake: LinkTakeSubsystem = LinkTakeSubsystem(hardwareMap)
     private val bucketPivot: BucketPivotSubsystem =
         BucketPivotSubsystem(hardwareMap)
     private val dipper: DipperSubsystem =
@@ -40,17 +42,27 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
     fun run() {
         // Run Scheduler.
         CommandScheduler.getInstance().run()
-
         // Drive System
         val strafe: Double = gpad1.gamepad.right_stick_x.pow(2) * sign(gpad1.gamepad.right_stick_x.toDouble())
-        val forward: Double = gpad1.gamepad.right_stick_y.pow(2) * sign(gpad1.gamepad.right_stick_y.toDouble())
+        val forward: Double = (gpad1.gamepad.right_stick_y.pow(2) * sign(gpad1.gamepad.right_stick_y.toDouble()))
         val spin: Double = (gpad1.gamepad.left_stick_x.pow(2) * sign(gpad1.gamepad.left_stick_x.toDouble()) * 0.90)
 
-        val speedMultiplier = 1.0
+
+
+        var speedMultiplier = if(precisionDrive && forward > 0) {
+            0.2;
+        } else {
+            1.0;
+        }
+
 
         drive.drive(
-            forward * speedMultiplier, strafe * speedMultiplier, spin * speedMultiplier
+            forward * speedMultiplier, strafe, spin
         )
+
+        // Update Current Pos
+        drive.update()
+
 
 //        // Manual Arm Control (Make sure to Un-Lock First)
 //        val armPower = (gpad2.gamepad.right_trigger - gpad2.gamepad.left_trigger).toDouble()
@@ -58,7 +70,8 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
 //            armMotor.setArmPower(armPower)
 //        }
 
-        drive.update()
+
+
 
         val poseEstimate = drive.poseEstimate
 
@@ -75,7 +88,11 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
     private fun initializeBindings() {
         // Intake: In
         getGamepad(this.keymap.intakeMap.second).getGamepadButton(this.keymap.intakeMap.first)
-            .whenHeld(InstantCommand({ intake.runIntake() })).whenReleased(InstantCommand({ intake.stopIntake() }))
+            .whenPressed(InstantCommand({
+                intake.runIntake()
+            })).whenReleased(InstantCommand({
+                    intake.stopIntake()
+            }))
         // Intake: Dispense
         getGamepad(this.keymap.dispenseMap.second).getGamepadButton(this.keymap.dispenseMap.first)
             .whenHeld(InstantCommand({ intake.dispenseIntake() })).whenReleased(InstantCommand({ intake.stopIntake() }))
@@ -131,7 +148,11 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
             InstantCommand({ drone.loadDrone() })
         )
 
-
+        // Precision Drive
+        setPressedBinding(
+                this.keymap.precisionDriveMap,
+                InstantCommand({precisionDrive = !precisionDrive})
+        )
     }
 
     // Keymap. values are given as a pair of the button and the gamepad number.
@@ -148,6 +169,7 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
         val disableManualControlMap: Pair<GamepadKeys.Button, Int>,
         val shootDroneMap: Pair<GamepadKeys.Button, Int>,
         val loadDroneMap: Pair<GamepadKeys.Button, Int>,
+        val precisionDriveMap: Pair<GamepadKeys.Button, Int>,
     )
 
 

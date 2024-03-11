@@ -1,11 +1,15 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import kotlin.Pair;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.helper.DriveManager;
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.TrajectoryFollowerCommand;
 
@@ -15,9 +19,13 @@ public class Solo extends CommandOpMode {
     TrajectoryFollowerCommand driveToBackDropBlue;
     DriveManager driveManager;
 
+    Telemetry telemetry;
+
     @Override
     public void initialize() {
-//        Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
+
+        telemetry = FtcDashboard.getInstance().getTelemetry();
+
         DriveManager.Keymap keymap = new DriveManager.Keymap(
                 new Pair<>(GamepadKeys.Button.RIGHT_BUMPER, 1), // Run intake
                 new Pair<>(GamepadKeys.Button.LEFT_BUMPER, 1), // Run dispense
@@ -30,7 +38,8 @@ public class Solo extends CommandOpMode {
                 new Pair<>(GamepadKeys.Button.X, 1),           // Arm Manual Control
                 new Pair<>(GamepadKeys.Button.B, 1),           // Arm Reset
                 new Pair<>(GamepadKeys.Button.Y, 1),           // Shoot
-                new Pair<>(GamepadKeys.Button.X, 1)            // Load
+                new Pair<>(GamepadKeys.Button.X, 1),           // Load
+                new Pair<>(GamepadKeys.Button.RIGHT_STICK_BUTTON, 1) // Precision Drive
         );
         driveManager = new DriveManager(hardwareMap, keymap, gamepad1, gamepad2);
 
@@ -72,5 +81,23 @@ public class Solo extends CommandOpMode {
 ////            telemetry.addData("DipperRightServo", dipper.rightDipperServo.getPosition());
 ////            telemetry.addData("DipperLeftServo", dipper.leftDipperServo.getPosition());
 //        telemetry.update();
+
+
+        // Control Intake via Triggers
+        if(!gamepad1.left_bumper) {
+            if(!gamepad1.right_bumper) {
+                if(gamepad1.right_trigger > 0.1) {
+                    // Square the input for better control
+                    double intakePower = Math.pow(gamepad1.right_trigger, 2);
+                    driveManager.getLinkTake().setArmPosRaw(intakePower * 0.75);
+                    driveManager.getIntake().runIntake();
+                } else {
+                    driveManager.getLinkTake().setArmPosRaw(0.2);
+                    driveManager.getIntake().stopIntake();
+                }
+            }
+        }
+
+        telemetry.addData("Intake Power", gamepad1.right_trigger);
     }
 }
