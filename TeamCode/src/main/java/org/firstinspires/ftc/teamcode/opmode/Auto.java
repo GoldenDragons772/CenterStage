@@ -270,6 +270,11 @@ public class Auto extends LinearOpMode {
                 .back(10)
                 .lineToLinearHeading(new Pose2d(-35, -10 * reflection, Math.toRadians(180)))
                 .lineToConstantHeading(new Vector2d(10, -10 * reflection))
+                .addSpatialMarker(new Vector2d(10, -10 * reflection), () -> {
+                    armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.LOW);
+                    dipper.setDipperPosition(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
+                    bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
+                })
                 .build();
 
         TrajectorySequence LD_BACKBOARD = drive.trajectorySequenceBuilder(LD_CARRIER.end())

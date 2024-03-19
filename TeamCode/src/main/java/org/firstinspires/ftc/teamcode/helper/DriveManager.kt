@@ -64,15 +64,6 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
         drive.update()
 
 
-//        // Manual Arm Control (Make sure to Un-Lock First)
-//        val armPower = (gpad2.gamepad.right_trigger - gpad2.gamepad.left_trigger).toDouble()
-//        if (armPower > 0.1 || armPower < -0.1) {
-//            armMotor.setArmPower(armPower)
-//        }
-
-
-
-
         val poseEstimate = drive.poseEstimate
 
     }
@@ -127,31 +118,43 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
             this.keymap.homePositionMap,
             CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.HOME)
         )
-//        // Arm Manual Control: Enable
-//        setPressedBinding(
-//            this.keymap.enableManualControlMap,
-//            InstantCommand({ enableManualControl() })
-//        )
-//        // Arm Manual Control: Disable
-//        setPressedBinding(
-//            this.keymap.disableManualControlMap,
-//            InstantCommand({ disableManualControl(this.keymap.disableManualControlMap.second) })
-//        )
-        // Drone: Shoot
+        // Increment Arm Position
         setPressedBinding(
-            this.keymap.shootDroneMap,
-            InstantCommand({ drone.shootDrone() })
+            this.keymap.incrementArmPosMap,
+            InstantCommand({ armMotor.incrementArmPos() })
         )
-        // Drone: Load
+        // Decrement Arm Position
         setPressedBinding(
-            this.keymap.loadDroneMap,
-            InstantCommand({ drone.loadDrone() })
+            this.keymap.decrementArmPosMap,
+            InstantCommand({ armMotor.decrementArmPos() })
         )
+//        // Drone: Shoot
+//        setPressedBinding(
+//            this.keymap.shootDroneMap,
+//            InstantCommand({ drone.shootDrone() })
+//        )
+//        // Drone: Load
+//        setPressedBinding(
+//            this.keymap.loadDroneMap,
+//            InstantCommand({ drone.loadDrone() })
+//        )
 
         // Precision Drive
         setPressedBinding(
                 this.keymap.precisionDriveMap,
                 InstantCommand({precisionDrive = !precisionDrive})
+        )
+
+        // Increment Link Take Position
+        setPressedBinding(
+            this.keymap.incrementLinkTakePosMap,
+            InstantCommand({ linkTake.incrementLinkTakePos() })
+        )
+
+        // Decrement Link Take Position
+        setPressedBinding(
+            this.keymap.decrementLinkTakePosMap,
+            InstantCommand({ linkTake.decrementLinkTakePos() })
         )
     }
 
@@ -165,11 +168,11 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
         val lowPositionMap: Pair<GamepadKeys.Button, Int>,
         val highPositionMap: Pair<GamepadKeys.Button, Int>,
         val homePositionMap: Pair<GamepadKeys.Button, Int>,
-        val enableManualControlMap: Pair<GamepadKeys.Button, Int>,
-        val disableManualControlMap: Pair<GamepadKeys.Button, Int>,
-        val shootDroneMap: Pair<GamepadKeys.Button, Int>,
-        val loadDroneMap: Pair<GamepadKeys.Button, Int>,
         val precisionDriveMap: Pair<GamepadKeys.Button, Int>,
+        val incrementArmPosMap: Pair<GamepadKeys.Button, Int>,
+        val decrementArmPosMap: Pair<GamepadKeys.Button, Int>,
+        val incrementLinkTakePosMap: Pair<GamepadKeys.Button, Int>,
+        val decrementLinkTakePosMap: Pair<GamepadKeys.Button, Int>
     )
 
 

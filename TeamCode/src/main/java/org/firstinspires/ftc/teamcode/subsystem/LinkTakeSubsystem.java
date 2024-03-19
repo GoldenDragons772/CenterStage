@@ -28,7 +28,7 @@ public class LinkTakeSubsystem extends SubsystemBase {
         linkTake.setPosition(servoLinkHomePos);
     }
 
-    public void setArmPos(LinkPosition pos) {
+    public void setLinkTakePos(LinkPosition pos) {
         switch (pos) {
             case HOME:
                 linkTake.setPosition(servoLinkHomePos);
@@ -39,7 +39,15 @@ public class LinkTakeSubsystem extends SubsystemBase {
         }
     }
 
-    public void setArmPosRaw(double pos) {
+    public void incrementLinkTakePos() {
+        linkTake.setPosition(linkTake.getPosition() + 0.1);
+    }
+
+    public void decrementLinkTakePos() {
+        linkTake.setPosition(linkTake.getPosition() - 0.1);
+    }
+
+    public void setLinkTakePosRaw(double pos) {
         linkTake.setPosition(pos);
     }
 }

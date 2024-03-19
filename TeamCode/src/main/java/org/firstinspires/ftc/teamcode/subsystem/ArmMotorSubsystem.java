@@ -19,7 +19,8 @@ public class ArmMotorSubsystem implements Subsystem {
     TimerTask tt;
 
     public enum ArmPos {
-        HIGH(2200),
+        HANG(2300),
+        HIGH(1750),
         MIDDLE(1250),
         LOW(750),
         HOME(0);
@@ -119,16 +120,36 @@ public class ArmMotorSubsystem implements Subsystem {
         }
     }
 
-    public void setArmManualControl(int power) {
+    public void incrementArmPos() {
 
         setArmMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         int leftArmPos = leftArmMotor.getCurrentPosition();
         int rightArmPos = rightArmMotor.getCurrentPosition();
 
-        leftArmMotor.setTargetPosition(leftArmPos + power);
-        rightArmMotor.setTargetPosition(rightArmPos + power);
+        // Set the Target Position
+        leftArmMotor.setTargetPosition(leftArmPos + 250);
+        rightArmMotor.setTargetPosition(rightArmPos + 250);
 
+        // Set the Power
+        if(leftArmMotor.getPower() == 0 || rightArmMotor.getPower() == 0) {
+            leftArmMotor.setPower(1);
+            rightArmMotor.setPower(1);
+        }
+    }
+
+    public void decrementArmPos() {
+
+        setArmMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        int leftArmPos = leftArmMotor.getCurrentPosition();
+        int rightArmPos = rightArmMotor.getCurrentPosition();
+
+        // Set the Target Position
+        leftArmMotor.setTargetPosition(leftArmPos - 250);
+        rightArmMotor.setTargetPosition(rightArmPos - 250);
+
+        // Set the Power
         if(leftArmMotor.getPower() == 0 || rightArmMotor.getPower() == 0) {
             leftArmMotor.setPower(1);
             rightArmMotor.setPower(1);

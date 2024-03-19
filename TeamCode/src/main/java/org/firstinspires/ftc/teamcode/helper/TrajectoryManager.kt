@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.helper
 
 import com.acmerobotics.roadrunner.geometry.Pose2d
-import org.firstinspires.ftc.teamcode.subsystem.HuskySubsystem.SpikeLocation
 import org.firstinspires.ftc.teamcode.vision.PropDetectionPipeline
 
 class TrajectoryManager {

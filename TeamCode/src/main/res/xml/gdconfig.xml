@@ -19,9 +19,9 @@
             <goBILDA5202SeriesMotor name="LeftArmMotor" port="0" />
             <goBILDA5202SeriesMotor name="IntakeMotor" port="1" />
             <goBILDA5202SeriesMotor name="RightArmMotor" port="2" />
-            <Servo name="Plane" port="3" />
-            <Servo name="RDipper" port="4" />
-            <Servo name="RBPivot" port="5" />
+            <Servo name="RDipper" port="0" />
+            <Servo name="RBPivot" port="2" />
+            <Servo name="Plane" port="4" />
         </LynxModule>
     </LynxUsbDevice>
 </Robot>

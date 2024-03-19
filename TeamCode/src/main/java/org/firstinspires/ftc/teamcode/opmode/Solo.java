@@ -19,28 +19,25 @@ public class Solo extends CommandOpMode {
     TrajectoryFollowerCommand driveToBackDropBlue;
     DriveManager driveManager;
 
-    Telemetry telemetry;
-
     @Override
     public void initialize() {
-
-        telemetry = FtcDashboard.getInstance().getTelemetry();
-
         DriveManager.Keymap keymap = new DriveManager.Keymap(
                 new Pair<>(GamepadKeys.Button.RIGHT_BUMPER, 1), // Run intake
                 new Pair<>(GamepadKeys.Button.LEFT_BUMPER, 1), // Run dispense
-                new Pair<>(GamepadKeys.Button.DPAD_UP, 1),     // Climb
-                new Pair<>(GamepadKeys.Button.DPAD_DOWN, 1),   // Hang
+                new Pair<>(GamepadKeys.Button.DPAD_UP, 2),     // Climb
+                new Pair<>(GamepadKeys.Button.DPAD_DOWN, 2),   // Hang
                 new Pair<>(GamepadKeys.Button.DPAD_RIGHT, 1),  // Middle Position
                 new Pair<>(GamepadKeys.Button.DPAD_LEFT, 1),    // Low Position
                 new Pair<>(GamepadKeys.Button.DPAD_UP, 1),     // Top Position
                 new Pair<>(GamepadKeys.Button.DPAD_DOWN, 1),   // Home Position
-                new Pair<>(GamepadKeys.Button.X, 1),           // Arm Manual Control
-                new Pair<>(GamepadKeys.Button.B, 1),           // Arm Reset
-                new Pair<>(GamepadKeys.Button.Y, 1),           // Shoot
-                new Pair<>(GamepadKeys.Button.X, 1),           // Load
-                new Pair<>(GamepadKeys.Button.RIGHT_STICK_BUTTON, 1) // Precision Drive
+                new Pair<>(GamepadKeys.Button.RIGHT_STICK_BUTTON, 1), // Precision Drive
+                new Pair<>(GamepadKeys.Button.Y, 1),           // Increment ArmPos
+                new Pair<>(GamepadKeys.Button.A, 1),            // Decrement ArmPos
+                new Pair<>(GamepadKeys.Button.B, 1),            // Increment LinkTakePos
+                new Pair<>(GamepadKeys.Button.X, 1)            // Decrement LinkTakePos
         );
+
+
         driveManager = new DriveManager(hardwareMap, keymap, gamepad1, gamepad2);
 
         // Auto Drive Cmds
@@ -88,16 +85,16 @@ public class Solo extends CommandOpMode {
             if(!gamepad1.right_bumper) {
                 if(gamepad1.right_trigger > 0.1) {
                     // Square the input for better control
-                    double intakePower = Math.pow(gamepad1.right_trigger, 2);
-                    driveManager.getLinkTake().setArmPosRaw(intakePower * 0.75);
+                    double intakePosition = Math.max(0.3, Math.min(0.75, Math.pow(gamepad1.right_trigger, 2) * 0.75));
+                    driveManager.getLinkTake().setLinkTakePosRaw(intakePosition);
                     driveManager.getIntake().runIntake();
+                    telemetry.addData("LinkTake Position", intakePosition);
                 } else {
-                    driveManager.getLinkTake().setArmPosRaw(0.2);
+                    driveManager.getLinkTake().setLinkTakePosRaw(0.3);
                     driveManager.getIntake().stopIntake();
                 }
             }
         }
-
-        telemetry.addData("Intake Power", gamepad1.right_trigger);
+        telemetry.update();
     }
 }
