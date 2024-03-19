@@ -1,7 +1,8 @@
 # Centerstage
-**Welcome to GoldenDragons FTC Team #772 from SCGSSM 🐉!**
-This repo contains TeamCode and information regarding the Robot used for the Year 2024 Centerstage Game.
+[![Java CI with Gradle](https://github.com/GoldenDragons772/Centerstage/actions/workflows/gradle.yml/badge.svg)](https://github.com/GoldenDragons772/Centerstage/actions/workflows/gradle.yml)
 
+**Welcome to GoldenDragons FTC Team [#772](https://ftcscout.org/teams/772) from [SCGSSM](https://www.scgssm.org/) 🐉!**
+#### This repo contains TeamCode and information regarding the Robot used for the Year 2023-24 Centerstage Game.
 ---
 ### Getting Started
 1. Install [Android Studio](https://developer.android.com/studio/install).
