@@ -11,6 +11,7 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -34,6 +35,7 @@ import static org.firstinspires.ftc.teamcode.helper.TrajectoryManager.*;
 
 import androidx.core.os.TraceKt;
 
+@Disabled
 @Autonomous(name = "GDAuto", group = "Auto")
 public class Auto extends LinearOpMode {
 

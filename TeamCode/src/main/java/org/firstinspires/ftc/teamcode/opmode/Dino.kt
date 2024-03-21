@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.arcrobotics.ftclib.command.CommandScheduler
 import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive
@@ -20,6 +21,7 @@ import org.firstinspires.ftc.teamcode.subsystem.subcommand.ClimbCommand
 import kotlin.math.exp
 import kotlin.math.sqrt
 
+@Disabled
 @TeleOp(name = "Diagnostic")
 class Dino : LinearOpMode() {
     private lateinit var mecDrive: MecanumDriveSubsystem

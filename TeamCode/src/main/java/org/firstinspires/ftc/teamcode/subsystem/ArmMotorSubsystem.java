@@ -19,7 +19,7 @@ public class ArmMotorSubsystem implements Subsystem {
     TimerTask tt;
 
     public enum ArmPos {
-        HANG(2300),
+        HANG(2600),
         HIGH(1750),
         MIDDLE(1250),
         LOW(750),
