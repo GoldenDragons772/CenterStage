@@ -8,9 +8,23 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Config
 public class LinkTakeSubsystem extends SubsystemBase {
 
+    public static LinkPosition linkPos = LinkPosition.HOME;
+
     public enum LinkPosition {
-        HOME,
-        FLOOR
+        HOME(0.3),
+        LOW(0.5),
+        MID(0.6),
+        FLOOR(0.7);
+
+        final private double position;
+
+        LinkPosition(double position) {
+            this.position = position;
+        }
+
+        public double getPosition() {
+            return this.position;
+        }
     }
 
     public static double servoLinkHomePos = 0;
@@ -30,22 +44,24 @@ public class LinkTakeSubsystem extends SubsystemBase {
     }
 
     public void setLinkTakePos(LinkPosition pos) {
-        switch (pos) {
-            case HOME:
-                linkTake.setPosition(servoLinkHomePos);
-                break;
-            case FLOOR:
-                linkTake.setPosition(servoFloorPos);
-                break;
-        }
+        linkPos = pos;
+        linkTake.setPosition(pos.getPosition());
     }
 
     public void incrementLinkTakePos() {
-        linkTake.setPosition(linkTake.getPosition() + 0.1);
+        //linkTake.setPosition(linkTake.getPosition() + 0.1);
+        int nextPos = linkPos.ordinal() + 1;
+        if (nextPos < LinkPosition.values().length) {
+            setLinkTakePos(LinkPosition.values()[nextPos]);
+        }
     }
 
     public void decrementLinkTakePos() {
-        linkTake.setPosition(linkTake.getPosition() - 0.1);
+        //linkTake.setPosition(linkTake.getPosition() - 0.1);
+        int nextPos = linkPos.ordinal() - 1;
+        if (nextPos >= 0) {
+            setLinkTakePos(LinkPosition.values()[nextPos]);
+        }
     }
 
     public void setLinkTakePosRaw(double pos) {

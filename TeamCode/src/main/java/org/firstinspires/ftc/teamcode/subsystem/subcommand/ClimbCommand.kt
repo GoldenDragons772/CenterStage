@@ -19,8 +19,8 @@ class ClimbCommand(
 
     override fun initialize() {
         dipper.setDipperPosition(BucketPivotSubsystem.BucketPivotPos.LOADING_POS)
-        bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.LOADING_POS)
-        armMotor.setArmToPos(if (climb) ArmMotorSubsystem.ArmPos.HANG.position else 100)
+        bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS)
+        armMotor.setArmToPos(if (climb) ArmMotorSubsystem.ArmPos.CLIMB else ArmMotorSubsystem.ArmPos.HANG)
     }
 
 }

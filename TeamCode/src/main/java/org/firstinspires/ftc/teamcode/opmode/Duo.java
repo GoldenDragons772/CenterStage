@@ -1,14 +1,10 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.path.Path;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import kotlin.Pair;
 import org.firstinspires.ftc.teamcode.helper.DriveManager;
-import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystem.LinkTakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.MecanumDriveSubsystem;
 
@@ -65,12 +61,12 @@ public class Duo extends CommandOpMode {
             if(!gamepad2.right_bumper) {
                 if(gamepad2.right_trigger > 0.1) {
                     // Square the input for better control
-                    double intakePosition = Math.max(0.4, Math.min(0.75, Math.pow(gamepad2.right_trigger, 2) * 0.75));
+                    double intakePosition = Math.max(0.4, Math.min(0.75, Math.pow(gamepad2.right_trigger * 0.75, 2)));
                     driveManager.getLinkTake().setLinkTakePosRaw(intakePosition);
                     driveManager.getIntake().runIntake();
                     telemetry.addData("LinkTake Position", intakePosition);
                 } else {
-                    driveManager.getLinkTake().setLinkTakePosRaw(0.4);
+                    driveManager.getLinkTake().setLinkTakePos(LinkTakeSubsystem.linkPos);
                     driveManager.getIntake().stopIntake();
                 }
             }

@@ -39,7 +39,9 @@ public class Auto extends LinearOpMode {
 
     private TrajectoryFollowerCommand<TrajectorySequence> follower, driveToBackdrop, driveToSpike, carrier, park;
     private PropDetectionPipeline detectProp;
-    private PropDetectionPipeline.propPos currentSpikeLocation;
+    private PropDetectionPipeline.propPos currentSpikeLocation, lastSpikeLocation;
+
+    private boolean updateAutoChnage = false;
 
     public static Alliance alliance;
     public static Distance distance;
@@ -118,37 +120,52 @@ public class Auto extends LinearOpMode {
 
             currentSpikeLocation = detectProp.getCurrentPropPos();//husky.getSpikeLocation(alliance, distance);
 
+            // Check if the Spike Location has changed
+            if (currentSpikeLocation != lastSpikeLocation) {
+                updateAutoChnage = true;
+                lastSpikeLocation = currentSpikeLocation;
+            }
+
             // Auto Selector
             if (gamepad1.dpad_right) { // Long Distance Red Auto
                 distance = Distance.LONG;
                 alliance = Alliance.RED;
                 curAuto = "LD_RED";
+                updateAutoChnage = true;
             } else if (gamepad1.dpad_left) { // Short Distance Red Auto
                 alliance = Alliance.RED;
                 distance = Distance.SHORT;
                 curAuto = "SD_RED";
+                updateAutoChnage = true;
             } else if (gamepad1.dpad_up) { // Long Distance Blue Auto
                 alliance = Alliance.BLUE;
                 distance = Distance.LONG;
                 curAuto = "LD_BLUE";
+                updateAutoChnage = true;
             } else if (gamepad1.dpad_down) { // Short Distance Blue Auto
                 alliance = Alliance.BLUE;
                 distance = Distance.SHORT;
                 curAuto = "SD_BLUE";
+                updateAutoChnage = true;
             }
 
-            // check if Distance is Long
-            if(distance == Distance.LONG) {
-                carrier = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.CARRIER));
+            if(updateAutoChnage) {
+                // check if Distance is Long
+                if(distance == Distance.LONG) {
+                    carrier = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.CARRIER));
+                }
+
+                follower = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.FOLLOW));
+                backDropPos = getBackdropPos();
+
+                driveToSpike = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.SPIKE));
+                driveToBackdrop = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.BACKBOARD));
+
+                park = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.PARK));
+
+                // Set update to false
+                updateAutoChnage = false;
             }
-
-            follower = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.FOLLOW));
-            backDropPos = getBackdropPos();
-
-            driveToSpike = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.SPIKE));
-            driveToBackdrop = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.BACKBOARD));
-
-            park = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.PARK));
 
             telemetry.addData("CurrentSpike Location", currentSpikeLocation.toString());
             telemetry.addData("Current Auto", curAuto);
@@ -270,17 +287,11 @@ public class Auto extends LinearOpMode {
                 .back(10)
                 .lineToLinearHeading(new Pose2d(-35, -10 * reflection, Math.toRadians(180)))
                 .lineToConstantHeading(new Vector2d(10, -10 * reflection))
-                .addSpatialMarker(new Vector2d(10, -10 * reflection), () -> {
-                    armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.LOW);
-                    dipper.setDipperPosition(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
-                    bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
-                })
                 .build();
 
         TrajectorySequence LD_BACKBOARD = drive.trajectorySequenceBuilder(LD_CARRIER.end())
                 .setConstraints(new AngularVelocityConstraint(30), new ProfileAccelerationConstraint(30))
                 .splineToConstantHeading(new Vector2d(47, -35 * reflection), Math.toRadians(270 * reflection))
-                //.splineToConstantHeading(new Vector2d(backDropPos.getX(), backDropPos.getY()), Math.toRadians(-180))
                 .lineToLinearHeading(backDropPos)
                 .build();
 

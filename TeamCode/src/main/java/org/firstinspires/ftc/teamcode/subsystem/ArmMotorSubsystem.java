@@ -13,17 +13,19 @@ import java.util.TimerTask;
 @Config
 public class ArmMotorSubsystem implements Subsystem {
     public double correction;
-    private ArmPos armPos = ArmPos.HOME;
+    public static ArmPos armPos = ArmPos.HOME;
     public DcMotorEx leftArmMotor, rightArmMotor;
     Timer t;
     TimerTask tt;
 
     public enum ArmPos {
-        HANG(2300),
-        HIGH(1750),
-        MIDDLE(1250),
+        HOME(0),
+        HANG(100),
         LOW(750),
-        HOME(0);
+        MIDDLE(1250),
+        HIGH(1750),
+        CLIMB(2300);
+
         final private int position;
 
         ArmPos(int position) {
@@ -56,6 +58,7 @@ public class ArmMotorSubsystem implements Subsystem {
     }
 
     public void setArmToPos(ArmPos pos) {
+        this.armPos = pos;
         this.setArmToPos(pos.getPosition());
     }
 
@@ -66,7 +69,7 @@ public class ArmMotorSubsystem implements Subsystem {
         rightArmMotor.setPower(0);
     }
 
-    public void setArmToPos(int pos) {
+    private void setArmToPos(int pos) {
 
         leftArmMotor.setTargetPosition(pos);
         rightArmMotor.setTargetPosition(pos);
@@ -122,14 +125,14 @@ public class ArmMotorSubsystem implements Subsystem {
 
     public void incrementArmPos() {
 
-        setArmMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        int leftArmPos = leftArmMotor.getCurrentPosition();
-        int rightArmPos = rightArmMotor.getCurrentPosition();
+        //setArmMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // Set the Target Position
-        leftArmMotor.setTargetPosition(leftArmPos + 250);
-        rightArmMotor.setTargetPosition(rightArmPos + 250);
+        int nextPos = armPos.ordinal() + 1;
+        if(nextPos < ArmPos.values().length) {
+            armPos = ArmPos.values()[nextPos];
+            setArmToPos(armPos);
+        }
 
         // Set the Power
         if(leftArmMotor.getPower() == 0 || rightArmMotor.getPower() == 0) {
@@ -140,14 +143,14 @@ public class ArmMotorSubsystem implements Subsystem {
 
     public void decrementArmPos() {
 
-        setArmMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        int leftArmPos = leftArmMotor.getCurrentPosition();
-        int rightArmPos = rightArmMotor.getCurrentPosition();
+        //setArmMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // Set the Target Position
-        leftArmMotor.setTargetPosition(leftArmPos - 250);
-        rightArmMotor.setTargetPosition(rightArmPos - 250);
+        int nextPos = armPos.ordinal() - 1;
+        if(nextPos >= 0) {
+            armPos = ArmPos.values()[nextPos];
+            setArmToPos(armPos);
+        }
 
         // Set the Power
         if(leftArmMotor.getPower() == 0 || rightArmMotor.getPower() == 0) {

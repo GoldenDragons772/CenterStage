@@ -1,15 +1,11 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import kotlin.Pair;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.helper.DriveManager;
+import org.firstinspires.ftc.teamcode.subsystem.LinkTakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.TrajectoryFollowerCommand;
 
 @TeleOp(name = "Solo", group = "TeleOp")
@@ -89,7 +85,7 @@ public class Solo extends CommandOpMode {
                     driveManager.getIntake().runIntake();
                     telemetry.addData("LinkTake Position", intakePosition);
                 } else {
-                    driveManager.getLinkTake().setLinkTakePosRaw(0.3);
+                    driveManager.getLinkTake().setLinkTakePos(LinkTakeSubsystem.linkPos);
                     driveManager.getIntake().stopIntake();
                 }
             }
