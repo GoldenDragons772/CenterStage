@@ -66,12 +66,12 @@ public class Duo extends CommandOpMode {
             if(!gamepad2.right_bumper) {
                 if(gamepad2.right_trigger > 0.1) {
                     // Square the input for better control
-                    double intakePosition = Math.max(0.4, Math.min(0.75, Math.pow(gamepad2.right_trigger, 2) * 0.75));
+                    double intakePosition = Math.max(0.4, Math.min(0.75, Math.pow(gamepad2.right_trigger * 0.75, 2)));
                     driveManager.getLinkTake().setLinkTakePosRaw(intakePosition);
                     driveManager.getIntake().runIntake();
                     telemetry.addData("LinkTake Position", intakePosition);
                 } else {
-                    driveManager.getLinkTake().setLinkTakePosRaw(0.4);
+                    driveManager.getLinkTake().setLinkTakePos(LinkTakeSubsystem.linkPos);
                     driveManager.getIntake().stopIntake();
                 }
             }

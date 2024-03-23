@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
+import static org.firstinspires.ftc.teamcode.subsystem.ArmMotorSubsystem.ArmPos.HOME;
+
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.*;
 
@@ -24,7 +26,9 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void dispenseIntake() {
-        intakeMotor.setPower(-0.2);
+        if(ArmMotorSubsystem.armPos == HOME) {
+            intakeMotor.setPower(-0.2);
+        }
         bucketServo.setPower(-1);
     }
 
