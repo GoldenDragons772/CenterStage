@@ -12,8 +12,9 @@ public class LinkTakeSubsystem extends SubsystemBase {
 
     public enum LinkPosition {
         HOME(0.3),
-        LOW(0.5),
-        MID(0.6),
+        STK1(0.49),
+        STK2(0.6),
+        STK3(0.7),
         FLOOR(0.7);
 
         final private double position;
