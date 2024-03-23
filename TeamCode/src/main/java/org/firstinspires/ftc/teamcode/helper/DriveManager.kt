@@ -12,13 +12,14 @@ import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive
 import org.firstinspires.ftc.teamcode.subsystem.*
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.CarriageCommand
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.ClimbCommand
+import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.sign
 
 
 class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamepad, gamepad2: Gamepad) {
 
-    var precisionDrive = false;
+    private var precisionDrive = false;
 
     val drive: MecanumDriveSubsystem = MecanumDriveSubsystem(MainMecanumDrive(hardwareMap), false)
     val intake: IntakeSubsystem = IntakeSubsystem(hardwareMap)
@@ -48,16 +49,12 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
         val spin: Double = (gpad1.gamepad.left_stick_x.pow(2) * sign(gpad1.gamepad.left_stick_x.toDouble()) * 0.90)
 
 
-
-        val speedMultiplier = if(precisionDrive) {
-            0.2;
-        } else {
-            1.0;
-        }
+        val minSlowdown = .2// minimum speed is 20%
+        val speedMultiplier = 1 - ((getGamepad(keymap.precisionDriveMap.second).getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) + 1)/2)*(1- minSlowdown)
 
 
         drive.drive(
-            forward * speedMultiplier, strafe, spin
+            forward * speedMultiplier, strafe* speedMultiplier, spin
         )
 
         // Update Current Pos
@@ -142,7 +139,9 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
         // Precision Drive
         setPressedBinding(
                 this.keymap.precisionDriveMap,
-                InstantCommand({precisionDrive = !precisionDrive})
+                InstantCommand({
+                    precisionDrive = !precisionDrive
+                })
         )
 
         // Increment Link Take Position

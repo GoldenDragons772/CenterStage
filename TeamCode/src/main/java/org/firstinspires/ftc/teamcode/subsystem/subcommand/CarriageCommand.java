@@ -35,7 +35,6 @@ public class CarriageCommand extends CommandBase {
     @Override
     public void initialize() {
         BucketPivotSubsystem.BucketPivotPos bucketPivotPos = armPos == ArmMotorSubsystem.ArmPos.HOME ? LOADING_POS : DROPPING_POS;
-        LinkTakeSubsystem.LinkPosition initialLinkTakePosition = linkTakeSubsystem.pos
         if (bucketPivotPos == LOADING_POS){
             linkTakeSubsystem.setLinkTakePos(LinkTakeSubsystem.LinkPosition.FLOOR);
         }
