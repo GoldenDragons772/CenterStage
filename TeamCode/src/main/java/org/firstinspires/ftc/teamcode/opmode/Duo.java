@@ -1,15 +1,10 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.path.Path;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import kotlin.Pair;
 import org.firstinspires.ftc.teamcode.helper.DriveManager;
-import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystem.LinkTakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.MecanumDriveSubsystem;
 
