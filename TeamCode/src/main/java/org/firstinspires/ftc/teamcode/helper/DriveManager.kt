@@ -49,7 +49,7 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
 
 
 
-        var speedMultiplier = if(precisionDrive && forward > 0) {
+        val speedMultiplier = if(precisionDrive) {
             0.2;
         } else {
             1.0;
@@ -101,22 +101,22 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
         // Arms: Low
         setPressedBinding(
             this.keymap.lowPositionMap,
-            CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.LOW)
+            CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.LOW, linkTake)
         )
         // Arms: Middle
         setPressedBinding(
             this.keymap.middlePositionMap,
-            CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.MIDDLE)
+            CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.MIDDLE,linkTake)
         )
         // Arms: High
         setPressedBinding(
             this.keymap.highPositionMap,
-            CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.HIGH)
+            CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.HIGH,linkTake)
         )
         // Arms: Home
         setPressedBinding(
             this.keymap.homePositionMap,
-            CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.HOME)
+            CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.HOME,linkTake)
         )
         // Increment Arm Position
         setPressedBinding(

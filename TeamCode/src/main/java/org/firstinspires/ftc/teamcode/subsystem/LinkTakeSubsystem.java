@@ -16,6 +16,7 @@ public class LinkTakeSubsystem extends SubsystemBase {
     public static double servoLinkHomePos = 0;
 
     public static double servoFloorPos = 0.7;
+    public static LinkPosition position;
 
     Servo linkTake;
     public LinkTakeSubsystem(HardwareMap hw) {
