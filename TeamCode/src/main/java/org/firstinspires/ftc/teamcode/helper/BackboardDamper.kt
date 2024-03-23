@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode.helper
 
+import com.acmerobotics.dashboard.FtcDashboard
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket
 import com.acmerobotics.roadrunner.geometry.Pose2d
-import kotlin.math.PI
-import kotlin.math.atan2
-import kotlin.math.pow
-import kotlin.math.sqrt
+import org.firstinspires.ftc.robotcore.external.Telemetry
+import kotlin.math.*
 
 class BackboardDamper {
     /**
@@ -21,24 +21,24 @@ class BackboardDamper {
      *  The position of the backboard.
      */
     private val backboardPositions: MutableList<Pose2d> = mutableListOf(
-        Pose2d(60.0,  35.0),
-        Pose2d(60.0, -35.0)
+        Pose2d(59.0,  35.0),
+        Pose2d(59.0, -35.0)
     );
 
     /**
      * The value added and subtracted from the exit direction to create the upper and lower bounds.
      */
-    private val exitBound: Float = 25.0f;
+    private val exitBound: Double = Math.toRadians(70.0);
 
    /**
      * The maximum distance to the backdrop wherein the damper will apply.
      */
-    private val radius: Float = 5.0f;
+    private val radius: Float = 30.0f;
 
     /**
      * The factor by which to damp when all requirements are met.
      */
-    private val factor: Float = .75f;
+    private val factor: Float = .25f;
 
     /**
      * The main function that outputs the speed at which the robot should move, factoring in all calculations etc.
@@ -46,32 +46,55 @@ class BackboardDamper {
     fun damp(currentPosition: Pose2d, xSpeed: Double, ySpeed: Double): MutableList<Double>? {
         if (!enabled) return mutableListOf(xSpeed, ySpeed)
         if (lastPosition == null) {
-            lastPosition = currentPosition
+            lastPosition = Pose2d(-37.0,62.0,Math.toRadians(270.0))
             return null
         }
-        if (!inRadius(currentPosition)) return null
         val direction = calculateDirection(currentPosition)
-        if (canExit(direction)) return null
+        val packet = TelemetryPacket()
+        packetAddDebugDirectionLine(currentPosition, direction, packet)
+        for (i in backboardPositions){
+            packet.fieldOverlay().fillCircle(i.x, i.y, 5.0)
+        }
+
+        val closestBackboard = inRadius(currentPosition)
+        if (closestBackboard == null){
+            lastPosition = currentPosition
+            FtcDashboard.getInstance().sendTelemetryPacket(packet)
+            return null
+        }
+
+
+        if (canExit(direction, currentPosition, closestBackboard)) {
+            lastPosition = currentPosition
+            FtcDashboard.getInstance().sendTelemetryPacket(packet)
+            return null
+        }
+        lastPosition = currentPosition
+        FtcDashboard.getInstance().sendTelemetryPacket(packet)
         return mutableListOf(xSpeed*factor, ySpeed*factor)
+    }
+    private fun packetAddDebugDirectionLine(currentPosition: Pose2d, direction: Double, packet: TelemetryPacket){
+        packet.fieldOverlay().strokeLine(currentPosition.x, currentPosition.y, currentPosition.x + cos(direction)*20, currentPosition.y + sin(direction)*20)
     }
 
     /**
      * Determines if the direction the robot is moving in is within the exit sector.
      */
-    private fun canExit(direction: Double): Boolean {
-        val oppositeDirection = direction + PI
-        return oppositeDirection - exitBound < direction && direction < oppositeDirection + exitBound
+    private fun canExit(direction: Double, currentPosition: Pose2d, closestBackboard: Pose2d): Boolean {
+        val oppositeDirection = atan2((closestBackboard.y - currentPosition.y), (closestBackboard.x - currentPosition.x)) % (2* PI)
+        val remainderDirection = direction % (2*PI)
+        return !(oppositeDirection - exitBound < remainderDirection && remainderDirection < oppositeDirection + exitBound)
     }
 
     /**
      * Determines if the robot is within the radius of a backboard.
      */
-    private fun inRadius(currentPosition: Pose2d): Boolean {
+    private fun inRadius(currentPosition: Pose2d): Pose2d? {
         for (i in backboardPositions) {
             if (distance(currentPosition, i) > radius) continue
-            return true
+            return i
         }
-        return false
+        return null
     }
 
     /**
