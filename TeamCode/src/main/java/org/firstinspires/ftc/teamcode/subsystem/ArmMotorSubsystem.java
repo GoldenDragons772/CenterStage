@@ -21,10 +21,16 @@ public class ArmMotorSubsystem implements Subsystem {
     public enum ArmPos {
         HOME(0),
         HANG(100),
-        LOW(750),
-        MIDDLE(1250),
-        HIGH(1750),
-        CLIMB(2300);
+        SET1(550),
+        LOW(700),
+        MIDDLE(1000),
+        HIGH(1300),
+        HIGHER(1600),
+        TALLER(1900),
+        SET2(2100),
+        CLIMB(2400),
+        SET2HIGHER(2700),
+        SET2TALLER(3000);
 
         final private int position;
 

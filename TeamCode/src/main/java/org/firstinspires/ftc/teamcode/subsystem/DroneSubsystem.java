@@ -8,9 +8,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Config
 public class DroneSubsystem extends SubsystemBase {
 
-    public static double shootingPos = 1;
+    public static double shootingPos = 0.75;
 
-    public static double loadingPos = 0.5;
+    public static double loadingPos = 0.2;
 
     Servo drone;
 

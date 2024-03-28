@@ -5,6 +5,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import kotlin.Pair;
 import org.firstinspires.ftc.teamcode.helper.DriveManager;
+import org.firstinspires.ftc.teamcode.subsystem.ArmMotorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.LinkTakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.TrajectoryFollowerCommand;
 
@@ -16,7 +17,7 @@ public class Solo extends CommandOpMode {
 
     @Override
     public void initialize() {
-        DriveManager.Keymap keymap = new DriveManager.Keymap(
+        DriveManager.Keymap keymap =    new DriveManager.Keymap(
                 new Pair<>(GamepadKeys.Button.RIGHT_BUMPER, 1), // Run intake
                 new Pair<>(GamepadKeys.Button.LEFT_BUMPER, 1), // Run dispense
                 new Pair<>(GamepadKeys.Button.DPAD_UP, 2),     // Climb
@@ -29,7 +30,9 @@ public class Solo extends CommandOpMode {
                 new Pair<>(GamepadKeys.Button.Y, 1),           // Increment ArmPos
                 new Pair<>(GamepadKeys.Button.A, 1),            // Decrement ArmPos
                 new Pair<>(GamepadKeys.Button.B, 1),            // Increment LinkTakePos
-                new Pair<>(GamepadKeys.Button.X, 1)            // Decrement LinkTakePos
+                new Pair<>(GamepadKeys.Button.X, 1),            // Decrement LinkTakePos
+                new Pair<>(GamepadKeys.Button.Y, 2),            // Shoot Drone
+                new Pair<>(GamepadKeys.Button.A, 2)            // Load Drone
         );
 
 
@@ -80,7 +83,7 @@ public class Solo extends CommandOpMode {
             if(!gamepad1.right_bumper) {
                 if(gamepad1.right_trigger > 0.1) {
                     // Square the input for better control
-                    double intakePosition = Math.max(0.3, Math.min(0.75, Math.pow(gamepad1.right_trigger, 2) * 0.75));
+                    double intakePosition = Math.max(0.3, Math.min(1, Math.pow(gamepad1.right_trigger, 2)));
                     driveManager.getLinkTake().setLinkTakePosRaw(intakePosition);
                     driveManager.getIntake().runIntake();
                     telemetry.addData("LinkTake Position", intakePosition);
@@ -90,6 +93,9 @@ public class Solo extends CommandOpMode {
                 }
             }
         }
+
+        telemetry.addData("ArmPos", ArmMotorSubsystem.armPos.name());
+
         telemetry.update();
     }
 }

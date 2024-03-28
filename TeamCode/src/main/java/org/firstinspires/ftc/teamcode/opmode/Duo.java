@@ -5,6 +5,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import kotlin.Pair;
 import org.firstinspires.ftc.teamcode.helper.DriveManager;
+import org.firstinspires.ftc.teamcode.subsystem.ArmMotorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.LinkTakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.MecanumDriveSubsystem;
 
@@ -33,7 +34,9 @@ public class Duo extends CommandOpMode {
                 new Pair<>(GamepadKeys.Button.Y, 2),           // Increment ArmPos
                 new Pair<>(GamepadKeys.Button.A, 2),            // Decrement ArmPos
                 new Pair<>(GamepadKeys.Button.B, 2),            // Increment LinkTakePos
-                new Pair<>(GamepadKeys.Button.X, 2)            // Decrement LinkTakePos
+                new Pair<>(GamepadKeys.Button.X, 2),            // Decrement LinkTakePos,
+                new Pair<>(GamepadKeys.Button.Y, 1),           // Shoot Drone,
+                new Pair<>(GamepadKeys.Button.A, 1)            // Shoot Drone,
         );
         driveManager = new DriveManager(hardwareMap, keymap, gamepad1, gamepad2);
 
@@ -61,7 +64,7 @@ public class Duo extends CommandOpMode {
             if(!gamepad2.right_bumper) {
                 if(gamepad2.right_trigger > 0.1) {
                     // Square the input for better control
-                    double intakePosition = Math.max(0.4, Math.min(0.75, Math.pow(gamepad2.right_trigger * 0.75, 2)));
+                    double intakePosition = Math.max(0.4, Math.min(1, Math.pow(gamepad2.right_trigger, 2)));
                     driveManager.getLinkTake().setLinkTakePosRaw(intakePosition);
                     driveManager.getIntake().runIntake();
                     telemetry.addData("LinkTake Position", intakePosition);

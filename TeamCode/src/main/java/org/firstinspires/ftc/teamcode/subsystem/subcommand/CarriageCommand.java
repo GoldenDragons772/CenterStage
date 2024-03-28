@@ -35,17 +35,8 @@ public class CarriageCommand extends CommandBase {
     @Override
     public void initialize() {
         BucketPivotSubsystem.BucketPivotPos bucketPivotPos = armPos == ArmMotorSubsystem.ArmPos.HOME ? LOADING_POS : DROPPING_POS;
-        if (bucketPivotPos == LOADING_POS){
-            linkTakeSubsystem.setLinkTakePos(LinkTakeSubsystem.LinkPosition.FLOOR);
-        }
         armMotor.setArmToPos(armPos);
         bucketPivot.runBucketPos(bucketPivotPos);
         dipper.setDipperPosition(bucketPivotPos);
     }
-
-//    @Override
-//    public void execute() {
-//
-//
-//    }
 }

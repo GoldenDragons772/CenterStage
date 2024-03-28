@@ -49,12 +49,12 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
         val spin: Double = (gpad1.gamepad.left_stick_x.pow(2) * sign(gpad1.gamepad.left_stick_x.toDouble()) * 0.90)
 
 
-        val minSlowdown = .2// minimum speed is 20%
-        val speedMultiplier = 1 - ((getGamepad(keymap.precisionDriveMap.second).getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) + 1)/2)*(1- minSlowdown)
+//        val minSlowdown = .2// minimum speed is 20%
+//        val speedMultiplier = 1 - ((getGamepad(keymap.precisionDriveMap.second).getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) + 1)/2)*(1- minSlowdown)
 
 
         drive.drive(
-            forward * speedMultiplier, strafe* speedMultiplier, spin
+            forward, strafe, spin
         )
 
         // Update Current Pos
@@ -125,16 +125,16 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
             this.keymap.decrementArmPosMap,
             InstantCommand({ armMotor.decrementArmPos() })
         )
-//        // Drone: Shoot
-//        setPressedBinding(
-//            this.keymap.shootDroneMap,
-//            InstantCommand({ drone.shootDrone() })
-//        )
-//        // Drone: Load
-//        setPressedBinding(
-//            this.keymap.loadDroneMap,
-//            InstantCommand({ drone.loadDrone() })
-//        )
+        // Drone: Shoot
+        setPressedBinding(
+            this.keymap.shootDroneMap,
+            InstantCommand({ drone.shootDrone() })
+        )
+        // Drone: Load
+        setPressedBinding(
+            this.keymap.loadDroneMap,
+            InstantCommand({ drone.loadDrone() })
+        )
 
         // Precision Drive
         setPressedBinding(
@@ -171,7 +171,9 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
         val incrementArmPosMap: Pair<GamepadKeys.Button, Int>,
         val decrementArmPosMap: Pair<GamepadKeys.Button, Int>,
         val incrementLinkTakePosMap: Pair<GamepadKeys.Button, Int>,
-        val decrementLinkTakePosMap: Pair<GamepadKeys.Button, Int>
+        val decrementLinkTakePosMap: Pair<GamepadKeys.Button, Int>,
+        val shootDroneMap: Pair<GamepadKeys.Button, Int>,
+        val loadDroneMap: Pair<GamepadKeys.Button, Int>
     )
 
 
