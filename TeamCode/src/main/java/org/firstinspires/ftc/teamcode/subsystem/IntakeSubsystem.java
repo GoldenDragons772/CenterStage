@@ -12,12 +12,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private final DcMotor intakeMotor;
     private final CRServo bucketServo;
-    private final RevColorSensorV3 bucketSensor;
 
     public IntakeSubsystem(HardwareMap hw) {
         this.intakeMotor = hw.get(DcMotorEx.class, "IntakeMotor");
         this.bucketServo = hw.get(CRServo.class, "Bucket");
-        this.bucketSensor = hw.get(RevColorSensorV3.class, "bucketSense");
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
@@ -27,12 +25,12 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void spikePixel() {
-        intakeMotor.setPower(-0.2);
+        intakeMotor.setPower(-0.3);
     }
 
     public void dispenseIntake() {
         if(ArmMotorSubsystem.armPos == HOME) {
-            intakeMotor.setPower(-0.2);
+            intakeMotor.setPower(-0.3);
         }
         bucketServo.setPower(-1);
     }
@@ -45,13 +43,4 @@ public class IntakeSubsystem extends SubsystemBase {
         bucketServo.setPower(-1);
     }
 
-    public BlinkinSubsystem.PixelColor getCurrentPixel() {
-
-        BlinkinSubsystem.PixelColor detectedColor = BlinkinSubsystem.PixelColor.PIXEL_WHITE;
-        NormalizedRGBA colorVal =  bucketSensor.getNormalizedColors();
-
-        // TODO: Finish Writing Bucket sensor Code.
-
-        return detectedColor;
-    }
 }

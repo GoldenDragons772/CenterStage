@@ -9,7 +9,6 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
-import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -32,7 +31,6 @@ import java.util.stream.Collectors;
 
 import static org.firstinspires.ftc.teamcode.helper.TrajectoryManager.*;
 
-import androidx.core.os.TraceKt;
 
 @Autonomous(name = "GDAuto", group = "Auto")
 public class Auto extends LinearOpMode {
@@ -196,7 +194,7 @@ public class Auto extends LinearOpMode {
         commandGroup.addCommands(driveToSpike);
         commandGroup.addCommands(new InstantCommand(() -> {
             intake.spikePixel();
-            sleep(500);
+            sleep(1000);
             intake.stopIntake();
         }));
         if (distance == Distance.LONG) { // TODO: create a transition from pppp (PurPle Pixel Placing) to placing on the backdrop.
@@ -240,7 +238,7 @@ public class Auto extends LinearOpMode {
                 return new Pose2d(56, (alliance == Alliance.BLUE) ? 30 : -41, Math.toRadians(180));
             }
             case CENTER: {
-                return new Pose2d(56, (alliance == Alliance.BLUE) ? 39 : -34, Math.toRadians(180));
+                return new Pose2d(56, (alliance == Alliance.BLUE) ? 34 : -34, Math.toRadians(180));
             }
         }
         return null;

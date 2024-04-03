@@ -16,7 +16,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PropDetectionPipeline extends OpenCvPipeline {
+public class PropThresholdPipeline extends OpenCvPipeline {
 
     public enum propPos {
         LEFT,
@@ -37,7 +37,7 @@ public class PropDetectionPipeline extends OpenCvPipeline {
 
     Mat hierarchy = new Mat();
 
-    public PropDetectionPipeline(Telemetry telemetry, boolean debug) {
+    public PropThresholdPipeline(Telemetry telemetry, boolean debug) {
         this.debug = debug;
         this.telemetry = telemetry;
     }
@@ -80,61 +80,8 @@ public class PropDetectionPipeline extends OpenCvPipeline {
         // you might have to tune the thresholds for hysteresis
 
         // Blur the Image alot to reduce noise
-        Imgproc.GaussianBlur(thresh, thresh, new org.opencv.core.Size(5, 5), 1);
 
-        Imgproc.Canny(thresh, edges, 200, 255);
-
-        // https://docs.opencv.org/3.4/da/d0c/tutorial_bounding_rects_circles.html
-        // Oftentimes the edges are disconnected. findContours connects these edges.
-        // We then find the bounding rectangles of those contours
-        // Merge the rectangles to form a single rectangle
-        List<MatOfPoint> contours = new ArrayList<>();
-
-        Imgproc.findContours(edges, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
-
-        MatOfPoint2f[] contoursPoly  = new MatOfPoint2f[contours.size()];
-        Rect[] boundRect = new Rect[contours.size()];
-        for (int i = 0; i < contours.size(); i++) {
-            contoursPoly[i] = new MatOfPoint2f();
-            Imgproc.approxPolyDP(new MatOfPoint2f(contours.get(i).toArray()), contoursPoly[i], 3, true);
-            boundRect[i] = Imgproc.boundingRect(new MatOfPoint(contoursPoly[i].toArray()));
-        }
-
-        // Iterate and check whether the bounding boxes
-        // cover left and/or right side of the image
-
-        // Draw one contour for each rectangle
-
-        // SetDefault
-        spikeX = 0;
-
-        for (int i = 0; i != boundRect.length; i++) {
-            // If the area of the rectangle is greater than 2000, then its a Spike
-            if (boundRect[i].area() > 3000) {
-
-                int y = boundRect[i].y + boundRect[i].height / 2;
-
-                if(y > 150) {
-                    Imgproc.rectangle(mat, boundRect[i], new Scalar(255, 255, 255), 2);
-
-                    spikeX = boundRect[i].x + boundRect[i].width / 2;
-
-                    // Draw a circle at the center of the rectangle
-                    Imgproc.circle(mat, new Point(spikeX, y), 5, new Scalar(255, 255, 255), 1);
-                }
-            }
-        }
-
-        if(debug) {
-            // Print the center of the rectangle
-            telemetry.addData("Prop Position", spikeX);
-            //telemetry.addData("Prop Y Position", y);
-//            telemetry.addData("Prop Location", propPosString());
-            telemetry.update();
-        }
-        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_HSV2RGB);
-
-        return mat; // return the mat with rectangles drawn
+        return thresh; // return the mat with rectangles drawn
     }
 
 
