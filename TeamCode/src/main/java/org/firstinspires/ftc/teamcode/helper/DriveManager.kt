@@ -12,14 +12,13 @@ import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive
 import org.firstinspires.ftc.teamcode.subsystem.*
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.CarriageCommand
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.ClimbCommand
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.sign
 
 
 class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamepad, gamepad2: Gamepad) {
-
-    private var precisionDrive = false;
-
     val drive: MecanumDriveSubsystem = MecanumDriveSubsystem(MainMecanumDrive(hardwareMap), false)
     val intake: IntakeSubsystem = IntakeSubsystem(hardwareMap)
     val linkTake: LinkTakeSubsystem = LinkTakeSubsystem(hardwareMap)
@@ -47,14 +46,30 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
         val forward: Double = (gpad1.gamepad.right_stick_y.pow(2) * sign(gpad1.gamepad.right_stick_y.toDouble()))
         val spin: Double = (gpad1.gamepad.left_stick_x.pow(2) * sign(gpad1.gamepad.left_stick_x.toDouble()) * 0.90)
 
-
-//        val minSlowdown = .2// minimum speed is 20%
-//        val speedMultiplier = 1 - ((getGamepad(keymap.precisionDriveMap.second).getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) + 1)/2)*(1- minSlowdown)
+        // Precision Drive
+        val triggerVal: Double = getGamepad(keymap.precisionDriveMap.second).getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)
+        val minSlowdown: Double = if(triggerVal > 0.1) .2 else 1.0 // minimum speed is 20%
+        val speedMultiplier: Double = 1.0 - (triggerVal * (1.0 - minSlowdown))
 
 
         drive.drive(
-            forward, strafe, spin
+            forward * speedMultiplier,
+            strafe * speedMultiplier,
+            spin * speedMultiplier
         )
+
+        // Link Take System
+        val gamepad: Gamepad = getGamepad(keymap.linkTakeMap.second).gamepad
+        if (!gamepad.left_bumper && !gamepad.right_bumper) {
+            if (gamepad.right_trigger > 0.1) {
+                val intakePosition: Double = max(0.4, min(0.7, gamepad.right_trigger.pow(2).toDouble()))
+                linkTake.setLinkTakePosRaw(intakePosition)
+                intake.runIntake()
+            } else {
+                linkTake.setLinkTakePos(LinkTakeSubsystem.linkPos)
+                intake.stopIntake()
+            }
+        }
 
         // Update Current Pos
         drive.update()
@@ -134,14 +149,6 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
             InstantCommand({ drone.loadDrone() })
         )
 
-        // Precision Drive
-        setPressedBinding(
-                this.keymap.precisionDriveMap,
-                InstantCommand({
-                    precisionDrive = !precisionDrive
-                })
-        )
-
         // Increment Link Take Position
         setPressedBinding(
             this.keymap.incrementLinkTakePosMap,
@@ -171,7 +178,8 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
         val incrementLinkTakePosMap: Pair<GamepadKeys.Button, Int>,
         val decrementLinkTakePosMap: Pair<GamepadKeys.Button, Int>,
         val shootDroneMap: Pair<GamepadKeys.Button, Int>,
-        val loadDroneMap: Pair<GamepadKeys.Button, Int>
+        val loadDroneMap: Pair<GamepadKeys.Button, Int>,
+        val linkTakeMap: Pair<GamepadKeys.Button, Int>
     )
 
 

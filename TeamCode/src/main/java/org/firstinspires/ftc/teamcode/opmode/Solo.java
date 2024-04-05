@@ -6,13 +6,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import kotlin.Pair;
 import org.firstinspires.ftc.teamcode.helper.DriveManager;
 import org.firstinspires.ftc.teamcode.subsystem.ArmMotorSubsystem;
-import org.firstinspires.ftc.teamcode.subsystem.LinkTakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystem.subcommand.TrajectoryFollowerCommand;
 
 @TeleOp(name = "Solo", group = "TeleOp")
 public class Solo extends CommandOpMode {
 
-    TrajectoryFollowerCommand driveToBackDropBlue;
+//    TrajectoryFollowerCommand driveToBackDropBlue;
     DriveManager driveManager;
 
     @Override
@@ -26,13 +24,14 @@ public class Solo extends CommandOpMode {
                 new Pair<>(GamepadKeys.Button.DPAD_LEFT, 1),    // Low Position
                 new Pair<>(GamepadKeys.Button.DPAD_UP, 1),     // Top Position
                 new Pair<>(GamepadKeys.Button.DPAD_DOWN, 1),   // Home Position
-                new Pair<>(GamepadKeys.Button.RIGHT_STICK_BUTTON, 1), // Precision Drive
+                new Pair<>(null, 1), // Precision Drive
                 new Pair<>(GamepadKeys.Button.Y, 1),           // Increment ArmPos
                 new Pair<>(GamepadKeys.Button.A, 1),            // Decrement ArmPos
                 new Pair<>(GamepadKeys.Button.B, 1),            // Increment LinkTakePos
                 new Pair<>(GamepadKeys.Button.X, 1),            // Decrement LinkTakePos
                 new Pair<>(GamepadKeys.Button.Y, 2),            // Shoot Drone
-                new Pair<>(GamepadKeys.Button.A, 2)            // Load Drone
+                new Pair<>(GamepadKeys.Button.A, 2),            // Load Drone
+                new Pair<>(null, 1)      // Run LinkTake
         );
 
 
@@ -52,47 +51,6 @@ public class Solo extends CommandOpMode {
     @Override
     public void run() {
         driveManager.run();
-
-        // Manual Arm Control...
-
-//        // Increment ArmPos
-//        if(gamepad1.right_trigger > 0.1) {
-//            driveManager.getArmMotor().setArmManualControl((int) ((driveManager.getArmMotor().getAvgArmPosition()) + (100 * gamepad1.right_trigger)));
-//        }
-//
-//        // Decrease ArmPos
-//        if(gamepad1.left_trigger < 0.1) {
-//            driveManager.getArmMotor().setArmManualControl((int) ((driveManager.getArmMotor().getAvgArmPosition()) - (100 * gamepad1.left_trigger)));
-//        }
-
-//        Pose2d poseEstimate = drive.getPoseEstimate();
-//        telemetry.addData("x", poseEstimate.getX());
-//        telemetry.addData("y", poseEstimate.getY());
-//        telemetry.addData("heading", poseEstimate.getHeading());
-//        telemetry.addData("LeftArmPos", armMotor.leftArmMotor.getCurrentPosition());
-//        telemetry.addData("RightArmPos", armMotor.rightArmMotor.getCurrentPosition());
-//        telemetry.addData("PIDError", 1500 - (armMotor.leftArmMotor.getCurrentPosition() + armMotor.rightArmMotor.getCurrentPosition()) / 2);
-//        telemetry.addData("Correction", armMotor.correction);
-////            telemetry.addData("DipperRightServo", dipper.rightDipperServo.getPosition());
-////            telemetry.addData("DipperLeftServo", dipper.leftDipperServo.getPosition());
-//        telemetry.update();
-
-
-        // Control Intake via Triggers
-        if(!gamepad1.left_bumper) {
-            if(!gamepad1.right_bumper) {
-                if(gamepad1.right_trigger > 0.1) {
-                    // Square the input for better control
-                    double intakePosition = Math.max(0.3, Math.min(1, Math.pow(gamepad1.right_trigger, 2)));
-                    driveManager.getLinkTake().setLinkTakePosRaw(intakePosition);
-                    driveManager.getIntake().runIntake();
-                    telemetry.addData("LinkTake Position", intakePosition);
-                } else {
-                    driveManager.getLinkTake().setLinkTakePos(LinkTakeSubsystem.linkPos);
-                    driveManager.getIntake().stopIntake();
-                }
-            }
-        }
 
         telemetry.addData("ArmPos", ArmMotorSubsystem.armPos.name());
 
