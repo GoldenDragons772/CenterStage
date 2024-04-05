@@ -12,7 +12,6 @@ import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive
 import org.firstinspires.ftc.teamcode.subsystem.*
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.CarriageCommand
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.ClimbCommand
-import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.sign
 
@@ -62,7 +61,6 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
 
 
         val poseEstimate = drive.poseEstimate
-
     }
 
     fun setHeldBinding(button: GamepadKeys.Button, gamepad: Int, command: Command) {
