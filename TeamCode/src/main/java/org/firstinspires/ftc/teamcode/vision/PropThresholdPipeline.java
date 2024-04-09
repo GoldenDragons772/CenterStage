@@ -5,16 +5,11 @@ import org.firstinspires.ftc.teamcode.helper.TrajectoryManager;
 import org.firstinspires.ftc.teamcode.opmode.Auto;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.MatOfPoint2f;
-import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class PropThresholdPipeline extends OpenCvPipeline {
 
@@ -23,97 +18,110 @@ public class PropThresholdPipeline extends OpenCvPipeline {
         CENTER,
         RIGHT
     }
-
+    private static final boolean DEBUG = false;
+    public static int redLeftX = (int) (350);
+    public static int redLeftY = (int) (444);
+    public static int redCenterX = (int) (858);
+    public static int redCenterY = (int) (409);
+    public static int blueLeftX = (int) (48);
+    public static int blueLeftY = (int) (453);
+    public static int blueCenterX = (int) (582);
+    public static int blueCenterY = (int) (418);
+    public static int leftWidth = (int) (200);
+    public static int leftHeight = (int) (100);
+    public static int centerWidth = (int) (260);
+    public static int centerHeight = (int) (150);
+    public static double BLUE_THRESHOLD = 55;
+    public static double RED_THRESHOLD = 100;
+    public double leftColor = 0.0;
+    public double centerColor = 0.0;
+    public Scalar left = new Scalar(0, 0, 0);
+    public Scalar center = new Scalar(0, 0, 0);
     Telemetry telemetry;
+    private String location = "RIGHT";
 
-    private int spikeX = 0;
+    public PropThresholdPipeline() {
+        this(null);
+    }
 
-    private boolean debug = false;
-
-    Mat mat = new Mat();
-    Mat thresh = new Mat();
-
-    Mat edges = new Mat();
-
-    Mat hierarchy = new Mat();
-
-    public PropThresholdPipeline(Telemetry telemetry, boolean debug) {
-        this.debug = debug;
+    public PropThresholdPipeline(Telemetry telemetry) {
         this.telemetry = telemetry;
     }
 
     @Override
     public Mat processFrame(Mat input) {
-        // "Mat" stands for matrix, which is basically the image that the detector will process
-        // the input matrix is the image coming from the camera
-        // the function will return a matrix to be drawn on your phone's screen
+        Rect leftZoneArea;
+        Rect centerZoneArea;
 
-        // The detector detects regular stones. The camera fits two stones.
-        // If it finds one regular stone then the other must be the skystone.
-        // If both are regular stones, it returns NONE to tell the robot to keep looking
 
-        // Make a working copy of the input matrix in HSV
 
-        Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
-
-        // We create a HSV range for yellow to detect regular stones
-        // NOTE: In OpenCV's implementation,
-        // Hue values are half the real value
-
-        Scalar lowHSV; // lower bound HSV for Red
-        Scalar highHSV; // higher bound HSV for Red
-
-        if(Auto.alliance == TrajectoryManager.Alliance.RED) {
-            lowHSV = new Scalar(0, 41, 96); // RED
-            highHSV = new Scalar(5, 234, 202); // RED
+        if (Auto.alliance == TrajectoryManager.Alliance.RED && Auto.distance == TrajectoryManager.Distance.LONG || Auto.alliance == TrajectoryManager.Alliance.BLUE && Auto.distance == TrajectoryManager.Distance.SHORT) {
+            leftZoneArea = new Rect(redLeftX, redLeftY, leftWidth, leftHeight);
+            centerZoneArea = new Rect(redCenterX, redCenterY, centerWidth, centerHeight);
         } else {
-            lowHSV = new Scalar(111, 196, 70); // lower bound HSV for Blue\ new Scalar(111, 196, 70);
-            highHSV = new Scalar(118, 255, 255); // higher bound HSV for Blue\ new Scalar(118, 255, 255);
+            leftZoneArea = new Rect(blueLeftX, blueLeftY, leftWidth, leftHeight);
+            centerZoneArea = new Rect(blueCenterX, blueCenterY, centerWidth, centerHeight);
         }
 
+        Mat leftZone = input.submat(leftZoneArea);
+        Mat centerZone = input.submat(centerZoneArea);
 
-        // We'll get a black and white image. The white regions represent the regular stones.
-        // inRange(): thresh[i][j] = {255,255,255} if mat[i][i] is within the range
-        Core.inRange(mat, lowHSV, highHSV, thresh);
 
-        // Use Canny Edge Detection to find edges
-        // you might have to tune the thresholds for hysteresis
+        if (DEBUG) {
+            Imgproc.rectangle(input, leftZoneArea, new Scalar(255, 255, 255), 2);
+            Imgproc.rectangle(input, centerZoneArea, new Scalar(255, 255, 255), 2);
+        }
 
-        // Blur the Image alot to reduce noise
+        Imgproc.blur(leftZone, leftZone, new Size(5, 5));
+        Imgproc.blur(centerZone, centerZone, new Size(5, 5));
 
-        return thresh; // return the mat with rectangles drawn
+        // Find the average color of the left and center zones
+        left = Core.mean(leftZone);
+        center = Core.mean(centerZone);
+
+        double threshold = Auto.alliance == TrajectoryManager.Alliance.RED ? RED_THRESHOLD : BLUE_THRESHOLD; //RED_THRESHOLD; //ALLIANCE == Location.RED ? RED_TRESHOLD : BLUE_TRESHOLD;
+        int idx = Auto.alliance == TrajectoryManager.Alliance.RED ? 0 : 2;
+
+        leftColor = left.val[idx];
+        centerColor = center.val[idx];
+
+        if (leftColor > threshold && (left.val[0] + left.val[1] + left.val[2] - left.val[idx] - threshold < left.val[idx])) {
+            // left zone has it
+            location = "LEFT";
+            Imgproc.rectangle(input, leftZoneArea, new Scalar(0, 255, 0), 2);
+        } else if (centerColor > threshold && (center.val[0] + center.val[1] + center.val[2] - center.val[idx] - threshold < center.val[idx])) {
+            // center zone has
+            location = "CENTER";
+            Imgproc.rectangle(input, centerZoneArea, new Scalar(0, 255, 0), 2);
+        } else {
+            // right zone has it
+            location = "RIGHT";
+        }
+
+        if (DEBUG) {
+            telemetry.addData("leftColor", left.toString());
+            telemetry.addData("centerColor", center.toString());
+            telemetry.addData("analysis", location.toString());
+
+            telemetry.addData("CenterColor", center.val[idx]);
+            telemetry.update();
+        }
+
+        leftZone.release();
+        centerZone.release();
+
+        return input;
     }
-
 
     public propPos getCurrentPropPos() {
-        if ((Auto.alliance == TrajectoryManager.Alliance.RED && Auto.distance == TrajectoryManager.Distance.SHORT) || (Auto.alliance == TrajectoryManager.Alliance.BLUE && Auto.distance == TrajectoryManager.Distance.LONG)) {
-            if(spikeX > 1 && spikeX < 150) {
+        switch (location) {
+            case "LEFT":
                 return propPos.LEFT;
-            } else if(spikeX > 150 && spikeX < 500) {
+            case "CENTER":
                 return propPos.CENTER;
-            } else {
+            case "RIGHT":
                 return propPos.RIGHT;
-            }
-        } else {
-            if(spikeX > 100 && spikeX < 300) {
-                return propPos.LEFT;
-            } else if(spikeX > 300 && spikeX < 600) {
-                return propPos.CENTER;
-            } else {
-                return propPos.CENTER;
-            }
         }
+        return propPos.RIGHT;
     }
-
-    public String propPosString() {
-        propPos currPos = getCurrentPropPos();
-        if(currPos == propPos.LEFT) {
-            return "PROP_LEFT";
-        } else if(currPos == propPos.CENTER) {
-            return "PROP_CENTER";
-        } else if(currPos == propPos.RIGHT) {
-            return  "PROP_RIGHT";
-        }
-        return "NOT_FOUND";
-    };
 }

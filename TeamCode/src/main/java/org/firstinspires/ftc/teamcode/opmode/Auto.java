@@ -22,6 +22,7 @@ import org.firstinspires.ftc.teamcode.subsystem.BucketPivotSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.DipperSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.TrajectoryFollowerCommand;
 import org.firstinspires.ftc.teamcode.vision.PropDetectionPipeline;
+import org.firstinspires.ftc.teamcode.vision.PropThresholdPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -36,8 +37,8 @@ import static org.firstinspires.ftc.teamcode.helper.TrajectoryManager.*;
 public class Auto extends LinearOpMode {
 
     private TrajectoryFollowerCommand<TrajectorySequence> follower, driveToBackdrop, driveToSpike, carrier, park;
-    private PropDetectionPipeline detectProp;
-    private PropDetectionPipeline.propPos currentSpikeLocation, lastSpikeLocation;
+    private PropThresholdPipeline detectProp;
+    private PropThresholdPipeline.propPos currentSpikeLocation, lastSpikeLocation;
 
     private boolean updateAutoChnage = false;
 
@@ -81,7 +82,7 @@ public class Auto extends LinearOpMode {
         armMotor = new ArmMotorSubsystem(hardwareMap);
         intake = new IntakeSubsystem(hardwareMap);
 
-        detectProp = new PropDetectionPipeline(telemetry, false);
+        detectProp = new PropThresholdPipeline(telemetry);
 
         // Initalize
         alliance = Alliance.RED;
@@ -91,7 +92,7 @@ public class Auto extends LinearOpMode {
         spikeLoc = new Pose2d(0, 0, Math.toRadians(0));
         startPos = new Pose2d(0, 0, Math.toRadians(0));
 
-        currentSpikeLocation = PropDetectionPipeline.propPos.RIGHT;
+        currentSpikeLocation = PropThresholdPipeline.propPos.RIGHT;
 
         WebcamName webcamName = hardwareMap.get(WebcamName.class, "gdeye");
 
@@ -100,7 +101,7 @@ public class Auto extends LinearOpMode {
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                camera.startStreaming(640, 360, OpenCvCameraRotation.UPRIGHT);
+                camera.startStreaming(1280, 720, OpenCvCameraRotation.UPRIGHT);
                 camera.setPipeline(detectProp);
                 FtcDashboard.getInstance().startCameraStream(camera, 100);
             }
