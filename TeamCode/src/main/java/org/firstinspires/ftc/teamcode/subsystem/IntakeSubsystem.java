@@ -1,7 +1,12 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
+import static org.firstinspires.ftc.teamcode.subsystem.ArmMotorSubsystem.ArmPos.HOME;
+
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.*;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class IntakeSubsystem extends SubsystemBase {
 
@@ -15,16 +20,18 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void runIntake() {
-        intakeMotor.setPower(1);
-        bucketServo.setPower(1);
+        intakeMotor.setPower(0.9);
+        bucketServo.setPower(0.9);
     }
 
     public void spikePixel() {
-        intakeMotor.setPower(-0.2);
+        intakeMotor.setPower(-0.3);
     }
 
     public void dispenseIntake() {
-        intakeMotor.setPower(-0.2);
+        if(ArmMotorSubsystem.armPos == HOME) {
+            intakeMotor.setPower(-0.3);
+        }
         bucketServo.setPower(-1);
     }
 
@@ -35,7 +42,5 @@ public class IntakeSubsystem extends SubsystemBase {
     public void specialDispenseJustForAutoPixelDispenseThing(){
         bucketServo.setPower(-1);
     }
-
-
 
 }

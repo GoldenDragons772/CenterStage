@@ -20,6 +20,8 @@ apply plugin: 'org.jetbrains.kotlin.android'
 buildscript {
     repositories {
         mavenCentral()
+        maven { url = 'https://jitpack.io' }
+
 
 //        maven {
 //            url = 'https://www.matthewo.tech/maven/'
@@ -33,6 +35,7 @@ repositories {
 //    maven {
 //        url = 'https://www.matthewo.tech/maven/'
 //    }
+    maven { url = 'https://jitpack.io' }
 }
 
 tasks.withType(Sign) {

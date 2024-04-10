@@ -9,7 +9,6 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
-import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -23,6 +22,7 @@ import org.firstinspires.ftc.teamcode.subsystem.BucketPivotSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.DipperSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.TrajectoryFollowerCommand;
 import org.firstinspires.ftc.teamcode.vision.PropDetectionPipeline;
+import org.firstinspires.ftc.teamcode.vision.PropThresholdPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -32,14 +32,15 @@ import java.util.stream.Collectors;
 
 import static org.firstinspires.ftc.teamcode.helper.TrajectoryManager.*;
 
-import androidx.core.os.TraceKt;
 
 @Autonomous(name = "GDAuto", group = "Auto")
 public class Auto extends LinearOpMode {
 
     private TrajectoryFollowerCommand<TrajectorySequence> follower, driveToBackdrop, driveToSpike, carrier, park;
-    private PropDetectionPipeline detectProp;
-    private PropDetectionPipeline.propPos currentSpikeLocation;
+    private PropThresholdPipeline detectProp;
+    private PropThresholdPipeline.propPos currentSpikeLocation, lastSpikeLocation;
+
+    private boolean updateAutoChnage = false;
 
     public static Alliance alliance;
     public static Distance distance;
@@ -81,7 +82,7 @@ public class Auto extends LinearOpMode {
         armMotor = new ArmMotorSubsystem(hardwareMap);
         intake = new IntakeSubsystem(hardwareMap);
 
-        detectProp = new PropDetectionPipeline(telemetry, false);
+        detectProp = new PropThresholdPipeline(telemetry);
 
         // Initalize
         alliance = Alliance.RED;
@@ -91,7 +92,7 @@ public class Auto extends LinearOpMode {
         spikeLoc = new Pose2d(0, 0, Math.toRadians(0));
         startPos = new Pose2d(0, 0, Math.toRadians(0));
 
-        currentSpikeLocation = PropDetectionPipeline.propPos.RIGHT;
+        currentSpikeLocation = PropThresholdPipeline.propPos.RIGHT;
 
         WebcamName webcamName = hardwareMap.get(WebcamName.class, "gdeye");
 
@@ -100,7 +101,7 @@ public class Auto extends LinearOpMode {
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                camera.startStreaming(640, 360, OpenCvCameraRotation.UPRIGHT);
+                camera.startStreaming(1280, 720, OpenCvCameraRotation.UPRIGHT);
                 camera.setPipeline(detectProp);
                 FtcDashboard.getInstance().startCameraStream(camera, 100);
             }
@@ -118,37 +119,52 @@ public class Auto extends LinearOpMode {
 
             currentSpikeLocation = detectProp.getCurrentPropPos();//husky.getSpikeLocation(alliance, distance);
 
+            // Check if the Spike Location has changed
+            if (currentSpikeLocation != lastSpikeLocation) {
+                updateAutoChnage = true;
+                lastSpikeLocation = currentSpikeLocation;
+            }
+
             // Auto Selector
             if (gamepad1.dpad_right) { // Long Distance Red Auto
                 distance = Distance.LONG;
                 alliance = Alliance.RED;
                 curAuto = "LD_RED";
+                updateAutoChnage = true;
             } else if (gamepad1.dpad_left) { // Short Distance Red Auto
                 alliance = Alliance.RED;
                 distance = Distance.SHORT;
                 curAuto = "SD_RED";
+                updateAutoChnage = true;
             } else if (gamepad1.dpad_up) { // Long Distance Blue Auto
                 alliance = Alliance.BLUE;
                 distance = Distance.LONG;
                 curAuto = "LD_BLUE";
+                updateAutoChnage = true;
             } else if (gamepad1.dpad_down) { // Short Distance Blue Auto
                 alliance = Alliance.BLUE;
                 distance = Distance.SHORT;
                 curAuto = "SD_BLUE";
+                updateAutoChnage = true;
             }
 
-            // check if Distance is Long
-            if(distance == Distance.LONG) {
-                carrier = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.CARRIER));
+            if(updateAutoChnage) {
+                // check if Distance is Long
+                if(distance == Distance.LONG) {
+                    carrier = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.CARRIER));
+                }
+
+                follower = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.FOLLOW));
+                backDropPos = getBackdropPos();
+
+                driveToSpike = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.SPIKE));
+                driveToBackdrop = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.BACKBOARD));
+
+                park = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.PARK));
+
+                // Set update to false
+                updateAutoChnage = false;
             }
-
-            follower = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.FOLLOW));
-            backDropPos = getBackdropPos();
-
-            driveToSpike = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.SPIKE));
-            driveToBackdrop = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.BACKBOARD));
-
-            park = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.PARK));
 
             telemetry.addData("CurrentSpike Location", currentSpikeLocation.toString());
             telemetry.addData("Current Auto", curAuto);
@@ -179,7 +195,7 @@ public class Auto extends LinearOpMode {
         commandGroup.addCommands(driveToSpike);
         commandGroup.addCommands(new InstantCommand(() -> {
             intake.spikePixel();
-            sleep(500);
+            sleep(1000);
             intake.stopIntake();
         }));
         if (distance == Distance.LONG) { // TODO: create a transition from pppp (PurPle Pixel Placing) to placing on the backdrop.
@@ -223,7 +239,7 @@ public class Auto extends LinearOpMode {
                 return new Pose2d(56, (alliance == Alliance.BLUE) ? 30 : -41, Math.toRadians(180));
             }
             case CENTER: {
-                return new Pose2d(56, (alliance == Alliance.BLUE) ? 39 : -34, Math.toRadians(180));
+                return new Pose2d(56, (alliance == Alliance.BLUE) ? 34 : -34, Math.toRadians(180));
             }
         }
         return null;
@@ -275,7 +291,6 @@ public class Auto extends LinearOpMode {
         TrajectorySequence LD_BACKBOARD = drive.trajectorySequenceBuilder(LD_CARRIER.end())
                 .setConstraints(new AngularVelocityConstraint(30), new ProfileAccelerationConstraint(30))
                 .splineToConstantHeading(new Vector2d(47, -35 * reflection), Math.toRadians(270 * reflection))
-                //.splineToConstantHeading(new Vector2d(backDropPos.getX(), backDropPos.getY()), Math.toRadians(-180))
                 .lineToLinearHeading(backDropPos)
                 .build();
 

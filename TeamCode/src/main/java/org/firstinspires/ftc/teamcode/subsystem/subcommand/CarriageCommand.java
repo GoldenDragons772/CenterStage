@@ -4,6 +4,7 @@ import com.arcrobotics.ftclib.command.CommandBase;
 import org.firstinspires.ftc.teamcode.subsystem.ArmMotorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.BucketPivotSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.DipperSubsystem;
+import org.firstinspires.ftc.teamcode.subsystem.LinkTakeSubsystem;
 
 import static org.firstinspires.ftc.teamcode.subsystem.BucketPivotSubsystem.BucketPivotPos.DROPPING_POS;
 import static org.firstinspires.ftc.teamcode.subsystem.BucketPivotSubsystem.BucketPivotPos.LOADING_POS;
@@ -14,18 +15,21 @@ public class CarriageCommand extends CommandBase {
     private final BucketPivotSubsystem bucketPivot;
     private final DipperSubsystem dipper;
     private final ArmMotorSubsystem.ArmPos armPos;
+    private final LinkTakeSubsystem linkTakeSubsystem;
 
     public CarriageCommand(
             ArmMotorSubsystem armMotor,
             BucketPivotSubsystem bucketPivot,
             DipperSubsystem dipper,
-            ArmMotorSubsystem.ArmPos armPos
+            ArmMotorSubsystem.ArmPos armPos,
+            LinkTakeSubsystem linkTakeSubsystem
     ) {
         this.armMotor = armMotor;
         this.bucketPivot = bucketPivot;
         this.dipper = dipper;
         this.armPos = armPos;
-        addRequirements(armMotor, bucketPivot, dipper);
+        this.linkTakeSubsystem = linkTakeSubsystem;
+        addRequirements(armMotor, bucketPivot, dipper, linkTakeSubsystem);
     }
 
     @Override
@@ -35,10 +39,4 @@ public class CarriageCommand extends CommandBase {
         bucketPivot.runBucketPos(bucketPivotPos);
         dipper.setDipperPosition(bucketPivotPos);
     }
-
-//    @Override
-//    public void execute() {
-//
-//
-//    }
 }

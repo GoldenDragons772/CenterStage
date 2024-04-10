@@ -67,8 +67,8 @@ public class PropDetectionPipeline extends OpenCvPipeline {
             lowHSV = new Scalar(0, 41, 96); // RED
             highHSV = new Scalar(5, 234, 202); // RED
         } else {
-            lowHSV = new Scalar(111, 196, 70); // lower bound HSV for Blue
-            highHSV = new Scalar(118, 255, 255); // higher bound HSV for Blue\
+            lowHSV = new Scalar(111, 196, 70); // lower bound HSV for Blue\ new Scalar(111, 196, 70);
+            highHSV = new Scalar(118, 255, 255); // higher bound HSV for Blue\ new Scalar(118, 255, 255);
         }
 
 
@@ -153,7 +153,7 @@ public class PropDetectionPipeline extends OpenCvPipeline {
             } else if(spikeX > 300 && spikeX < 600) {
                 return propPos.CENTER;
             } else {
-                return propPos.RIGHT;
+                return propPos.CENTER;
             }
         }
     }

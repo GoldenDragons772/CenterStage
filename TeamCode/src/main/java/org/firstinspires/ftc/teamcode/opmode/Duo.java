@@ -8,8 +8,6 @@ import org.firstinspires.ftc.teamcode.helper.DriveManager;
 
 @TeleOp(name = "Duo", group = "TeleOp")
 public class Duo extends CommandOpMode {
-
-//    private Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
     private DriveManager driveManager;
 
     @Override
@@ -24,10 +22,14 @@ public class Duo extends CommandOpMode {
                 new Pair<>(GamepadKeys.Button.DPAD_LEFT, 2),    // Low Position
                 new Pair<>(GamepadKeys.Button.DPAD_UP, 2),     // Top Position
                 new Pair<>(GamepadKeys.Button.DPAD_DOWN, 2),   // Home Position
-                new Pair<>(GamepadKeys.Button.X, 2),           // Arm Manual Control
-                new Pair<>(GamepadKeys.Button.B, 2),           // Arm Reset
-                new Pair<>(GamepadKeys.Button.Y, 1),           // Shoot
-                new Pair<>(GamepadKeys.Button.X, 1)            // Load
+                new Pair<>(null, 1), // Precision Drive
+                new Pair<>(GamepadKeys.Button.Y, 2),           // Increment ArmPos
+                new Pair<>(GamepadKeys.Button.A, 2),            // Decrement ArmPos
+                new Pair<>(GamepadKeys.Button.B, 2),            // Increment LinkTakePos
+                new Pair<>(GamepadKeys.Button.X, 2),            // Decrement LinkTakePos,
+                new Pair<>(GamepadKeys.Button.Y, 1),           // Shoot Drone,
+                new Pair<>(GamepadKeys.Button.A, 1),            // Shoot Drone,
+                new Pair<>(null, 1) // Run LinkTake
         );
         driveManager = new DriveManager(hardwareMap, keymap, gamepad1, gamepad2);
     }
@@ -35,15 +37,5 @@ public class Duo extends CommandOpMode {
     @Override
     public void run() {
         driveManager.run();
-//        telemetry.addData("x", poseEstimate.getX());
-//        telemetry.addData("y", poseEstimate.getY());
-//        telemetry.addData("heading", poseEstimate.getHeading());
-//        telemetry.addData("LeftArmPos", armMotor.leftArmMotor.getCurrentPosition());
-//        telemetry.addData("RightArmPos", armMotor.rightArmMotor.getCurrentPosition());
-//        telemetry.addData("PIDError", 1500 - (armMotor.leftArmMotor.getCurrentPosition() + armMotor.rightArmMotor.getCurrentPosition()) / 2);
-//        telemetry.addData("Correction", armMotor.correction);
-//        telemetry.addData("ManualArmPower", armPower);
-//        telemetry.update();
-
     }
 }

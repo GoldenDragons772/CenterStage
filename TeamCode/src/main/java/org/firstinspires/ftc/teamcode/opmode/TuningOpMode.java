@@ -30,6 +30,7 @@ public class TuningOpMode extends CommandOpMode {
     private IntakeSubsystem intake;
 
     private ArmMotorSubsystem armMotor;
+    private LinkTakeSubsystem linkTake;
 
 
     private DipperSubsystem dipper;
@@ -61,6 +62,7 @@ public class TuningOpMode extends CommandOpMode {
         dipper = new DipperSubsystem(hardwareMap);
         bucketPivot = new BucketPivotSubsystem(hardwareMap);
         drone = new DroneSubsystem(hardwareMap);
+        linkTake = new LinkTakeSubsystem(hardwareMap);
 
         WebcamName webcamName = hardwareMap.get(WebcamName.class, "gdeye");
 
@@ -116,15 +118,15 @@ public class TuningOpMode extends CommandOpMode {
                 }));
 
         gpad1.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whenPressed(new CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.HIGH));
+                .whenPressed(new CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.HIGH,linkTake));
 
 
         gpad1.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
-                .whenPressed(new CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.MIDDLE));
+                .whenPressed(new CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.MIDDLE,linkTake));
 
         gpad1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
                 .whenPressed(new InstantCommand(() -> {
-                    new CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.MIDDLE).execute();
+                    new CarriageCommand(armMotor, bucketPivot, dipper, ArmMotorSubsystem.ArmPos.MIDDLE,linkTake).execute();
                     int timeout = 1200;
                     int epsilon = 550; // Machine epsilon
                     while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {

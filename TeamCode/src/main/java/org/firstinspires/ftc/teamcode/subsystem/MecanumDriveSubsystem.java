@@ -63,15 +63,21 @@ public class MecanumDriveSubsystem extends SubsystemBase {
 
 
     public void followTrajectory(Trajectory trajectory) {
-        drive.followTrajectoryAsync(trajectory);
+        drive.followTrajectory(trajectory);
     }
 
     public void followTrajectory(TrajectorySequence trajectorySequence) {
         drive.followTrajectorySequenceAsync(trajectorySequence);
     }
+    public void followSyncTrajectorySequence(TrajectorySequence trajectorySequence){
+        drive.followTrajectorySequence(trajectorySequence);
+    }
 
     public void turn(double radians) {
         drive.turnAsync(radians);
+    }
+    public void turnSync(double radians) {
+        drive.turn(radians);
     }
 
     public void stop() {
