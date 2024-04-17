@@ -15,6 +15,7 @@ public class BlinkinSubsystem extends SubsystemBase {
 
     RevBlinkinLedDriver blinkin;
 
+
     public BlinkinSubsystem(HardwareMap hw) {
         blinkin = hw.get(RevBlinkinLedDriver.class, "blinker");
         blinkin.setPattern(RevBlinkinLedDriver.BlinkinPattern.CONFETTI);

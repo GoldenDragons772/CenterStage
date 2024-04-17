@@ -7,10 +7,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @Config
 public class DipperSubsystem extends SubsystemBase {
-    public static double rightLoadingPos = 0.235;
-    public static double leftLoadingPos = 0.214;
+    public static double rightLoadingPos = 0.252;
+    public static double leftLoadingPos = 0.172;
     public static double rightScoringPos = 0.973;
-    public static double leftScoringPos = 0.9889;
+    public static double leftScoringPos = 0.96;
     private static double leftDestinationPos = 0.0;
     private static double rightDestinationPos = 0.0;
     private final Servo right, left;
@@ -30,14 +30,14 @@ public class DipperSubsystem extends SubsystemBase {
 
         // Set Initial Loading Pos
         right.setPosition(rightLoadingPos);
-        left.setPosition(leftLoadingPos);
+        left.setPosition(leftLoadingPos + 0.047);
     }
 
     public void setDipperPosition(BucketPivotSubsystem.BucketPivotPos pos) {
 
         if (pos == BucketPivotSubsystem.BucketPivotPos.LOADING_POS) {
             right.setPosition(rightLoadingPos + 0.025); // 0.025 offset
-            left.setPosition(leftLoadingPos);
+            left.setPosition(leftLoadingPos + 0.047);
             rightDestinationPos = rightLoadingPos;
             leftDestinationPos = leftLoadingPos;
         } else if (pos == BucketPivotSubsystem.BucketPivotPos.DROPPING_POS) {

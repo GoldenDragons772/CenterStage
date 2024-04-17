@@ -27,8 +27,8 @@ public class PropSim extends OpenCvPipeline {
     public static int leftHeight = (int) (100);
     public static int centerWidth = (int) (260);
     public static int centerHeight = (int) (150);
-    public static double BLUE_THRESHOLD = 55;
-    public static double RED_THRESHOLD = 100;
+    public static double BLUE_THRESHOLD = 70;
+    public static double RED_THRESHOLD = 150;
     private final Mat hsv = new Mat();
     public double leftColor = 0.0;
     public double centerColor = 0.0;
@@ -53,11 +53,11 @@ public class PropSim extends OpenCvPipeline {
         Rect centerZoneArea;
 
 //        if (ALLIANCE == Location.RED && SIDE == Location.FAR || ALLIANCE == Location.BLUE && SIDE == Location.CLOSE) {
-            leftZoneArea = new Rect(redLeftX, redLeftY, leftWidth, leftHeight);
-            centerZoneArea = new Rect(redCenterX, redCenterY, centerWidth, centerHeight);
+//            leftZoneArea = new Rect(redLeftX, redLeftY, leftWidth, leftHeight);
+//            centerZoneArea = new Rect(redCenterX, redCenterY, centerWidth, centerHeight);
 //        } else {
-//            leftZoneArea = new Rect(blueLeftX, blueLeftY, leftWidth, leftHeight);
-//            centerZoneArea = new Rect(blueCenterX, blueCenterY, centerWidth, centerHeight);
+            leftZoneArea = new Rect(blueLeftX, blueLeftY, leftWidth, leftHeight);
+            centerZoneArea = new Rect(blueCenterX, blueCenterY, centerWidth, centerHeight);
 //        }
 
         Mat leftZone = input.submat(leftZoneArea);

@@ -31,8 +31,8 @@ public class PropThresholdPipeline extends OpenCvPipeline {
     public static int leftHeight = (int) (100);
     public static int centerWidth = (int) (260);
     public static int centerHeight = (int) (150);
-    public static double BLUE_THRESHOLD = 55;
-    public static double RED_THRESHOLD = 100;
+    public static double BLUE_THRESHOLD = 70;
+    public static double RED_THRESHOLD = 150;
     public double leftColor = 0.0;
     public double centerColor = 0.0;
     public Scalar left = new Scalar(0, 0, 0);

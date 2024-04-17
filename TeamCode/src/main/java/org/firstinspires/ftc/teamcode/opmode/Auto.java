@@ -233,7 +233,7 @@ public class Auto extends LinearOpMode {
     private Pose2d getBackdropPos() {
         switch (currentSpikeLocation) {
             case LEFT: {
-                return new Pose2d(56, (alliance == Alliance.BLUE) ? 41 : -27, Math.toRadians(180));
+                return new Pose2d(56, (alliance == Alliance.BLUE) ? 43 : -27, Math.toRadians(180));
             }
             case RIGHT: {
                 return new Pose2d(56, (alliance == Alliance.BLUE) ? 30 : -41, Math.toRadians(180));
