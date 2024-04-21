@@ -23,6 +23,7 @@ public class ArmMotorSubsystem implements Subsystem {
         HANG(100),
         SET1(550),
         LOW(700),
+        BONUS(850),
         MIDDLE(1000),
         HIGH(1300),
         HIGHER(1600),

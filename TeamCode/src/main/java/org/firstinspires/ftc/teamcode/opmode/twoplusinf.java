@@ -1,5 +1,11 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
+import static org.firstinspires.ftc.teamcode.helper.TrajectoryManager.Alliance;
+import static org.firstinspires.ftc.teamcode.helper.TrajectoryManager.Distance;
+import static org.firstinspires.ftc.teamcode.helper.TrajectoryManager.Type;
+import static org.firstinspires.ftc.teamcode.helper.TrajectoryManager.getSpikeLocation;
+import static org.firstinspires.ftc.teamcode.helper.TrajectoryManager.getStartPosition;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -17,27 +23,27 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.helper.StorePos;
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive;
 import org.firstinspires.ftc.teamcode.rr.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.subsystem.*;
 import org.firstinspires.ftc.teamcode.subsystem.ArmMotorSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.BucketPivotSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.DipperSubsystem;
+import org.firstinspires.ftc.teamcode.subsystem.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystem.LinkTakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystem.MecanumDriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.TrajectoryFollowerCommand;
-import org.firstinspires.ftc.teamcode.vision.PropDetectionPipeline;
 import org.firstinspires.ftc.teamcode.vision.PropThresholdPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.HashMap;
+import java.util.TimerTask;
 import java.util.stream.Collectors;
 
-import static org.firstinspires.ftc.teamcode.helper.TrajectoryManager.*;
 
+@Autonomous(name = "2+X", group = "Auto")
+public class twoplusinf extends LinearOpMode {
 
-@Autonomous(name = "GDAuto", group = "Auto")
-public class Auto extends LinearOpMode {
-
-    private TrajectoryFollowerCommand<TrajectorySequence> follower, driveToBackdrop, driveToSpike, carrier, park;
+    private TrajectoryFollowerCommand<TrajectorySequence> follower, stack, driveToBackdrop, driveToSpike, carrier, park;
     private PropThresholdPipeline detectProp;
     private PropThresholdPipeline.propPos currentSpikeLocation, lastSpikeLocation;
 
@@ -54,7 +60,6 @@ public class Auto extends LinearOpMode {
     private DipperSubsystem dipper;
     private ArmMotorSubsystem armMotor;
     private IntakeSubsystem intake;
-
     private LinkTakeSubsystem linkTake;
 
     // Camera Instance
@@ -84,6 +89,7 @@ public class Auto extends LinearOpMode {
         dipper = new DipperSubsystem(hardwareMap);
         armMotor = new ArmMotorSubsystem(hardwareMap);
         intake = new IntakeSubsystem(hardwareMap);
+
         linkTake = new LinkTakeSubsystem(hardwareMap);
 
         detectProp = new PropThresholdPipeline(telemetry);
@@ -166,6 +172,8 @@ public class Auto extends LinearOpMode {
 
                 park = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.PARK));
 
+                stack = new TrajectoryFollowerCommand<>(drive, getTrajectory(alliance, distance, Type.STACK));
+
                 // Set update to false
                 updateAutoChnage = false;
             }
@@ -195,6 +203,7 @@ public class Auto extends LinearOpMode {
 
     private SequentialCommandGroup createCommandGroup() {
         SequentialCommandGroup commandGroup = new SequentialCommandGroup();
+        // Spike Auto
         commandGroup.addCommands(follower);
         commandGroup.addCommands(driveToSpike);
         commandGroup.addCommands(new InstantCommand(() -> {
@@ -202,25 +211,35 @@ public class Auto extends LinearOpMode {
             sleep(1000);
             intake.stopIntake();
         }));
+
+        // Long Distance
         if (distance == Distance.LONG) { // TODO: create a transition from pppp (PurPle Pixel Placing) to placing on the backdrop.
+            commandGroup.addCommands(new InstantCommand(() -> {
+                // Run Intake
+                linkTake.setLinkTakePos(LinkTakeSubsystem.LinkPosition.STK1);
+                intake.runIntake();
+            }));
+            commandGroup.addCommands(stack);
+            commandGroup.addCommands(new WaitCommand(2000));
+            commandGroup.addCommands(new InstantCommand(() -> {
+                intake.spikePixel();
+            }));
             commandGroup.addCommands(carrier);
-            commandGroup.addCommands(new WaitCommand(7000));
         }
         commandGroup.addCommands(new InstantCommand(() -> {
-            //
-            armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.BONUS);
+            armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.LOW);
             dipper.setDipperPosition(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
             bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
         }));
+
         commandGroup.addCommands(new WaitCommand(750));
         commandGroup.addCommands(driveToBackdrop);
         commandGroup.addCommands(new InstantCommand(() -> intake.specialDispenseJustForAutoPixelDispenseThing()));
-        commandGroup.addCommands(new WaitCommand(2000));
+        commandGroup.addCommands(new WaitCommand(1500));
         commandGroup.addCommands(new InstantCommand(() -> { // TODO: Figure out how to make this into a function.
             intake.stopIntake();
             dipper.setDipperPosition(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
             armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.HOME);
-            linkTake.setLinkTakePos(LinkTakeSubsystem.LinkPosition.HOME);
             int timeout = 1200;
             int epsilon = 550; // Machine epsilon
             while (!(-epsilon < armMotor.getAvgArmPosition() && armMotor.getAvgArmPosition() < epsilon)) {
@@ -243,10 +262,10 @@ public class Auto extends LinearOpMode {
                 return new Pose2d(56, (alliance == Alliance.BLUE) ? 43 : -27, Math.toRadians(180));
             }
             case RIGHT: {
-                return new Pose2d(56, (alliance == Alliance.BLUE) ? 30 : -39, Math.toRadians(180));
+                return new Pose2d(56, (alliance == Alliance.BLUE) ? 30 : -41, Math.toRadians(180));
             }
             case CENTER: {
-                return new Pose2d(56, (alliance == Alliance.BLUE) ? 34 : -34, Math.toRadians(175));
+                return new Pose2d(56, (alliance == Alliance.BLUE) ? 34 : -34, Math.toRadians(180));
             }
         }
         return null;
@@ -270,14 +289,17 @@ public class Auto extends LinearOpMode {
                 .forward(1)
                 .build();
 
-        TrajectorySequence SD_BACKBOARD = drive.trajectorySequenceBuilder(SD_SPIKE.end())
+        TrajectorySequence SD_STACK = drive.trajectorySequenceBuilder(SD_SPIKE.end())
+                .lineToLinearHeading(new Pose2d(-60, -12 * reflection, Math.toRadians(185)))
+                .build();
+
+        TrajectorySequence SD_BACKBOARD = drive.trajectorySequenceBuilder(SD_STACK.end())
                 .lineToLinearHeading(backDropPos)
                 .build();
 
         TrajectorySequence SD_PARK = drive.trajectorySequenceBuilder(SD_BACKBOARD.end())
                 .forward(2)
-                .lineToConstantHeading(new Vector2d(52, -10 * reflection))
-                //.lineToConstantHeading(new Vector2d(50, -60 * reflection))
+                .lineToConstantHeading(new Vector2d(50, -60 * reflection))
                 .build();
 
         // Long Distance Auto
@@ -290,16 +312,22 @@ public class Auto extends LinearOpMode {
                 .forward(1)
                 .build();
 
-        TrajectorySequence LD_CARRIER = drive.trajectorySequenceBuilder(LD_SPIKE.end())
+        TrajectorySequence LD_STACK = drive.trajectorySequenceBuilder(LD_SPIKE.end())
+                .lineToLinearHeading(new Pose2d(-60, -11 * reflection, Math.toRadians(185)))
+                .lineTo(new Vector2d(-60, -8 * reflection))
+                .forward(2)
+                .strafeLeft(-5 * reflection)
+                .build();
+
+        TrajectorySequence LD_CARRIER = drive.trajectorySequenceBuilder(LD_STACK.end())
                 .back(10)
-                .lineToLinearHeading(new Pose2d(-35, -12 * reflection, Math.toRadians(180)))
-                .lineToLinearHeading(new Pose2d(23, -12 * reflection, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-35, -13 * reflection, Math.toRadians(180)))
+                .lineToConstantHeading(new Vector2d(10, -13 * reflection))
                 .build();
 
         TrajectorySequence LD_BACKBOARD = drive.trajectorySequenceBuilder(LD_CARRIER.end())
                 .setConstraints(new AngularVelocityConstraint(30), new ProfileAccelerationConstraint(30))
-                //.splineToConstantHeading(new Vector2d(47, -35 * reflection), Math.toRadians(270 * reflection))
-                .lineToLinearHeading(new Pose2d(40, -37 * reflection, Math.toRadians(180)))
+                .splineToConstantHeading(new Vector2d(47, -35 * reflection), Math.toRadians(270 * reflection))
                 .lineToLinearHeading(backDropPos)
                 .build();
 
@@ -312,12 +340,15 @@ public class Auto extends LinearOpMode {
         // Options for Short Distance
         choices.put("SD_FOLLOW", SD_FOLLOW);
         choices.put("SD_SPIKE", SD_SPIKE);
+        choices.put("SD_STACK", SD_STACK);
         choices.put("SD_BACKBOARD", SD_BACKBOARD);
         choices.put("SD_PARK", SD_PARK);
+
 
         // Options for Long Distance
         choices.put("LD_FOLLOW", LD_FOLLOW);
         choices.put("LD_SPIKE", LD_SPIKE);
+        choices.put("LD_STACK", LD_STACK);
         choices.put("LD_CARRIER", LD_CARRIER);
         choices.put("LD_BACKBOARD", LD_BACKBOARD);
         choices.put("LD_PARK", LD_PARK);
@@ -348,6 +379,14 @@ public class Auto extends LinearOpMode {
             case SPIKE: {
                 for (String key : choices.keySet()) {
                     if (key.contains("SPIKE")) {
+                        return choices.get(key);
+                    }
+                }
+                break;
+            }
+            case STACK: {
+                for (String key : choices.keySet()) {
+                    if (key.contains("STACK")) {
                         return choices.get(key);
                     }
                 }
