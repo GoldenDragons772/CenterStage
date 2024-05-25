@@ -40,7 +40,7 @@ import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 
-@Autonomous(name = "2+X", group = "Auto")
+@Autonomous(name = "2+1", group = "Auto")
 public class twoplusinf extends LinearOpMode {
 
     private TrajectoryFollowerCommand<TrajectorySequence> follower, stack, driveToBackdrop, driveToSpike, carrier, park;
@@ -204,13 +204,16 @@ public class twoplusinf extends LinearOpMode {
     private SequentialCommandGroup createCommandGroup() {
         SequentialCommandGroup commandGroup = new SequentialCommandGroup();
         // Spike Auto
+        commandGroup.addCommands(new InstantCommand(() -> {
+            // Set Initial State
+            linkTake.setLinkTakePosRaw(0);
+        }));
         commandGroup.addCommands(follower);
         commandGroup.addCommands(driveToSpike);
         commandGroup.addCommands(new InstantCommand(() -> {
             intake.spikePixel();
-            sleep(1000);
-            intake.stopIntake();
         }));
+        commandGroup.addCommands(new WaitCommand(1000));
 
         // Long Distance
         if (distance == Distance.LONG) { // TODO: create a transition from pppp (PurPle Pixel Placing) to placing on the backdrop.
@@ -220,22 +223,27 @@ public class twoplusinf extends LinearOpMode {
                 intake.runIntake();
             }));
             commandGroup.addCommands(stack);
-            commandGroup.addCommands(new WaitCommand(2000));
+            commandGroup.addCommands(new WaitCommand(2000)); // Wait for Alliance
             commandGroup.addCommands(new InstantCommand(() -> {
-                intake.spikePixel();
+                // Get Rid of Stuck Pixels
+                linkTake.setLinkTakePos(LinkTakeSubsystem.LinkPosition.HOME);
+                intake.escapePenalty();
             }));
             commandGroup.addCommands(carrier);
         }
         commandGroup.addCommands(new InstantCommand(() -> {
-            armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.LOW);
+            // Stop the Intake stuff
+            intake.stopIntake();
+
+            // Run Arm Sequence...
+            armMotor.setArmToPos(ArmMotorSubsystem.ArmPos.MIDDLE);
             dipper.setDipperPosition(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
             bucketPivot.runBucketPos(BucketPivotSubsystem.BucketPivotPos.DROPPING_POS);
         }));
-
         commandGroup.addCommands(new WaitCommand(750));
         commandGroup.addCommands(driveToBackdrop);
         commandGroup.addCommands(new InstantCommand(() -> intake.specialDispenseJustForAutoPixelDispenseThing()));
-        commandGroup.addCommands(new WaitCommand(1500));
+        commandGroup.addCommands(new WaitCommand(5000));
         commandGroup.addCommands(new InstantCommand(() -> { // TODO: Figure out how to make this into a function.
             intake.stopIntake();
             dipper.setDipperPosition(BucketPivotSubsystem.BucketPivotPos.LOADING_POS);
@@ -265,7 +273,7 @@ public class twoplusinf extends LinearOpMode {
                 return new Pose2d(56, (alliance == Alliance.BLUE) ? 30 : -41, Math.toRadians(180));
             }
             case CENTER: {
-                return new Pose2d(56, (alliance == Alliance.BLUE) ? 34 : -34, Math.toRadians(180));
+                return new Pose2d(56, (alliance == Alliance.BLUE) ? 36 : -36, Math.toRadians(180));
             }
         }
         return null;
@@ -313,21 +321,22 @@ public class twoplusinf extends LinearOpMode {
                 .build();
 
         TrajectorySequence LD_STACK = drive.trajectorySequenceBuilder(LD_SPIKE.end())
-                .lineToLinearHeading(new Pose2d(-60, -11 * reflection, Math.toRadians(185)))
-                .lineTo(new Vector2d(-60, -8 * reflection))
+                .lineToLinearHeading(new Pose2d(-35, -11 * reflection, Math.toRadians(175)))
+                .lineToLinearHeading(new Pose2d(-54, -11 * reflection, Math.toRadians(185)))
                 .forward(2)
-                .strafeLeft(-5 * reflection)
+                .back(5)
+                .forward(7)
                 .build();
 
         TrajectorySequence LD_CARRIER = drive.trajectorySequenceBuilder(LD_STACK.end())
                 .back(10)
-                .lineToLinearHeading(new Pose2d(-35, -13 * reflection, Math.toRadians(180)))
-                .lineToConstantHeading(new Vector2d(10, -13 * reflection))
+                .lineToLinearHeading(new Pose2d(-35, -11 * reflection, Math.toRadians(180)))
+                .lineToConstantHeading(new Vector2d(10, -11 * reflection))
                 .build();
 
         TrajectorySequence LD_BACKBOARD = drive.trajectorySequenceBuilder(LD_CARRIER.end())
                 .setConstraints(new AngularVelocityConstraint(30), new ProfileAccelerationConstraint(30))
-                .splineToConstantHeading(new Vector2d(47, -35 * reflection), Math.toRadians(270 * reflection))
+                .splineToConstantHeading(new Vector2d(40, -38 * reflection), Math.toRadians(270 * reflection))
                 .lineToLinearHeading(backDropPos)
                 .build();
 

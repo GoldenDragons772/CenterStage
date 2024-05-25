@@ -243,7 +243,7 @@ public class Auto extends LinearOpMode {
                 return new Pose2d(56, (alliance == Alliance.BLUE) ? 43 : -27, Math.toRadians(180));
             }
             case RIGHT: {
-                return new Pose2d(56, (alliance == Alliance.BLUE) ? 30 : -39, Math.toRadians(180));
+                return new Pose2d(56, (alliance == Alliance.BLUE) ? 27 : -39, Math.toRadians(180));
             }
             case CENTER: {
                 return new Pose2d(56, (alliance == Alliance.BLUE) ? 34 : -34, Math.toRadians(175));

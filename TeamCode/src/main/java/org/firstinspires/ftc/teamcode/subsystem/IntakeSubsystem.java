@@ -25,7 +25,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void spikePixel() {
-        intakeMotor.setPower(-0.3);
+        intakeMotor.setPower(-0.28);
     }
 
     public void dispenseIntake() {
@@ -33,6 +33,10 @@ public class IntakeSubsystem extends SubsystemBase {
             intakeMotor.setPower(-0.3);
         }
         bucketServo.setPower(-1);
+    }
+
+    public void escapePenalty() {
+        intakeMotor.setPower(-0.4);
     }
 
     public void stopIntake() {
