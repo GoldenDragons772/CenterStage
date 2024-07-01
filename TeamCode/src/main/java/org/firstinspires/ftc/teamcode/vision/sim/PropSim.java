@@ -1,10 +1,6 @@
 package org.firstinspires.ftc.teamcode.vision.sim;
 
-import android.graphics.Canvas;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
-import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
@@ -14,20 +10,20 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 public class PropSim extends OpenCvPipeline {
-    private static final boolean DEBUG = false;
-    public static int redLeftX = (int) (350);
+    private static final boolean DEBUG = true;
+    public static int redLeftX = (int) (300);
     public static int redLeftY = (int) (444);
-    public static int redCenterX = (int) (858);
+    public static int redCenterX = (int) (778);
     public static int redCenterY = (int) (409);
     public static int blueLeftX = (int) (48);
     public static int blueLeftY = (int) (453);
-    public static int blueCenterX = (int) (582);
+    public static int blueCenterX = (int) (700);
     public static int blueCenterY = (int) (418);
     public static int leftWidth = (int) (200);
     public static int leftHeight = (int) (100);
     public static int centerWidth = (int) (260);
     public static int centerHeight = (int) (150);
-    public static double BLUE_THRESHOLD = 70;
+    public static double BLUE_THRESHOLD = 120;
     public static double RED_THRESHOLD = 150;
     private final Mat hsv = new Mat();
     public double leftColor = 0.0;
@@ -53,9 +49,11 @@ public class PropSim extends OpenCvPipeline {
         Rect centerZoneArea;
 
 //        if (ALLIANCE == Location.RED && SIDE == Location.FAR || ALLIANCE == Location.BLUE && SIDE == Location.CLOSE) {
-//            leftZoneArea = new Rect(redLeftX, redLeftY, leftWidth, leftHeight);
-//            centerZoneArea = new Rect(redCenterX, redCenterY, centerWidth, centerHeight);
+            // SD_BLUE and LD_RED
+            leftZoneArea = new Rect(redLeftX, redLeftY, leftWidth, leftHeight);
+            centerZoneArea = new Rect(redCenterX, redCenterY, centerWidth, centerHeight);
 //        } else {
+            // SD_RED and LD_BLUE
             leftZoneArea = new Rect(blueLeftX, blueLeftY, leftWidth, leftHeight);
             centerZoneArea = new Rect(blueCenterX, blueCenterY, centerWidth, centerHeight);
 //        }

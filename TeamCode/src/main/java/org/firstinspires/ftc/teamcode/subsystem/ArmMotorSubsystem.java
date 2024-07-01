@@ -166,9 +166,10 @@ public class ArmMotorSubsystem implements Subsystem {
         }
     }
 
-  public int getAvgArmPosition() {
+    public int getAvgArmPosition() {
         return (leftArmMotor.getCurrentPosition() + rightArmMotor.getCurrentPosition()) / 2;
     }
+
     public ArmPos getArmPos(){
         return armPos;
     }

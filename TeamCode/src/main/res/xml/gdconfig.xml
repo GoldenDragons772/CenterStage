@@ -9,7 +9,7 @@
             <Servo name="LDipper" port="3" />
             <Servo name="LBPivot" port="0" />
             <Servo name="LinkTake" port="4" />
-            <ContinuousRotationServo name="Bucket" port="5" />
+            <ContinuousRotationServo name="Bucket" port="1" />
             <LynxEmbeddedIMU name="imu" port="0" bus="0" />
         </LynxModule>
     </LynxUsbDevice>

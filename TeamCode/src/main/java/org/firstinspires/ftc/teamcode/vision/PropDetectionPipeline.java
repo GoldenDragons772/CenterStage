@@ -16,6 +16,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class PropDetectionPipeline extends OpenCvPipeline {
 
     public enum propPos {

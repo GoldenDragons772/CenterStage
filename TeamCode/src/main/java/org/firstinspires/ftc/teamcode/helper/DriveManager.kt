@@ -64,9 +64,8 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
 
         // Precision Drive
         val triggerVal: Double = getGamepad(keymap.precisionDriveMap.second).getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)
-        val minSlowdown: Double = if(triggerVal > 0.1) .2 else 1.0 // minimum speed is 20%
-        val speedMultiplier: Double = 1.0 - (triggerVal * (1.0 - minSlowdown))
-
+        val minSlowdown: Double = if(triggerVal > 0.1) .4 else 1.0 // minimum speed is 20%
+        val speedMultiplier: Double = 1.0 - ((1.0 - minSlowdown))
 
         drive.drive(
             forward * speedMultiplier,

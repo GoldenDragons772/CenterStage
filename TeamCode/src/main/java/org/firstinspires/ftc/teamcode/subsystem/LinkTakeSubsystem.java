@@ -42,7 +42,7 @@ public class LinkTakeSubsystem extends SubsystemBase {
         linkTake.setDirection(Servo.Direction.REVERSE);
 
         // Set the Positions
-        //linkTake.setPosition(servoLinkHomePos);
+        linkTake.setPosition(0.3);
     }
 
     public void setLinkTakePos(LinkPosition pos) {
