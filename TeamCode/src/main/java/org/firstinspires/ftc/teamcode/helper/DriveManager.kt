@@ -5,9 +5,11 @@ import com.arcrobotics.ftclib.command.CommandScheduler
 import com.arcrobotics.ftclib.command.InstantCommand
 import com.arcrobotics.ftclib.gamepad.GamepadEx
 import com.arcrobotics.ftclib.gamepad.GamepadKeys
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.Gamepad
 import com.qualcomm.robotcore.hardware.HardwareMap
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.rr.drive.MainMecanumDrive
 import org.firstinspires.ftc.teamcode.subsystem.*
 import org.firstinspires.ftc.teamcode.subsystem.subcommand.CarriageCommand
@@ -22,6 +24,8 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
     val drive: MecanumDriveSubsystem = MecanumDriveSubsystem(MainMecanumDrive(hardwareMap), false)
     val intake: IntakeSubsystem = IntakeSubsystem(hardwareMap)
     val linkTake: LinkTakeSubsystem = LinkTakeSubsystem(hardwareMap)
+    val bucketSense: BucketSenseSubsystem = BucketSenseSubsystem(hardwareMap)
+    val blinker: BlinkinSubsystem = BlinkinSubsystem(hardwareMap)
     private val bucketPivot: BucketPivotSubsystem =
         BucketPivotSubsystem(hardwareMap)
     private val dipper: DipperSubsystem =
@@ -39,26 +43,6 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
     }
 
     fun run() {
-        // Run Scheduler.
-        CommandScheduler.getInstance().run()
-        // Drive System
-        val strafe: Double = gpad1.gamepad.right_stick_x.pow(2) * sign(gpad1.gamepad.right_stick_x.toDouble())
-        val forward: Double = (gpad1.gamepad.right_stick_y.pow(2) * sign(gpad1.gamepad.right_stick_y.toDouble()))
-        val spin: Double = (gpad1.gamepad.left_stick_x.pow(2) * sign(gpad1.gamepad.left_stick_x.toDouble()) * 0.90)
-
-        // Precision Drive
-        val triggerVal: Double = getGamepad(keymap.precisionDriveMap.second).getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)
-        val minSlowdown: Double = if(triggerVal > 0.1) .2 else 1.0 // minimum speed is 20%
-        val speedMultiplier: Double = 1.0 - (triggerVal * (1.0 - minSlowdown))
-
-
-        drive.drive(
-            forward * speedMultiplier,
-            strafe * speedMultiplier,
-            spin * speedMultiplier
-        )
-
-        // Link Take System
         val gamepad: Gamepad = getGamepad(keymap.linkTakeMap.second).gamepad
         if (!gamepad.left_bumper && !gamepad.right_bumper) {
             if (gamepad.right_trigger > 0.1) {
@@ -69,6 +53,40 @@ class DriveManager(hardwareMap: HardwareMap, val keymap: Keymap, gamepad1: Gamep
                 linkTake.setLinkTakePos(LinkTakeSubsystem.linkPos)
                 intake.stopIntake()
             }
+        }
+
+        // Run Scheduler.
+        CommandScheduler.getInstance().run()
+        // Drive System
+        val strafe: Double = gpad1.gamepad.right_stick_x.pow(2) * sign(gpad1.gamepad.right_stick_x.toDouble())
+        val forward: Double = (gpad1.gamepad.right_stick_y.pow(2) * sign(gpad1.gamepad.right_stick_y.toDouble()))
+        val spin: Double = (gpad1.gamepad.left_stick_x.pow(2) * sign(gpad1.gamepad.left_stick_x.toDouble()) * 0.90)
+
+        // Precision Drive
+        val triggerVal: Double = getGamepad(keymap.precisionDriveMap.second).getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)
+        val minSlowdown: Double = if(triggerVal > 0.1) .4 else 1.0 // minimum speed is 20%
+        val speedMultiplier: Double = 1.0 - ((1.0 - minSlowdown))
+
+        drive.drive(
+            forward * speedMultiplier,
+            strafe * speedMultiplier,
+            spin * speedMultiplier
+        )
+
+        // BucketSenseSystem
+        val dist = bucketSense.colorSensorV3.getDistance(DistanceUnit.CM)
+        if(dist < 1) {
+            if (bucketSense.isYellow()) {
+                blinker.setColor(BlinkinSubsystem.PixelColor.PIXEL_YELLOW)
+            } else if(bucketSense.isWhite()) {
+                blinker.setColor(BlinkinSubsystem.PixelColor.PIXEL_WHITE)
+            } else if(bucketSense.isPurple()) {
+                blinker.setColor(BlinkinSubsystem.PixelColor.PIXEL_PURPLE);
+            } else if(bucketSense.isGreen()) {
+                blinker.setColor(BlinkinSubsystem.PixelColor.PIXEL_GREEN)
+            }
+        } else {
+            blinker.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK)
         }
 
         // Update Current Pos

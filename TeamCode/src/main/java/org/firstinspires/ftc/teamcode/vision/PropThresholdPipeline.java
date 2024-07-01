@@ -21,18 +21,18 @@ public class PropThresholdPipeline extends OpenCvPipeline {
     private static final boolean DEBUG = false;
     public static int redLeftX = (int) (350);
     public static int redLeftY = (int) (444);
-    public static int redCenterX = (int) (858);
+    public static int redCenterX = (int) (778);
     public static int redCenterY = (int) (409);
     public static int blueLeftX = (int) (48);
     public static int blueLeftY = (int) (453);
-    public static int blueCenterX = (int) (582);
+    public static int blueCenterX = (int) (700);
     public static int blueCenterY = (int) (418);
     public static int leftWidth = (int) (200);
     public static int leftHeight = (int) (100);
     public static int centerWidth = (int) (260);
     public static int centerHeight = (int) (150);
-    public static double BLUE_THRESHOLD = 55;
-    public static double RED_THRESHOLD = 100;
+    public static double BLUE_THRESHOLD = 120;
+    public static double RED_THRESHOLD = 150;
     public double leftColor = 0.0;
     public double centerColor = 0.0;
     public Scalar left = new Scalar(0, 0, 0);
@@ -45,6 +45,7 @@ public class PropThresholdPipeline extends OpenCvPipeline {
     }
 
     public PropThresholdPipeline(Telemetry telemetry) {
+
         this.telemetry = telemetry;
     }
 
@@ -52,7 +53,6 @@ public class PropThresholdPipeline extends OpenCvPipeline {
     public Mat processFrame(Mat input) {
         Rect leftZoneArea;
         Rect centerZoneArea;
-
 
 
         if (Auto.alliance == TrajectoryManager.Alliance.RED && Auto.distance == TrajectoryManager.Distance.LONG || Auto.alliance == TrajectoryManager.Alliance.BLUE && Auto.distance == TrajectoryManager.Distance.SHORT) {

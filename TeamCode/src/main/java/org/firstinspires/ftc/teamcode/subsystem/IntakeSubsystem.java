@@ -10,8 +10,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class IntakeSubsystem extends SubsystemBase {
 
-    private final DcMotor intakeMotor;
-    private final CRServo bucketServo;
+    public final DcMotor intakeMotor;
+    public final CRServo bucketServo;
 
     public IntakeSubsystem(HardwareMap hw) {
         this.intakeMotor = hw.get(DcMotorEx.class, "IntakeMotor");
@@ -25,7 +25,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void spikePixel() {
-        intakeMotor.setPower(-0.3);
+        intakeMotor.setPower(-0.2);
     }
 
     public void dispenseIntake() {
@@ -35,12 +35,17 @@ public class IntakeSubsystem extends SubsystemBase {
         bucketServo.setPower(-1);
     }
 
+    public void escapePenalty() {
+        intakeMotor.setPower(-0.4);
+    }
+
     public void stopIntake() {
         intakeMotor.setPower(0);
         bucketServo.setPower(0);
     }
+
     public void specialDispenseJustForAutoPixelDispenseThing(){
-        bucketServo.setPower(-1);
+        bucketServo.setPower(-0.25);
     }
 
 }

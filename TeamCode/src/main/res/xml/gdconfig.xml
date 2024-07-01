@@ -9,7 +9,7 @@
             <Servo name="LDipper" port="3" />
             <Servo name="LBPivot" port="0" />
             <Servo name="LinkTake" port="4" />
-            <ContinuousRotationServo name="Bucket" port="5" />
+            <ContinuousRotationServo name="Bucket" port="1" />
             <LynxEmbeddedIMU name="imu" port="0" bus="0" />
         </LynxModule>
     </LynxUsbDevice>
@@ -19,6 +19,8 @@
             <goBILDA5202SeriesMotor name="LeftArmMotor" port="0" />
             <goBILDA5202SeriesMotor name="IntakeMotor" port="1" />
             <goBILDA5202SeriesMotor name="RightArmMotor" port="2" />
+            <RevBlinkinLedDriver name="blinker" port="5" />
+            <RevColorSensorV3 name="bucketsense" port="0" bus="0" />
             <Servo name="RDipper" port="0" />
             <Servo name="RBPivot" port="2" />
             <Servo name="Plane" port="4" />

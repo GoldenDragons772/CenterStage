@@ -36,7 +36,7 @@ class TrajectoryManager {
                     name(Alliance.BLUE, Distance.LONG, PropThresholdPipeline.propPos.RIGHT) to Pose2d(-44.0, 18.0, Math.toRadians(90.0)),
                     name(Alliance.RED, Distance.SHORT, PropThresholdPipeline.propPos.LEFT) to Pose2d(10.0, -37.0, Math.toRadians(155.0)),
                     name(Alliance.RED, Distance.SHORT, PropThresholdPipeline.propPos.CENTER) to Pose2d(21.0, -24.0, Math.toRadians(180.0)),
-                    name(Alliance.RED, Distance.SHORT, PropThresholdPipeline.propPos.RIGHT) to Pose2d(23.0, -39.0, Math.toRadians(90.0)),
+                    name(Alliance.RED, Distance.SHORT, PropThresholdPipeline.propPos.RIGHT) to Pose2d(23.0, -39.0, Math.toRadians(85.0)),
                     name(Alliance.RED, Distance.LONG, PropThresholdPipeline.propPos.LEFT) to Pose2d(-44.0, -18.0, Math.toRadians(270.0)),
                     name(Alliance.RED, Distance.LONG, PropThresholdPipeline.propPos.CENTER) to Pose2d(-42.0, -25.0, Math.toRadians(0.0)),
                     name(Alliance.RED, Distance.LONG, PropThresholdPipeline.propPos.RIGHT) to Pose2d(-32.0, -37.0, Math.toRadians(30.0))
@@ -58,8 +58,6 @@ class TrajectoryManager {
     }
 
     enum class Type {
-        SPIKE, FOLLOW, BACKBOARD, CARRIER, PARK
+        SPIKE, STACK, FOLLOW, BACKBOARD, CARRIER, PARK
     }
-
-
 }

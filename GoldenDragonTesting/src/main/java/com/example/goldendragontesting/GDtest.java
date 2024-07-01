@@ -39,6 +39,9 @@ public class GDtest {
                             System.out.println("Run ArmSequence");
                         })
                         .splineToConstantHeading(new Vector2d(47, -35), Math.toRadians(270))
+                        .lineToConstantHeading(new Vector2d(52, -15))
+                        .lineToConstantHeading(new Vector2d(10, -10))
+                                .lineToLinearHeading(new Pose2d(-60, -11, Math.toRadians(185)))
                         //
 //                        .lineToConstantHeading(new Vector2d(10, -10))
 //                        .splineToConstantHeading(new Vector2d(47, -35), Math.toRadians(270))

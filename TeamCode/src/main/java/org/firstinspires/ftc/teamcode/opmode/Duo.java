@@ -29,7 +29,7 @@ public class Duo extends CommandOpMode {
                 new Pair<>(GamepadKeys.Button.X, 2),            // Decrement LinkTakePos,
                 new Pair<>(GamepadKeys.Button.Y, 1),           // Shoot Drone,
                 new Pair<>(GamepadKeys.Button.A, 1),            // Shoot Drone,
-                new Pair<>(null, 1) // Run LinkTake
+                new Pair<>(null, 2) // Run LinkTake
         );
         driveManager = new DriveManager(hardwareMap, keymap, gamepad1, gamepad2);
     }

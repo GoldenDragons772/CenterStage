@@ -23,6 +23,7 @@ public class ArmMotorSubsystem implements Subsystem {
         HANG(100),
         SET1(550),
         LOW(700),
+        BONUS(850),
         MIDDLE(1000),
         HIGH(1300),
         HIGHER(1600),
@@ -165,9 +166,10 @@ public class ArmMotorSubsystem implements Subsystem {
         }
     }
 
-  public int getAvgArmPosition() {
+    public int getAvgArmPosition() {
         return (leftArmMotor.getCurrentPosition() + rightArmMotor.getCurrentPosition()) / 2;
     }
+
     public ArmPos getArmPos(){
         return armPos;
     }

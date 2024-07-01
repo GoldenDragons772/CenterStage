@@ -12,6 +12,7 @@ public class LinkTakeSubsystem extends SubsystemBase {
 
     public enum LinkPosition {
         HOME(0.3),
+        STK0(0.43),
         STK1(0.56),
         STK2(0.6),
         STK3(0.7),
@@ -41,7 +42,7 @@ public class LinkTakeSubsystem extends SubsystemBase {
         linkTake.setDirection(Servo.Direction.REVERSE);
 
         // Set the Positions
-        linkTake.setPosition(servoLinkHomePos);
+        linkTake.setPosition(0.3);
     }
 
     public void setLinkTakePos(LinkPosition pos) {

@@ -15,7 +15,7 @@
 apply from: '../build.common.gradle'
 apply from: '../build.dependencies.gradle'
 apply plugin: 'org.jetbrains.kotlin.android'
-//apply plugin: 'org.team11260.fast-load-plugin'
+apply plugin: 'org.team11260.fast-load-plugin'
 
 buildscript {
     repositories {
@@ -23,18 +23,20 @@ buildscript {
         maven { url = 'https://jitpack.io' }
 
 
-//        maven {
-//            url = 'https://www.matthewo.tech/maven/'
-//        }
-    }}
-//    dependencies {
-//        classpath 'org.team11260:fast-load-plugin:0.1.1'
-//    }}
+        maven {
+            url = 'https://www.matthewo.tech/maven/'
+        }
+    }
+    dependencies {
+        classpath 'org.team11260:fast-load-plugin:0.1.2'
+    }
+}
+
 
 repositories {
-//    maven {
-//        url = 'https://www.matthewo.tech/maven/'
-//    }
+    maven {
+        url = 'https://www.matthewo.tech/maven/'
+    }
     maven { url = 'https://jitpack.io' }
 }
 
@@ -76,22 +78,11 @@ dependencies {
     //noinspection GradleDependency
     implementation 'androidx.core:core-ktx:1.6.0'
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
-
     implementation 'org.apache.commons:commons-math3:3.6.1'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7'
-
-//    implementation 'org.openftc:easyopencv:1.7.0'
+    implementation 'org.openftc:easyopencv:1.7.2'
     implementation 'com.acmerobotics.roadrunner:core:0.5.6'
-
     implementation 'com.acmerobotics.dashboard:dashboard:0.4.14'
-
-//    implementation 'org.team11260:fast-load:0.1.1'
-
+    implementation 'org.team11260:fast-load:0.1.2'
     implementation 'org.ftclib.ftclib:core:2.1.1'
-
-//    implementation project(path: ':opencv')
-
-    // Vision
-    //implementation 'org.bytedeco:depthai-platform:2.21.2-1.5.9'
-    //implementation 'org.bytedeco:opencv-platform:4.7.0-1.5.9'
 }
